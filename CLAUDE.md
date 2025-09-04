@@ -5,7 +5,12 @@ This is the CHDS (Center for Homeland Defense and Security) Seating Charter appl
 
 ## 🚀 Current Status (September 2025)
 
-### ✅ APPLICATION COMPLETE! All 13 Issues Implemented
+### ✅ APPLICATION COMPLETE & DEPLOYED TO PRODUCTION!
+
+**Live Production URL**: https://sc.domt.app  
+**Development URL**: https://sc.dev.domt.app
+
+### All 13 Issues Implemented
 
 #### Completed Features:
 - ✅ **Phase 1-2**: Rails 8 setup with PostgreSQL and GPT-5 Integration
@@ -205,14 +210,34 @@ The following can be started immediately:
 2. Natural language parsing (Issue #7) - Service exists, needs UI
 3. Optimization algorithm (Issue #8) - Core business logic
 
+## 🌐 Production Deployment
+
+### Live URLs
+- **Production**: https://sc.domt.app
+- **Development**: https://sc.dev.domt.app
+- **GitHub**: https://github.com/jeremedia/seating-charter
+
+### Infrastructure
+- **Production Server**: jer-serve (100.74.87.20)
+- **Port**: 3200
+- **Database**: PostgreSQL (seating_charter_production)
+- **Service**: systemd (seating-charter.service)
+- **CI/CD**: GitHub Actions (auto-deploy on push to main)
+- **DNS**: Google Cloud DNS → Caddy proxy → Tailscale
+
+### Deployment
+- Pushing to `main` branch automatically deploys via GitHub Actions
+- Service managed by systemd on production server
+- Environment variables in `/home/jeremy/apps/seating-charter/.env`
+
 ## 📞 Contact & Context
 
 - **Client**: CHDS at Naval Postgraduate School
 - **Purpose**: Optimize diversity in emergency management training
 - **Users**: 5 instructors max
 - **Scale**: 40 students max per cohort
-- **Timeline**: 8-week implementation (5 weeks remaining)
+- **Status**: ✅ COMPLETE - Deployed to Production!
 
 ---
 
-*Last Updated: September 2025 - GPT-5 Successfully Integrated!*
+*Last Updated: September 2025 - Application Complete & Deployed to Production!*
