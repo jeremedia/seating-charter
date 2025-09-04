@@ -2,6 +2,12 @@ require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
+  
+  # Allow requests from sc.dev.domt.app
+  config.hosts << "sc.dev.domt.app"
+  config.hosts << "localhost"
+  config.hosts << "127.0.0.1"
+  config.hosts << /.*\.domt\.app/
 
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
