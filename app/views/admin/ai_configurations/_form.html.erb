@@ -1,0 +1,133 @@
+<%= form_with(model: [:admin, @ai_configuration], local: true, class: "space-y-6") do |form| %>
+  <% if @ai_configuration.errors.any? %>
+    <div class="rounded-md bg-red-50 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">
+            <%= pluralize(@ai_configuration.errors.count, "error") %> prohibited this configuration from being saved:
+          </h3>
+          <div class="mt-2 text-sm text-red-700">
+            <ul role="list" class="list-disc list-inside">
+              <% @ai_configuration.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+      <div class="md:col-span-1">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Model Configuration</h3>
+        <p class="mt-1 text-sm text-gray-500">Basic settings for the AI model.</p>
+      </div>
+      <div class="mt-5 space-y-6 md:mt-0 md:col-span-2">
+        <div>
+          <%= form.label :ai_model_name, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.select :ai_model_name, 
+                options_for_select(AiConfiguration.available_models.map { |model| [model, model] }, @ai_configuration.ai_model_name),
+                { prompt: 'Select a model' },
+                { class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" } %>
+        </div>
+
+        <div>
+          <%= form.label :api_endpoint, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.text_field :api_endpoint, 
+              placeholder: "https://api.openai.com/v1/chat/completions",
+              class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+          <p class="mt-1 text-sm text-gray-500">Optional: Leave blank to use OpenAI's default endpoint.</p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <%= form.label :temperature, class: "block text-sm font-medium text-gray-700" %>
+            <%= form.number_field :temperature, 
+                step: 0.1, min: 0, max: 2,
+                class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+            <p class="mt-1 text-sm text-gray-500">0.0 = deterministic, 2.0 = very creative</p>
+          </div>
+
+          <div>
+            <%= form.label :max_tokens, class: "block text-sm font-medium text-gray-700" %>
+            <%= form.number_field :max_tokens, 
+                min: 1, max: 4096,
+                class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+            <p class="mt-1 text-sm text-gray-500">Maximum response length</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+      <div class="md:col-span-1">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Processing Configuration</h3>
+        <p class="mt-1 text-sm text-gray-500">Settings for batch processing and error handling.</p>
+      </div>
+      <div class="mt-5 space-y-6 md:mt-0 md:col-span-2">
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <%= form.label :batch_size, class: "block text-sm font-medium text-gray-700" %>
+            <%= form.number_field :batch_size, 
+                min: 1, max: 20,
+                class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+            <p class="mt-1 text-sm text-gray-500">Items per batch for roster processing</p>
+          </div>
+
+          <div>
+            <%= form.label :retry_attempts, class: "block text-sm font-medium text-gray-700" %>
+            <%= form.number_field :retry_attempts, 
+                min: 1, max: 10,
+                class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+            <p class="mt-1 text-sm text-gray-500">Number of retries on rate limits</p>
+          </div>
+        </div>
+
+        <div>
+          <%= form.label :cost_per_token, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.number_field :cost_per_token, 
+              step: 0.000001, min: 0,
+              class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+          <p class="mt-1 text-sm text-gray-500">Cost per token in USD (e.g., 0.00003 for GPT-4o-mini)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+      <div class="md:col-span-1">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Activation</h3>
+        <p class="mt-1 text-sm text-gray-500">Only one configuration can be active at a time.</p>
+      </div>
+      <div class="mt-5 md:mt-0 md:col-span-2">
+        <div class="relative flex items-start">
+          <div class="flex items-center h-5">
+            <%= form.check_box :active, 
+                class: "focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" %>
+          </div>
+          <div class="ml-3 text-sm">
+            <%= form.label :active, "Make this the active configuration", class: "font-medium text-gray-700" %>
+            <p class="text-gray-500">This will deactivate any other active configuration.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end">
+    <%= link_to 'Cancel', admin_ai_configurations_path, 
+        class: "bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+    <%= form.submit (@ai_configuration.new_record? ? 'Create Configuration' : 'Update Configuration'), 
+        class: "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+  </div>
+<% end %>

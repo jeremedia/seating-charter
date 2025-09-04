@@ -21,7 +21,12 @@ Rails.application.routes.draw do
   
   # Admin routes (for AI configuration and custom attributes)
   namespace :admin do
-    resources :ai_configurations
+    resources :ai_configurations do
+      member do
+        patch :activate
+        patch :test
+      end
+    end
     resources :custom_attributes
     resources :cost_trackings, only: [:index, :show]
     resources :users, only: [:index, :show, :edit, :update, :destroy]

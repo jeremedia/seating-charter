@@ -1,0 +1,53 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div>
+      <nav class="flex" aria-label="Breadcrumb">
+        <ol role="list" class="flex items-center space-x-4">
+          <li>
+            <div>
+              <%= link_to admin_ai_configurations_path, class: "text-gray-400 hover:text-gray-500" do %>
+                <svg class="flex-shrink-0 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L9 5.414V17a1 1 0 102 0V5.414l5.293 5.293a1 1 0 001.414-1.414l-7-7z"></path>
+                </svg>
+                <span class="sr-only">Home</span>
+              <% end %>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <%= link_to "AI Configurations", admin_ai_configurations_path, class: "ml-4 text-sm font-medium text-gray-500 hover:text-gray-700" %>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span class="ml-4 text-sm font-medium text-gray-500">New Configuration</span>
+            </div>
+          </li>
+        </ol>
+      </nav>
+    </div>
+
+    <div class="mt-8">
+      <div class="md:grid md:grid-cols-3 md:gap-6">
+        <div class="md:col-span-1">
+          <div class="px-4 sm:px-0">
+            <h1 class="text-2xl font-semibold text-gray-900">New AI Configuration</h1>
+            <p class="mt-1 text-sm text-gray-600">
+              Create a new OpenAI model configuration. You can set one configuration as active to use it for all AI operations.
+            </p>
+          </div>
+        </div>
+        
+        <div class="mt-5 md:mt-0 md:col-span-2">
+          <%= render 'form', ai_configuration: @ai_configuration %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

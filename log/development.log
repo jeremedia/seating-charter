@@ -728,3 +728,325 @@ FOREIGN KEY ("user_id")
   [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
   [1m[36mSeatingEvent Create (0.6ms)[0m  [1m[32mINSERT INTO "seating_events" ("cohort_id", "name", "event_type", "event_date", "table_size", "total_tables", "created_at", "updated_at") VALUES (1, 'Day 1 - Opening Session', 0, '2025-01-13', 4, 7, '2025-09-04 18:11:42.004841', '2025-09-04 18:11:42.004841') RETURNING "id" /*application='SeatingCharter'*/[0m
   [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mUser Load (0.6ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'test@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (1.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mUser Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "users" WHERE "users"."email" = 'test@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mUser Create (0.4ms)[0m  [1m[32mINSERT INTO "users" ("email", "encrypted_password", "reset_password_token", "reset_password_sent_at", "remember_created_at", "role", "first_name", "last_name", "created_at", "updated_at") VALUES ('test@chds.edu', '$2a$12$/cQo4TYU7MRS9anq5QXB6erUdbF7jsqvEcBPlkeq12iZtHEOR7qAW', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-04 18:23:24.631326', '2025-09-04 18:23:24.631326') RETURNING "id" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (1.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Load (0.4ms)[0m  [1m[34mSELECT "ai_configurations".* FROM "ai_configurations" WHERE "ai_configurations"."ai_model_name" = 'gpt-4o-mini' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "ai_configurations" WHERE "ai_configurations"."active" = TRUE AND "ai_configurations"."id" IS NOT NULL LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ app/models/ai_configuration.rb:47:in 'AiConfiguration#only_one_active_configuration'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mCohort Load (0.4ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."name" = 'Test Cohort 2024' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:43:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:43:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:43:in 'block (2 levels) in <main>'
+  [1m[36mStudent Load (0.6ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'John Smith' AND "students"."cohort_id" IS NULL LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:69:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:69:in 'block (3 levels) in <main>'
+  [1m[36mStudent Create (0.6ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('John Smith', 'Supervisory Special Agent', 'FBI', 'Washington, DC', NULL, NULL, NULL, NULL, '2025-09-04 18:23:24.721036', '2025-09-04 18:23:24.721036') RETURNING "id" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:69:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[31mROLLBACK /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:69:in 'block (3 levels) in <main>'
+  [1m[36mCohort Load (0.8ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."name" = 'Test Cohort 2024' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:150:in 'block (2 levels) in <main>'
+  [1m[36mUser Load (0.9ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'test@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:156:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:158:in 'block (2 levels) in <main>'
+  [1m[36mCohort Load (0.3ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."user_id" = 3 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:158:in 'block (2 levels) in <main>'
+  [1m[36mImportSession Load (1.8ms)[0m  [1m[34mSELECT "import_sessions".* FROM "import_sessions" WHERE "import_sessions"."user_id" = 3 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:158:in 'block (2 levels) in <main>'
+  [1m[36mInferenceFeedback Load (1.5ms)[0m  [1m[34mSELECT "inference_feedbacks".* FROM "inference_feedbacks" WHERE "inference_feedbacks"."user_id" = 3 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:158:in 'block (2 levels) in <main>'
+  [1m[36mCostTracking Load (0.8ms)[0m  [1m[34mSELECT "cost_trackings".* FROM "cost_trackings" WHERE "cost_trackings"."user_id" = 3 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:158:in 'block (2 levels) in <main>'
+  [1m[36mSeatingArrangement Load (0.7ms)[0m  [1m[34mSELECT "seating_arrangements".* FROM "seating_arrangements" WHERE "seating_arrangements"."created_by_id" = 3 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:158:in 'block (2 levels) in <main>'
+  [1m[36mUser Destroy (0.9ms)[0m  [1m[31mDELETE FROM "users" WHERE "users"."id" = 3 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:158:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:158:in 'block (2 levels) in <main>'
+  [1m[36mUser Load (1.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'test@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (1.9ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mUser Exists? (0.5ms)[0m  [1m[34mSELECT 1 AS one FROM "users" WHERE "users"."email" = 'test@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mUser Create (0.7ms)[0m  [1m[32mINSERT INTO "users" ("email", "encrypted_password", "reset_password_token", "reset_password_sent_at", "remember_created_at", "role", "first_name", "last_name", "created_at", "updated_at") VALUES ('test@chds.edu', '$2a$12$CNlCFfndMLSwVfuuljEPXe3eYEe8c3aBXWaYF5rYxmg0s7HzLdsgq', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-04 18:23:43.318902', '2025-09-04 18:23:43.318902') RETURNING "id" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (1.3ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Load (0.4ms)[0m  [1m[34mSELECT "ai_configurations".* FROM "ai_configurations" WHERE "ai_configurations"."ai_model_name" = 'gpt-4o-mini' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Exists? (0.9ms)[0m  [1m[34mSELECT 1 AS one FROM "ai_configurations" WHERE "ai_configurations"."active" = TRUE AND "ai_configurations"."id" IS NOT NULL LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ app/models/ai_configuration.rb:47:in 'AiConfiguration#only_one_active_configuration'
+  [1m[36mTRANSACTION (0.9ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mCohort Load (0.5ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."name" = 'Test Cohort 2024' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:43:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:43:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:43:in 'block (2 levels) in <main>'
+  [1m[36mStudent Load (2.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'John Smith' AND "students"."cohort_id" IS NULL LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:69:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:69:in 'block (3 levels) in <main>'
+  [1m[36mStudent Create (3.0ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('John Smith', 'Supervisory Special Agent', 'FBI', 'Washington, DC', NULL, NULL, NULL, NULL, '2025-09-04 18:23:43.473678', '2025-09-04 18:23:43.473678') RETURNING "id" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:69:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.7ms)[0m  [1m[31mROLLBACK /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:69:in 'block (3 levels) in <main>'
+  [1m[36mCohort Load (0.6ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."name" = 'Test Cohort 2024' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:154:in 'block (2 levels) in <main>'
+  [1m[36mUser Load (0.5ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'test@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:160:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mCohort Load (0.2ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."user_id" = 4 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mImportSession Load (0.5ms)[0m  [1m[34mSELECT "import_sessions".* FROM "import_sessions" WHERE "import_sessions"."user_id" = 4 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mInferenceFeedback Load (0.4ms)[0m  [1m[34mSELECT "inference_feedbacks".* FROM "inference_feedbacks" WHERE "inference_feedbacks"."user_id" = 4 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mCostTracking Load (0.5ms)[0m  [1m[34mSELECT "cost_trackings".* FROM "cost_trackings" WHERE "cost_trackings"."user_id" = 4 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mSeatingArrangement Load (0.4ms)[0m  [1m[34mSELECT "seating_arrangements".* FROM "seating_arrangements" WHERE "seating_arrangements"."created_by_id" = 4 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mUser Destroy (0.6ms)[0m  [1m[31mDELETE FROM "users" WHERE "users"."id" = 4 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mUser Load (0.8ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'test@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (1.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mUser Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "users" WHERE "users"."email" = 'test@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mUser Create (0.4ms)[0m  [1m[32mINSERT INTO "users" ("email", "encrypted_password", "reset_password_token", "reset_password_sent_at", "remember_created_at", "role", "first_name", "last_name", "created_at", "updated_at") VALUES ('test@chds.edu', '$2a$12$Acxm73m7PhkwnKvfYdN2eeRVq0swi3yNrbJ/2a0FSSdQYZ.6C1haO', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-04 18:23:58.087329', '2025-09-04 18:23:58.087329') RETURNING "id" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Load (0.3ms)[0m  [1m[34mSELECT "ai_configurations".* FROM "ai_configurations" WHERE "ai_configurations"."ai_model_name" = 'gpt-4o-mini' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "ai_configurations" WHERE "ai_configurations"."active" = TRUE AND "ai_configurations"."id" IS NOT NULL LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ app/models/ai_configuration.rb:47:in 'AiConfiguration#only_one_active_configuration'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mCohort Load (0.4ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."name" = 'Test Cohort 2024' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:43:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:43:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:43:in 'block (2 levels) in <main>'
+  [1m[36mStudent Load (0.5ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'John Smith' AND "students"."cohort_id" IS NULL LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:69:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:71:in 'block (3 levels) in <main>'
+  [1m[36mStudent Create (1.3ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('John Smith', 'Supervisory Special Agent', 'FBI', 'Washington, DC', NULL, NULL, NULL, NULL, '2025-09-04 18:23:58.194784', '2025-09-04 18:23:58.194784') RETURNING "id" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:71:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[31mROLLBACK /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:71:in 'block (3 levels) in <main>'
+  [1m[36mCohort Load (0.5ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."name" = 'Test Cohort 2024' LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (1.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.5ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('John Test', 'Test Title', 'Test Org', 'Test Location', NULL, NULL, NULL, NULL, '2025-09-04 18:24:10.294166', '2025-09-04 18:24:10.294166') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[31mROLLBACK /*application='SeatingCharter'*/[0m
+  [1m[36mCohort Count (52.7ms)[0m  [1m[34mSELECT COUNT(*) FROM "cohorts" /*application='SeatingCharter'*/[0m
+  [1m[36mCohort Load (1.8ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" ORDER BY "cohorts"."id" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mCohort Load (0.6ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" ORDER BY "cohorts"."id" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mCohort Load (4.0ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (0.5ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('John Test', 'Test Title', 'Test Org', 'Test Location', 1, NULL, NULL, NULL, '2025-09-04 18:24:26.113760', '2025-09-04 18:24:26.113760') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mCohort Load (0.9ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."name" = 'Test Cohort 2024' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:154:in 'block (2 levels) in <main>'
+  [1m[36mUser Load (0.6ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'test@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:160:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mCohort Load (0.2ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."user_id" = 5 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mImportSession Load (0.4ms)[0m  [1m[34mSELECT "import_sessions".* FROM "import_sessions" WHERE "import_sessions"."user_id" = 5 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mInferenceFeedback Load (0.4ms)[0m  [1m[34mSELECT "inference_feedbacks".* FROM "inference_feedbacks" WHERE "inference_feedbacks"."user_id" = 5 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mCostTracking Load (0.3ms)[0m  [1m[34mSELECT "cost_trackings".* FROM "cost_trackings" WHERE "cost_trackings"."user_id" = 5 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mSeatingArrangement Load (0.4ms)[0m  [1m[34mSELECT "seating_arrangements".* FROM "seating_arrangements" WHERE "seating_arrangements"."created_by_id" = 5 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mUser Destroy (0.7ms)[0m  [1m[31mDELETE FROM "users" WHERE "users"."id" = 5 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:162:in 'block (2 levels) in <main>'
+  [1m[36mUser Load (0.7ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'test@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (1.0ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mUser Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "users" WHERE "users"."email" = 'test@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mUser Create (0.3ms)[0m  [1m[32mINSERT INTO "users" ("email", "encrypted_password", "reset_password_token", "reset_password_sent_at", "remember_created_at", "role", "first_name", "last_name", "created_at", "updated_at") VALUES ('test@chds.edu', '$2a$12$aa0AkTlslWIAMEzuXkTUEeNQMCU7HHgpDvmf.mRN.7bFcUsTIwBXK', NULL, NULL, NULL, 0, NULL, NULL, '2025-09-04 18:24:43.612648', '2025-09-04 18:24:43.612648') RETURNING "id" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Load (0.4ms)[0m  [1m[34mSELECT "ai_configurations".* FROM "ai_configurations" WHERE "ai_configurations"."ai_model_name" = 'gpt-4o-mini' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "ai_configurations" WHERE "ai_configurations"."active" = TRUE AND "ai_configurations"."id" IS NOT NULL LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ app/models/ai_configuration.rb:47:in 'AiConfiguration#only_one_active_configuration'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mCohort Load (0.3ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."name" = 'Test Cohort 2024' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:43:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:43:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:43:in 'block (2 levels) in <main>'
+  [1m[36mStudent Load (0.5ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'John Smith' AND "students"."cohort_id" IS NULL LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:69:in 'block (3 levels) in <main>'
+  [1m[36mUser Load (0.8ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'test@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Load (0.8ms)[0m  [1m[34mSELECT "ai_configurations".* FROM "ai_configurations" WHERE "ai_configurations"."ai_model_name" = 'gpt-4o-mini' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "ai_configurations" WHERE "ai_configurations"."active" = TRUE AND "ai_configurations"."id" IS NOT NULL LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ app/models/ai_configuration.rb:47:in 'AiConfiguration#only_one_active_configuration'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mCohort Load (0.5ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" ORDER BY "cohorts"."id" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:43:in 'block (2 levels) in <main>'
+  [1m[36mStudent Load (0.6ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'John Smith' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:75:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:77:in 'block (3 levels) in <main>'
+  [1m[36mCohort Load (1.1ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:77:in 'block (3 levels) in <main>'
+  [1m[36mStudent Create (0.6ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('John Smith', 'Supervisory Special Agent', 'FBI', 'Washington, DC', 1, NULL, NULL, NULL, '2025-09-04 18:25:03.632671', '2025-09-04 18:25:03.632671') RETURNING "id" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:77:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:77:in 'block (3 levels) in <main>'
+  [1m[36mStudent Load (0.3ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Sarah Johnson' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:75:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:77:in 'block (3 levels) in <main>'
+  [1m[36mCohort Load (1.7ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:77:in 'block (3 levels) in <main>'
+  [1m[36mStudent Create (0.3ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Sarah Johnson', 'Captain', 'U.S. Army', 'Fort Bragg, NC', 1, NULL, NULL, NULL, '2025-09-04 18:25:03.640435', '2025-09-04 18:25:03.640435') RETURNING "id" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:77:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:77:in 'block (3 levels) in <main>'
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Michael Davis' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:75:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:77:in 'block (3 levels) in <main>'
+  [1m[36mCohort Load (1.1ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:77:in 'block (3 levels) in <main>'
+  [1m[36mStudent Create (0.2ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Michael Davis', 'Emergency Management Director', 'City of Phoenix', 'Phoenix, AZ', 1, NULL, NULL, NULL, '2025-09-04 18:25:03.649214', '2025-09-04 18:25:03.649214') RETURNING "id" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:77:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:77:in 'block (3 levels) in <main>'
+  [1m[36mStudent Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "students" WHERE "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:93:in 'block (2 levels) in <main>'
+  [1m[36mStudent Load (3.4ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."cohort_id" = 1 LIMIT 3 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:111:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:119:in 'block (3 levels) in <main>'
+  [1m[36mStudent Update (6.1ms)[0m  [1m[33mUPDATE "students" SET "inferences" = '{"gender":{"value":"male","confidence":0.9},"agency_level":{"value":"military","confidence":0.85},"department_type":{"value":"military","confidence":0.98},"seniority_level":{"value":"mid","confidence":0.75}}', "updated_at" = '2025-09-04 18:25:03.668469' WHERE "students"."id" = 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:119:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:119:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:119:in 'block (3 levels) in <main>'
+  [1m[36mStudent Update (0.9ms)[0m  [1m[33mUPDATE "students" SET "inferences" = '{"gender":{"value":"male","confidence":0.9},"agency_level":{"value":"federal","confidence":0.85},"department_type":{"value":"law_enforcement","confidence":0.95},"seniority_level":{"value":"mid","confidence":0.8}}', "updated_at" = '2025-09-04 18:25:03.695002' WHERE "students"."id" = 2 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:119:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:119:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:119:in 'block (3 levels) in <main>'
+  [1m[36mStudent Update (0.8ms)[0m  [1m[33mUPDATE "students" SET "inferences" = '{"gender":{"value":"unknown","confidence":0.3},"agency_level":{"value":"unknown","confidence":0.3},"department_type":{"value":"security","confidence":0.92},"seniority_level":{"value":"senior","confidence":0.85}}', "updated_at" = '2025-09-04 18:25:03.700263' WHERE "students"."id" = 3 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:119:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:119:in 'block (3 levels) in <main>'
+  [1m[36mCostTracking Sum (1.5ms)[0m  [1m[34mSELECT SUM("cost_trackings"."cost_estimate") FROM "cost_trackings" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:131:in 'block (2 levels) in <main>'
+  [1m[36mCostTracking Count (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "cost_trackings" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:132:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Count (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "ai_configurations" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:141:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Count (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "ai_configurations" WHERE "ai_configurations"."active" = TRUE /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:141:in 'block (2 levels) in <main>'
+  [1m[36mStudent Count (0.3ms)[0m  [1m[34mSELECT COUNT(*) FROM "students" WHERE "students"."cohort_id" = 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:143:in 'block (2 levels) in <main>'
+  [1m[36mCostTracking Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "cost_trackings" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:144:in 'block (2 levels) in <main>'
+Started GET "/admin/ai_configurations" for ::1 at 2025-09-04 11:25:09 -0700
+  [1m[36mActiveRecord::SchemaMigration Load (0.9ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+Processing by Admin::AiConfigurationsController#index as */*
+Completed 401 Unauthorized in 104ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 14.2ms)
+
+
+  [1m[36mCohort Load (0.6ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" ORDER BY "cohorts"."id" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.5ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."cohort_id" = 1 LIMIT 3 /*application='SeatingCharter'*/[0m
+  [1m[36mCohort Load (0.5ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" ORDER BY "cohorts"."id" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.4ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."cohort_id" = 1 LIMIT 3 /*application='SeatingCharter'*/[0m
+  [1m[36mUser Load (0.8ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'test@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:9:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Load (0.3ms)[0m  [1m[34mSELECT "ai_configurations".* FROM "ai_configurations" WHERE "ai_configurations"."ai_model_name" = 'gpt-4o-mini' LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "ai_configurations" WHERE "ai_configurations"."active" = TRUE AND "ai_configurations"."id" IS NOT NULL LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ app/models/ai_configuration.rb:47:in 'AiConfiguration#only_one_active_configuration'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:17:in 'block (2 levels) in <main>'
+  [1m[36mCohort Load (0.6ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" ORDER BY "cohorts"."id" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:43:in 'block (2 levels) in <main>'
+  [1m[36mStudent Load (0.6ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'John Smith' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:75:in 'block (3 levels) in <main>'
+  [1m[36mStudent Load (0.3ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Sarah Johnson' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:75:in 'block (3 levels) in <main>'
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Michael Davis' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:75:in 'block (3 levels) in <main>'
+  [1m[36mStudent Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "students" WHERE "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:93:in 'block (2 levels) in <main>'
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."cohort_id" = 1 LIMIT 3 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:111:in 'block (2 levels) in <main>'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:119:in 'block (3 levels) in <main>'
+  [1m[36mStudent Update (1.4ms)[0m  [1m[33mUPDATE "students" SET "inferences" = '{"gender":{"value":"female","confidence":0.9},"agency_level":{"value":"unknown","confidence":0.3},"department_type":{"value":"emergency_management","confidence":0.98},"seniority_level":{"value":"executive","confidence":0.9}}', "updated_at" = '2025-09-04 18:26:15.490705' WHERE "students"."id" = 4 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:119:in 'block (3 levels) in <main>'
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:119:in 'block (3 levels) in <main>'
+  [1m[36mCostTracking Sum (0.3ms)[0m  [1m[34mSELECT SUM("cost_trackings"."cost_estimate") FROM "cost_trackings" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:131:in 'block (2 levels) in <main>'
+  [1m[36mCostTracking Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "cost_trackings" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:132:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "ai_configurations" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:141:in 'block (2 levels) in <main>'
+  [1m[36mAiConfiguration Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "ai_configurations" WHERE "ai_configurations"."active" = TRUE /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:141:in 'block (2 levels) in <main>'
+  [1m[36mStudent Count (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "students" WHERE "students"."cohort_id" = 1 /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:143:in 'block (2 levels) in <main>'
+  [1m[36mCostTracking Count (3.5ms)[0m  [1m[34mSELECT COUNT(*) FROM "cost_trackings" /*application='SeatingCharter'*/[0m
+  ↳ lib/tasks/phase2_test.rake:144:in 'block (2 levels) in <main>'

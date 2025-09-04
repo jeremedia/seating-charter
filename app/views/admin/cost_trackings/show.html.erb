@@ -1,0 +1,162 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div>
+      <nav class="flex" aria-label="Breadcrumb">
+        <ol role="list" class="flex items-center space-x-4">
+          <li>
+            <div>
+              <%= link_to admin_cost_trackings_path, class: "text-gray-400 hover:text-gray-500" do %>
+                <svg class="flex-shrink-0 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L9 5.414V17a1 1 0 102 0V5.414l5.293 5.293a1 1 0 001.414-1.414l-7-7z"></path>
+                </svg>
+                <span class="sr-only">Home</span>
+              <% end %>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <%= link_to "Cost Tracking", admin_cost_trackings_path, class: "ml-4 text-sm font-medium text-gray-500 hover:text-gray-700" %>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span class="ml-4 text-sm font-medium text-gray-500"><%= @cost_tracking.request_id %></span>
+            </div>
+          </li>
+        </ol>
+      </nav>
+    </div>
+
+    <div class="mt-8">
+      <h1 class="text-2xl font-semibold text-gray-900">Cost Tracking Record</h1>
+      <p class="mt-2 text-sm text-gray-700">Detailed information about this AI API request.</p>
+
+      <!-- Main Details -->
+      <div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">Request Details</h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">
+            API call made on <%= @cost_tracking.created_at.strftime('%B %d, %Y at %I:%M %p') %>
+          </p>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+          <dl class="sm:divide-y sm:divide-gray-200">
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Request ID</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <code class="bg-gray-100 px-2 py-1 rounded text-xs font-mono"><%= @cost_tracking.request_id %></code>
+              </dd>
+            </div>
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">User</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <%= @cost_tracking.user.email %>
+                <span class="text-gray-500">(ID: <%= @cost_tracking.user.id %>)</span>
+              </dd>
+            </div>
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">AI Model</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <%= @cost_tracking.ai_model_used %>
+                </span>
+              </dd>
+            </div>
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Purpose</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  <%= @cost_tracking.purpose.humanize %>
+                </span>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Token Usage -->
+      <div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">Token Usage</h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">Breakdown of input and output tokens consumed.</p>
+        </div>
+        <div class="border-t border-gray-200">
+          <div class="grid grid-cols-1 divide-y divide-gray-200 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
+            <div class="px-6 py-5 text-sm font-medium text-gray-500 text-center">
+              <span class="block text-2xl font-bold text-gray-900"><%= number_with_delimiter(@cost_tracking.input_tokens) %></span>
+              <span class="mt-1 block">Input Tokens</span>
+            </div>
+            <div class="px-6 py-5 text-sm font-medium text-gray-500 text-center">
+              <span class="block text-2xl font-bold text-gray-900"><%= number_with_delimiter(@cost_tracking.output_tokens) %></span>
+              <span class="mt-1 block">Output Tokens</span>
+            </div>
+            <div class="px-6 py-5 text-sm font-medium text-gray-500 text-center">
+              <span class="block text-2xl font-bold text-indigo-600"><%= number_with_delimiter(@cost_tracking.input_tokens + @cost_tracking.output_tokens) %></span>
+              <span class="mt-1 block">Total Tokens</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cost Analysis -->
+      <div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">Cost Analysis</h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">Estimated cost breakdown for this request.</p>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+          <dl class="sm:divide-y sm:divide-gray-200">
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Total Estimated Cost</dt>
+              <dd class="mt-1 text-xl font-bold text-green-600 sm:mt-0 sm:col-span-2">
+                $<%= '%.6f' % @cost_tracking.cost_estimate %>
+              </dd>
+            </div>
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Cost per Token</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                $<%= '%.8f' % (@cost_tracking.cost_estimate / (@cost_tracking.input_tokens + @cost_tracking.output_tokens)) %> 
+                <span class="text-gray-500">(average for this request)</span>
+              </dd>
+            </div>
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Efficiency</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <% efficiency_ratio = @cost_tracking.output_tokens.to_f / @cost_tracking.input_tokens.to_f %>
+                <% if efficiency_ratio > 0.5 %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    High efficiency (<%= '%.1f' % (efficiency_ratio * 100) %>% output/input ratio)
+                  </span>
+                <% elsif efficiency_ratio > 0.2 %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                    Medium efficiency (<%= '%.1f' % (efficiency_ratio * 100) %>% output/input ratio)
+                  </span>
+                <% else %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    Low efficiency (<%= '%.1f' % (efficiency_ratio * 100) %>% output/input ratio)
+                  </span>
+                <% end %>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="mt-8 flex justify-between">
+        <%= link_to 'Back to Cost Tracking', admin_cost_trackings_path, 
+            class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+        
+        <div class="text-sm text-gray-500">
+          Record created: <%= @cost_tracking.created_at.strftime('%B %d, %Y at %I:%M:%S %p') %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

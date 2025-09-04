@@ -1,0 +1,180 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div>
+      <nav class="flex" aria-label="Breadcrumb">
+        <ol role="list" class="flex items-center space-x-4">
+          <li>
+            <div>
+              <%= link_to admin_ai_configurations_path, class: "text-gray-400 hover:text-gray-500" do %>
+                <svg class="flex-shrink-0 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L9 5.414V17a1 1 0 102 0V5.414l5.293 5.293a1 1 0 001.414-1.414l-7-7z"></path>
+                </svg>
+                <span class="sr-only">Home</span>
+              <% end %>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <%= link_to "AI Configurations", admin_ai_configurations_path, class: "ml-4 text-sm font-medium text-gray-500 hover:text-gray-700" %>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span class="ml-4 text-sm font-medium text-gray-500"><%= @ai_configuration.ai_model_name %></span>
+            </div>
+          </li>
+        </ol>
+      </nav>
+    </div>
+
+    <div class="mt-8">
+      <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+          <h1 class="text-2xl font-semibold text-gray-900">
+            <%= @ai_configuration.ai_model_name %>
+            <% if @ai_configuration.active? %>
+              <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+            <% end %>
+          </h1>
+          <p class="mt-2 text-sm text-gray-700">Configuration details and testing interface.</p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none space-x-2">
+          <%= link_to 'Edit', edit_admin_ai_configuration_path(@ai_configuration), 
+              class: "inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+          <% unless @ai_configuration.active? %>
+            <%= link_to 'Activate', admin_ai_configuration_path(@ai_configuration, activate: true), 
+                method: :patch,
+                class: "inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500",
+                confirm: "Make this the active configuration?" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Configuration Details -->
+      <div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">Configuration Details</h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">Model settings and parameters.</p>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+          <dl class="sm:divide-y sm:divide-gray-200">
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Model Name</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @ai_configuration.ai_model_name %></dd>
+            </div>
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Status</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <% if @ai_configuration.active? %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+                <% else %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Inactive</span>
+                <% end %>
+              </dd>
+            </div>
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">API Endpoint</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <%= @ai_configuration.api_endpoint.present? ? @ai_configuration.api_endpoint : "Default (OpenAI)" %>
+              </dd>
+            </div>
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Temperature</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @ai_configuration.temperature %></dd>
+            </div>
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Max Tokens</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @ai_configuration.max_tokens %></dd>
+            </div>
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Batch Size</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @ai_configuration.batch_size %></dd>
+            </div>
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Retry Attempts</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @ai_configuration.retry_attempts %></dd>
+            </div>
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Cost per Token</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                $<%= @ai_configuration.cost_per_token %>
+                <span class="text-gray-500">(~$<%= @ai_configuration.estimated_cost_per_request %> per 1k tokens)</span>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Test Interface -->
+      <div class="mt-8 bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">Test Interface</h3>
+          <div class="mt-2 max-w-xl text-sm text-gray-500">
+            <p>Test this configuration with a sample prompt to verify it's working correctly.</p>
+          </div>
+          
+          <%= form_with url: admin_ai_configuration_path(@ai_configuration), method: :patch, local: true, class: "mt-5" do |form| %>
+            <%= hidden_field_tag :test, true %>
+            <div>
+              <%= label_tag :test_prompt, "Test Prompt", class: "block text-sm font-medium text-gray-700" %>
+              <%= text_area_tag :test_prompt, 
+                  params[:test_prompt] || "Please analyze the following student name and provide gender inference: 'John Smith'. Respond with just 'male', 'female', or 'unknown'.",
+                  rows: 3,
+                  class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+            </div>
+            <div class="mt-4">
+              <%= submit_tag "Run Test", 
+                  class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+            </div>
+          <% end %>
+
+          <% if @test_result %>
+            <div class="mt-6">
+              <h4 class="text-sm font-medium text-gray-900">Test Result:</h4>
+              <div class="mt-2 p-4 border rounded-md <%= @test_result[:success] ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200' %>">
+                <% if @test_result[:success] %>
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-green-800">Success!</h3>
+                      <div class="mt-2 text-sm text-green-700">
+                        <p><strong>Response:</strong> <%= @test_result[:response] %></p>
+                        <p class="mt-2"><strong>Model Used:</strong> <%= @test_result[:model_used] %></p>
+                        <p><strong>Timestamp:</strong> <%= @test_result[:timestamp] %></p>
+                      </div>
+                    </div>
+                  </div>
+                <% else %>
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-red-800">Test Failed</h3>
+                      <div class="mt-2 text-sm text-red-700">
+                        <p><strong>Error:</strong> <%= @test_result[:error] %></p>
+                        <p class="mt-2"><strong>Timestamp:</strong> <%= @test_result[:timestamp] %></p>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
