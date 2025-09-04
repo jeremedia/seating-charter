@@ -1,0 +1,48 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Deploy to jer-serve via SSH
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.PRODUCTION_HOST }}
+        username: ${{ secrets.PRODUCTION_USER }}
+        key: ${{ secrets.PRODUCTION_SSH_KEY }}
+        port: 22
+        script: |
+          cd /home/jeremy/apps/seating-charter
+          
+          # Pull latest changes
+          git pull origin main
+          
+          # Setup Ruby environment
+          export PATH="$HOME/.rbenv/bin:$PATH"
+          eval "$(rbenv init -)"
+          
+          # Install/update dependencies
+          bundle install --deployment --without development test
+          
+          # Run migrations
+          RAILS_ENV=production bundle exec rails db:migrate
+          
+          # Precompile assets
+          RAILS_ENV=production bundle exec rails assets:precompile
+          
+          # Restart the service
+          sudo systemctl restart seating-charter
+          
+          # Wait for service to start
+          sleep 5
+          
+          # Check service status
+          sudo systemctl status seating-charter --no-pager
+          
+          echo "✅ Deployment completed successfully!"
