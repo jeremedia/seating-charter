@@ -1050,3 +1050,55 @@ Completed 401 Unauthorized in 104ms (ActiveRecord: 0.0ms (0 queries, 0 cached) |
   ↳ lib/tasks/phase2_test.rake:143:in 'block (2 levels) in <main>'
   [1m[36mCostTracking Count (3.5ms)[0m  [1m[34mSELECT COUNT(*) FROM "cost_trackings" /*application='SeatingCharter'*/[0m
   ↳ lib/tasks/phase2_test.rake:144:in 'block (2 levels) in <main>'
+[dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
+[dotenv] Loaded [33m.env[0m
+[dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
+[dotenv] Loaded [33m.env[0m
+[dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
+[dotenv] Loaded [33m.env[0m
+[dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
+[dotenv] Loaded [33m.env[0m
+  [1m[36mAiConfiguration Update All (0.7ms)[0m  [1m[33mUPDATE "ai_configurations" SET "active" = FALSE /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  ↳ app/models/ai_configuration.rb:49:in 'AiConfiguration#only_one_active_configuration'
+  [1m[36mAiConfiguration Exists? (1.4ms)[0m  [1m[34mSELECT 1 AS one FROM "ai_configurations" WHERE "ai_configurations"."active" = TRUE AND "ai_configurations"."id" IS NOT NULL LIMIT 1 /*application='SeatingCharter'*/[0m
+  ↳ app/models/ai_configuration.rb:49:in 'AiConfiguration#only_one_active_configuration'
+  [1m[36mAiConfiguration Update All (0.2ms)[0m  [1m[33mUPDATE "ai_configurations" SET "active" = FALSE WHERE "ai_configurations"."id" IS NOT NULL /*application='SeatingCharter'*/[0m
+  ↳ app/models/ai_configuration.rb:56:in 'AiConfiguration#deactivate_others_if_active'
+  [1m[36mAiConfiguration Create (0.6ms)[0m  [1m[32mINSERT INTO "ai_configurations" ("ai_model_name", "api_endpoint", "temperature", "max_tokens", "batch_size", "retry_attempts", "cost_per_token", "active", "created_at", "updated_at") VALUES ('gpt-5', 'https://api.openai.com/v1/chat/completions', 0.3, 4000, 10, 3, 0.00002, TRUE, '2025-09-04 18:47:17.285003', '2025-09-04 18:47:17.285003') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+[dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
+[dotenv] Loaded [33m.env[0m
+[dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
+[dotenv] Loaded [33m.env[0m
+[dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
+[dotenv] Loaded [33m.env[0m
+[dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
+[dotenv] Loaded [33m.env[0m
+Started GET "/" for ::1 at 2025-09-04 11:50:39 -0700
+  [1m[36mActiveRecord::SchemaMigration Load (1.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+Processing by DashboardController#index as HTML
+Completed 401 Unauthorized in 104ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 11:50:40 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering /opt/homebrew/lib/ruby/gems/3.4.0/gems/devise-4.9.4/app/views/devise/sessions/new.html.erb within layouts/application
+  Rendered /opt/homebrew/lib/ruby/gems/3.4.0/gems/devise-4.9.4/app/views/devise/shared/_links.html.erb (Duration: 4.6ms | GC: 0.0ms)
+  Rendered /opt/homebrew/lib/ruby/gems/3.4.0/gems/devise-4.9.4/app/views/devise/sessions/new.html.erb within layouts/application (Duration: 24.8ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 43.9ms | GC: 0.0ms)
+Completed 200 OK in 148ms (Views: 60.5ms | ActiveRecord: 9.2ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/assets/application-8b441ae0.css" for ::1 at 2025-09-04 11:50:40 -0700
+Started GET "/assets/tailwind-8350bad6.css" for ::1 at 2025-09-04 11:50:40 -0700
+Started GET "/assets/turbo.min-3a2e143f.js" for ::1 at 2025-09-04 11:50:40 -0700
+Started GET "/assets/application-bfcdf840.js" for ::1 at 2025-09-04 11:50:40 -0700
+Started GET "/assets/stimulus.min-4b1e420e.js" for ::1 at 2025-09-04 11:50:40 -0700
+Started GET "/assets/stimulus-loading-1fc53fe7.js" for ::1 at 2025-09-04 11:50:40 -0700
+Started GET "/assets/controllers/application-3affb389.js" for ::1 at 2025-09-04 11:50:40 -0700
+Started GET "/assets/controllers/hello_controller-708796bd.js" for ::1 at 2025-09-04 11:50:41 -0700
+Started GET "/assets/controllers/index-ee64e1f1.js" for ::1 at 2025-09-04 11:50:41 -0700
+Started GET "/assets/stimulus.min-2395e199.js.map" for ::1 at 2025-09-04 11:50:49 -0700
+Started GET "/assets/turbo.min-5f3b7fda.js.map" for ::1 at 2025-09-04 11:50:49 -0700

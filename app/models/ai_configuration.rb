@@ -22,13 +22,21 @@ class AiConfiguration < ApplicationRecord
   end
   
   def self.available_models
+    # 2025 models - GPT-5 series is NOW AVAILABLE!
     [
-      'gpt-4o',
-      'gpt-4o-mini', 
-      'gpt-4-turbo',
-      'gpt-4',
-      'gpt-3.5-turbo',
-      'gpt-3.5-turbo-16k'
+      'gpt-5',                    # Latest GPT-5 model
+      'gpt-5-2025-08-07',        # Specific GPT-5 version
+      'gpt-5-chat-latest',       # Latest GPT-5 chat model
+      'gpt-5-mini',              # Smaller, faster GPT-5
+      'gpt-5-mini-2025-08-07',   # Specific GPT-5 mini version
+      'gpt-5-nano',              # Smallest, fastest GPT-5
+      'gpt-5-nano-2025-08-07',   # Specific GPT-5 nano version
+      'gpt-4o',                  # GPT-4 Omni (still excellent)
+      'gpt-4o-mini',             # GPT-4 Omni mini
+      'gpt-4.1',                 # GPT-4.1 (enhanced)
+      'gpt-4.1-mini',            # GPT-4.1 mini
+      'gpt-4-turbo',             # Legacy GPT-4 turbo
+      'gpt-3.5-turbo'            # Budget option
     ]
   end
   

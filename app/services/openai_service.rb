@@ -22,14 +22,25 @@ class OpenaiService
       begin
         attempt += 1
         
-        response = client.chat(
-          parameters: {
-            model: model,
-            messages: [{ role: "user", content: prompt }],
-            temperature: config.temperature.to_f,
-            max_tokens: config.max_tokens
-          }
-        )
+        # Build parameters based on model type (GPT-5 has different requirements)
+        params = {
+          model: model,
+          messages: [{ role: "user", content: prompt }]
+        }
+        
+        # GPT-5 specific adjustments
+        if model.start_with?('gpt-5')
+          # GPT-5 uses max_completion_tokens instead of max_tokens
+          params[:max_completion_tokens] = config.max_tokens
+          # GPT-5 currently only supports default temperature (1.0)
+          # Don't include temperature parameter for GPT-5
+        else
+          # GPT-4 and earlier models
+          params[:temperature] = config.temperature.to_f
+          params[:max_tokens] = config.max_tokens
+        end
+        
+        response = client.chat(parameters: params)
         
         # Track costs
         track_cost(
