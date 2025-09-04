@@ -1,0 +1,219 @@
+<div class="table-explanation">
+  <!-- Table Header -->
+  <div class="flex justify-between items-start mb-4">
+    <div>
+      <h3 class="text-xl font-semibold text-gray-900">Table <%= @table_number %> Analysis</h3>
+      <div class="flex items-center mt-1">
+        <span class="text-sm text-gray-600 mr-3">
+          Table Score: <%= number_to_percentage(@table_confidence * 100, precision: 1) %>
+        </span>
+        <div class="flex items-center">
+          <div class="w-20 bg-gray-200 rounded-full h-2 mr-2">
+            <div class="bg-<%= @table_confidence >= 0.8 ? 'green' : (@table_confidence >= 0.6 ? 'yellow' : 'red') %>-500 h-2 rounded-full" 
+                 style="width: <%= (@table_confidence * 100).round(1) %>%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+      <%= @table_students.count %> students
+    </span>
+  </div>
+
+  <!-- AI Explanation -->
+  <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <h4 class="text-sm font-medium text-blue-800">AI Analysis</h4>
+        <div class="mt-2 text-sm text-blue-700">
+          <p><%= @table_explanation&.dig('explanation') || "This table composition was designed to optimize diversity and collaborative potential among the students." %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Students at this Table -->
+  <div class="mb-6">
+    <h4 class="text-lg font-medium text-gray-900 mb-3">Students at this Table</h4>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <% @table_students.each do |student| %>
+        <div class="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+             onclick="showStudentDetails(<%= student.id %>)">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+              <%= student.display_name.split(' ').map(&:first).join('').first(2) %>
+            </div>
+          </div>
+          <div class="ml-3 flex-1">
+            <p class="text-sm font-medium text-gray-900"><%= student.display_name %></p>
+            <div class="flex items-center mt-1">
+              <span class="text-xs text-gray-500">
+                Confidence: <%= number_to_percentage(@seating_arrangement.student_confidence(student) * 100, precision: 0) %>
+              </span>
+              <% confidence = @seating_arrangement.student_confidence(student) %>
+              <div class="ml-2 w-12 bg-gray-200 rounded-full h-1">
+                <div class="bg-<%= confidence >= 0.8 ? 'green' : (confidence >= 0.6 ? 'yellow' : 'red') %>-500 h-1 rounded-full" 
+                     style="width: <%= (confidence * 100).round(1) %>%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="flex-shrink-0">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Diversity Breakdown -->
+  <div class="mb-6">
+    <h4 class="text-lg font-medium text-gray-900 mb-3">Diversity Metrics</h4>
+    <div class="space-y-3">
+      <% if @table_diversity.present? %>
+        <% @table_diversity.each do |metric, score| %>
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="text-sm font-medium text-gray-700"><%= metric.humanize %></span>
+              <span class="ml-2 text-xs text-gray-500">
+                (<%= score.is_a?(Numeric) ? number_to_percentage(score * 100, precision: 1) : score %>)
+              </span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-32 bg-gray-200 rounded-full h-2 mr-2">
+                <% score_value = score.is_a?(Numeric) ? score : 0.5 %>
+                <div class="bg-<%= score_value >= 0.8 ? 'green' : (score_value >= 0.6 ? 'blue' : (score_value >= 0.4 ? 'yellow' : 'red')) %>-500 h-2 rounded-full" 
+                     style="width: <%= (score_value * 100).round(1) %>%"></div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="text-gray-500 italic">Diversity metrics not available for this table.</div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Performance Indicators -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div class="bg-green-50 p-4 rounded-lg">
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div>
+          <p class="text-sm font-medium text-green-800">Strengths</p>
+          <p class="text-xs text-green-600">
+            <% if @table_explanation&.dig('diversity_breakdown') %>
+              <%= @table_explanation['diversity_breakdown'].select { |k, v| v.to_f > 0.7 }.keys.map(&:humanize).join(', ').presence || "Well-balanced composition" %>
+            <% else %>
+              Good student mix
+            <% end %>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-blue-50 p-4 rounded-lg">
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div>
+          <p class="text-sm font-medium text-blue-800">Optimization Score</p>
+          <p class="text-xs text-blue-600">
+            <%= number_to_percentage(@table_confidence * 100, precision: 1) %> overall
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-yellow-50 p-4 rounded-lg">
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+        <div>
+          <p class="text-sm font-medium text-yellow-800">Improvement Areas</p>
+          <p class="text-xs text-yellow-600">
+            <% if @table_explanation&.dig('improvement_suggestions')&.any? %>
+              <%= @table_explanation['improvement_suggestions'].first %>
+            <% else %>
+              Consider manual adjustments
+            <% end %>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Constraint Satisfaction -->
+  <% if @table_explanation&.dig('constraint_satisfaction')&.any? %>
+    <div class="mb-6">
+      <h4 class="text-lg font-medium text-gray-900 mb-3">Constraint Satisfaction</h4>
+      <div class="space-y-2">
+        <% @table_explanation['constraint_satisfaction'].each do |constraint| %>
+          <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+            <span class="text-sm text-gray-700">
+              <%= constraint['description'] || constraint['rule'] || 'Seating constraint' %>
+            </span>
+            <div class="flex items-center">
+              <% satisfaction = constraint['satisfaction_rate'] || constraint['impact_level'] || 0.8 %>
+              <% satisfied = satisfaction > 0.7 %>
+              <span class="text-xs <%= satisfied ? 'text-green-600' : 'text-red-600' %> mr-2">
+                <%= satisfied ? 'Satisfied' : 'Needs attention' %>
+              </span>
+              <div class="w-16 bg-gray-200 rounded-full h-1">
+                <div class="bg-<%= satisfied ? 'green' : 'red' %>-500 h-1 rounded-full" 
+                     style="width: <%= (satisfaction * 100).round(1) %>%"></div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Action Buttons -->
+  <div class="flex justify-between items-center pt-4 border-t border-gray-200">
+    <div class="flex space-x-2">
+      <button onclick="exploreAlternatives(<%= @table_number %>)" 
+              class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+        Explore Alternatives
+      </button>
+      <button onclick="showWhyNotAnalysis(<%= @table_number %>)" 
+              class="text-gray-600 hover:text-gray-800 text-sm font-medium">
+        Why Not Other Students?
+      </button>
+    </div>
+    <div class="text-xs text-gray-500">
+      Last updated: <%= time_ago_in_words(@seating_arrangement.updated_at) %> ago
+    </div>
+  </div>
+</div>
+
+<script>
+function showStudentDetails(studentId) {
+  // Close current modal and open student modal
+  $('#tableModal').modal('hide');
+  setTimeout(() => {
+    showStudentExplanation(studentId);
+  }, 300);
+}
+
+function exploreAlternatives(tableNumber) {
+  // Implementation for exploring alternative compositions
+  alert('Alternative compositions feature coming soon!');
+}
+
+function showWhyNotAnalysis(tableNumber) {
+  // Implementation for showing why other students weren't placed here
+  alert('Why not analysis feature coming soon!');
+}
+</script>

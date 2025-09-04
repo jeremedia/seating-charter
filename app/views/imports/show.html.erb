@@ -1,0 +1,230 @@
+<% content_for :title, "Import Status - #{@cohort.name}" %>
+
+<div class="max-w-4xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Import Status</h1>
+        <p class="text-gray-600 mt-2">Processing roster for <strong><%= @cohort.name %></strong></p>
+      </div>
+      <%= link_to 'Back to Cohort', cohort_path(@cohort), 
+            class: 'inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50' %>
+    </div>
+  </div>
+
+  <!-- Status Card -->
+  <div class="bg-white shadow rounded-lg mb-8" id="status-card">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-medium text-gray-900">Import Progress</h3>
+    </div>
+    
+    <div class="p-6">
+      <!-- Status Indicator -->
+      <div class="flex items-center mb-6">
+        <div class="flex-shrink-0 mr-4" id="status-icon">
+          <% case @import_session.status %>
+          <% when 'pending' %>
+            <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          <% when 'processing' %>
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="m100 50A50 50 0 1 0 0 50a50 50 0 1 0 100 0Z"></path>
+              </svg>
+            </div>
+          <% when 'completed' %>
+            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+          <% when 'failed' %>
+            <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </div>
+          <% end %>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-semibold text-gray-900 capitalize" id="status-text">
+            <%= @import_session.status.humanize %>
+          </h4>
+          <p class="text-sm text-gray-600" id="status-description">
+            <% case @import_session.status %>
+            <% when 'pending' %>
+              Waiting to start processing your roster file
+            <% when 'processing' %>
+              Parsing roster and running AI inference on student attributes
+            <% when 'completed' %>
+              Import completed successfully
+            <% when 'failed' %>
+              Import failed - see details below
+            <% end %>
+          </p>
+        </div>
+      </div>
+
+      <!-- File Information -->
+      <div class="grid grid-cols-2 gap-6 mb-6">
+        <div>
+          <h5 class="text-sm font-medium text-gray-500">File Name</h5>
+          <p class="text-sm text-gray-900"><%= @import_session.file_name %></p>
+        </div>
+        <div>
+          <h5 class="text-sm font-medium text-gray-500">File Size</h5>
+          <p class="text-sm text-gray-900"><%= @import_session.file_size_human %></p>
+        </div>
+        <div>
+          <h5 class="text-sm font-medium text-gray-500">Uploaded At</h5>
+          <p class="text-sm text-gray-900"><%= @import_session.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+        </div>
+        <div>
+          <h5 class="text-sm font-medium text-gray-500">Processed At</h5>
+          <p class="text-sm text-gray-900" id="processed-at">
+            <%= @import_session.processed_at ? @import_session.processed_at.strftime("%B %d, %Y at %I:%M %p") : "Not yet processed" %>
+          </p>
+        </div>
+      </div>
+
+      <!-- Progress Information -->
+      <div class="border-t pt-6" id="progress-section">
+        <% if @import_session.completed? %>
+          <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <h4 class="text-sm font-medium text-green-800">Import Successful</h4>
+                <p class="text-sm text-green-700 mt-1">
+                  Successfully imported <strong><%= @import_session.students_imported %></strong> students with AI-inferred attributes
+                </p>
+              </div>
+            </div>
+            
+            <!-- Next Steps -->
+            <div class="mt-4 flex space-x-3">
+              <%= link_to 'Review AI Inferences', 
+                    cohort_import_session_import_reviews_path(@cohort, @import_session), 
+                    class: 'inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700' %>
+              <%= link_to 'View Students', cohort_path(@cohort), 
+                    class: 'inline-flex items-center px-4 py-2 border border-green-600 text-green-600 text-sm font-medium rounded-md hover:bg-green-50' %>
+            </div>
+          </div>
+        
+        <% elsif @import_session.failed? %>
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div class="flex items-start">
+              <svg class="w-5 h-5 text-red-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <h4 class="text-sm font-medium text-red-800">Import Failed</h4>
+                <p class="text-sm text-red-700 mt-1">
+                  <%= @import_session.import_metadata&.dig('error') || 'An unknown error occurred during import' %>
+                </p>
+                <div class="mt-4">
+                  <%= link_to 'Try Again', new_cohort_import_path(@cohort), 
+                        class: 'inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700' %>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        <% elsif @import_session.processing? %>
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-blue-600 mr-3 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+              <div>
+                <h4 class="text-sm font-medium text-blue-800">Processing in Progress</h4>
+                <p class="text-sm text-blue-700 mt-1">
+                  Our AI is parsing your roster and inferring student attributes. This typically takes 1-3 minutes.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+        <% else %>
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-yellow-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <h4 class="text-sm font-medium text-yellow-800">Queued for Processing</h4>
+                <p class="text-sm text-yellow-700 mt-1">
+                  Your file is in the processing queue and will begin shortly.
+                </p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- What Happens Next -->
+  <% unless @import_session.failed? %>
+    <div class="bg-white shadow rounded-lg">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">What Happens Next</h3>
+      </div>
+      
+      <div class="p-6">
+        <div class="space-y-4">
+          <div class="flex items-start">
+            <div class="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-xs mt-0.5">1</div>
+            <div class="ml-3">
+              <p class="font-medium text-gray-900">AI Processing</p>
+              <p class="text-sm text-gray-600">Our AI analyzes the roster to extract student information and infer attributes like gender, agency level, department type, and seniority level.</p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <div class="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-xs mt-0.5">2</div>
+            <div class="ml-3">
+              <p class="font-medium text-gray-900">Review Inferences</p>
+              <p class="text-sm text-gray-600">You'll have the opportunity to review and correct any AI inferences before they're finalized. Confidence scores help identify which inferences may need review.</p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <div class="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-xs mt-0.5">3</div>
+            <div class="ml-3">
+              <p class="font-medium text-gray-900">Finalize Import</p>
+              <p class="text-sm text-gray-600">Once reviewed, the students will be added to your cohort and will be available for seating chart generation.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<!-- Auto-refresh for processing status -->
+<% if @import_session.pending? || @import_session.processing? %>
+  <script>
+    // Auto-refresh the page to check status
+    setTimeout(function() {
+      // Use AJAX to check status without full page reload
+      fetch('<%= cohort_import_path(@cohort, @import_session, format: :json) %>')
+        .then(response => response.json())
+        .then(data => {
+          if (data.status !== '<%= @import_session.status %>') {
+            location.reload();
+          }
+        })
+        .catch(() => {
+          // If fetch fails, do full page refresh
+          location.reload();
+        });
+    }, 5000); // Check every 5 seconds
+  </script>
+<% end %>

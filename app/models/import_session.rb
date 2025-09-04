@@ -4,6 +4,9 @@ class ImportSession < ApplicationRecord
   belongs_to :user
   has_many :student_import_records, dependent: :destroy
 
+  # Serializers
+  serialize :import_metadata, coder: JSON
+
   # Enums
   enum :status, {
     pending: 0,

@@ -3,6 +3,8 @@ class SeatingEvent < ApplicationRecord
   belongs_to :cohort
   has_many :seating_arrangements, dependent: :destroy
   has_many :seating_instructions, dependent: :destroy
+  has_many :seating_rules, dependent: :destroy
+  has_many :natural_language_instructions, dependent: :destroy
   has_many :interaction_trackings, dependent: :destroy
 
   # Enums

@@ -1,0 +1,409 @@
+<div class="seating-table" 
+     data-seating-editor-target="table"
+     data-table-number="<%= table_number %>"
+     data-max-size="8"
+     data-action="dblclick->seating-editor#onTableDoubleClick">
+  
+  <!-- Table Header -->
+  <div class="table-header">
+    <div class="table-title">
+      <h4>Table <%= table_number %></h4>
+      <span class="student-count">
+        <%= table_data[:students].length %>/8 students
+      </span>
+    </div>
+    
+    <div class="table-actions">
+      <div class="dropdown">
+        <button type="button" 
+                class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                data-bs-toggle="dropdown">
+          <span class="icon">⚙️</span>
+        </button>
+        <ul class="dropdown-menu">
+          <li>
+            <button class="dropdown-item" 
+                    data-action="click->seating-editor#shuffleTable"
+                    data-table-number="<%= table_number %>">
+              <span class="icon">🔄</span> Shuffle Table
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item"
+                    onclick="prompt('New table name:', 'Table <%= table_number %>')">
+              <span class="icon">✏️</span> Rename Table
+            </button>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <button class="dropdown-item text-danger" 
+                    data-action="click->seating-editor#deleteTable"
+                    data-table-number="<%= table_number %>">
+              <span class="icon">🗑️</span> Delete Table
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Diversity Score -->
+  <div class="table-diversity">
+    <div class="diversity-indicator">
+      <span class="diversity-label">Diversity Score:</span>
+      <span class="diversity-value score-<%= table_data[:diversity_score] > 0.8 ? 'high' : table_data[:diversity_score] > 0.6 ? 'medium' : 'low' %>">
+        <%= (table_data[:diversity_score] * 100).round(1) %>%
+      </span>
+    </div>
+    
+    <% if table_data[:constraint_violations]&.any? %>
+      <div class="constraint-indicators">
+        <% table_data[:constraint_violations].each do |violation| %>
+          <span class="constraint-violation <%= violation[:severity] %>" 
+                title="<%= violation[:message] %>">
+            ⚠️
+          </span>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Student Cards Container -->
+  <div class="student-cards-container">
+    <div class="student-cards" data-table-number="<%= table_number %>">
+      <% table_data[:students].each do |student| %>
+        <%= render 'student_card', student: student %>
+      <% end %>
+      
+      <!-- Empty State for Table -->
+      <% if table_data[:students].empty? %>
+        <div class="empty-table-state">
+          <div class="empty-icon">👥</div>
+          <p>Drag students here</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Table Visualization (Optional) -->
+  <div class="table-visualization">
+    <div class="table-shape round-table">
+      <% if table_data[:students].any? %>
+        <% table_data[:students].each_with_index do |student, index| %>
+          <div class="seat-position" 
+               style="--position: <%= index %>; --total: <%= [table_data[:students].length, 8].max %>">
+            <div class="seat-marker" 
+                 title="<%= student[:name] %>"
+                 data-student-id="<%= student[:id] %>">
+              <%= student[:name].split(' ').map(&:first).join('') %>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="empty-seats">
+          <% 8.times do |i| %>
+            <div class="seat-position empty" 
+                 style="--position: <%= i %>; --total: 8">
+              <div class="seat-marker empty"></div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Diversity Breakdown -->
+  <div class="table-diversity-details">
+    <% 
+      students = table_data[:students]
+      if students.any?
+        gender_breakdown = students.group_by { |s| s[:gender] }.transform_values(&:count)
+        agency_breakdown = students.group_by { |s| s[:agency_level] }.transform_values(&:count)
+        department_breakdown = students.group_by { |s| s[:department_type] }.transform_values(&:count)
+      end
+    %>
+    
+    <% if students.any? %>
+      <div class="breakdown-section">
+        <h6>Gender Distribution</h6>
+        <div class="breakdown-bars">
+          <% gender_breakdown.each do |gender, count| %>
+            <div class="breakdown-item">
+              <span class="breakdown-label"><%= gender&.capitalize || 'Unknown' %></span>
+              <div class="breakdown-bar">
+                <div class="breakdown-fill gender-<%= gender&.downcase || 'unknown' %>" 
+                     style="width: <%= (count.to_f / students.length * 100).round(1) %>%"></div>
+              </div>
+              <span class="breakdown-count"><%= count %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="breakdown-section">
+        <h6>Agency Levels</h6>
+        <div class="breakdown-bars">
+          <% agency_breakdown.each do |agency, count| %>
+            <div class="breakdown-item">
+              <span class="breakdown-label"><%= agency&.humanize || 'Unknown' %></span>
+              <div class="breakdown-bar">
+                <div class="breakdown-fill agency-<%= agency&.downcase&.gsub(/\s+/, '-') || 'unknown' %>" 
+                     style="width: <%= (count.to_f / students.length * 100).round(1) %>%"></div>
+              </div>
+              <span class="breakdown-count"><%= count %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Interaction Indicators -->
+  <div class="interaction-indicators">
+    <% if students.any? %>
+      <!-- Show potential problematic interactions -->
+      <div class="interaction-warnings">
+        <!-- This would be populated based on interaction tracking data -->
+        <!-- For now, just placeholder -->
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<style>
+  .seating-table {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    position: relative;
+    min-height: 400px;
+  }
+  
+  .seating-table:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .table-title h4 {
+    margin: 0;
+    color: #495057;
+    font-size: 1.1rem;
+  }
+  
+  .student-count {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-left: 0.5rem;
+  }
+  
+  .table-diversity {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 0.25rem;
+  }
+  
+  .diversity-value.score-high { color: #28a745; }
+  .diversity-value.score-medium { color: #ffc107; }
+  .diversity-value.score-low { color: #dc3545; }
+  
+  .constraint-indicators {
+    display: flex;
+    gap: 0.25rem;
+  }
+  
+  .constraint-violation {
+    font-size: 1.2rem;
+    cursor: help;
+  }
+  
+  .constraint-violation.warning { color: #ffc107; }
+  .constraint-violation.error { color: #dc3545; }
+  
+  .student-cards-container {
+    min-height: 150px;
+    margin-bottom: 1rem;
+  }
+  
+  .student-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 2px dashed transparent;
+    border-radius: 0.25rem;
+    min-height: 140px;
+    transition: all 0.2s ease;
+  }
+  
+  .student-cards:empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .empty-table-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-style: italic;
+    height: 100px;
+  }
+  
+  .empty-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+  }
+  
+  .table-visualization {
+    margin: 1rem 0;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .table-shape {
+    position: relative;
+    width: 120px;
+    height: 120px;
+  }
+  
+  .round-table {
+    border: 3px solid #495057;
+    border-radius: 50%;
+    background: rgba(73, 80, 87, 0.1);
+  }
+  
+  .seat-position {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 50%;
+    top: 50%;
+    transform-origin: center;
+    transform: translate(-50%, -50%) rotate(calc(360deg / var(--total) * var(--position))) translateY(-45px);
+  }
+  
+  .seat-marker {
+    width: 20px;
+    height: 20px;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+    cursor: pointer;
+    transform: rotate(calc(-360deg / var(--total) * var(--position)));
+    transition: all 0.2s ease;
+  }
+  
+  .seat-marker:hover {
+    transform: rotate(calc(-360deg / var(--total) * var(--position))) scale(1.2);
+  }
+  
+  .seat-marker.empty {
+    background: #e9ecef;
+    border: 1px dashed #adb5bd;
+  }
+  
+  .table-diversity-details {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+  }
+  
+  .breakdown-section {
+    margin-bottom: 1rem;
+  }
+  
+  .breakdown-section h6 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.8rem;
+    color: #495057;
+    font-weight: 600;
+  }
+  
+  .breakdown-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.25rem;
+    gap: 0.5rem;
+  }
+  
+  .breakdown-label {
+    min-width: 60px;
+    font-size: 0.75rem;
+    color: #6c757d;
+  }
+  
+  .breakdown-bar {
+    flex: 1;
+    height: 12px;
+    background: #e9ecef;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  
+  .breakdown-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+  }
+  
+  .breakdown-count {
+    min-width: 20px;
+    text-align: right;
+    font-size: 0.75rem;
+    color: #495057;
+    font-weight: 600;
+  }
+  
+  /* Gender colors */
+  .breakdown-fill.gender-male { background: #007bff; }
+  .breakdown-fill.gender-female { background: #e83e8c; }
+  .breakdown-fill.gender-unknown { background: #6c757d; }
+  
+  /* Agency colors */
+  .breakdown-fill.agency-federal { background: #28a745; }
+  .breakdown-fill.agency-state { background: #17a2b8; }
+  .breakdown-fill.agency-local { background: #ffc107; }
+  .breakdown-fill.agency-unknown { background: #6c757d; }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .seating-table {
+      margin-bottom: 1rem;
+    }
+    
+    .table-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    
+    .student-cards {
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    }
+    
+    .table-visualization {
+      display: none; /* Hide on mobile for space */
+    }
+  }
+</style>

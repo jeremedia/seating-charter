@@ -1,0 +1,189 @@
+<% content_for :title, "Edit Student Attributes - #{@student.name}" %>
+
+<div class="max-w-4xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Edit Student Attributes</h1>
+        <p class="text-gray-600 mt-2">Review and correct AI inferences for <strong><%= @student.name %></strong></p>
+      </div>
+      <%= link_to 'Back to Review', cohort_import_session_import_reviews_path(@cohort, @import_session), 
+            class: 'inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50' %>
+    </div>
+  </div>
+
+  <!-- Student Information Card -->
+  <div class="bg-white shadow rounded-lg mb-8">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-medium text-gray-900">Student Information</h3>
+    </div>
+    
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="text-sm font-medium text-gray-500">Name</h4>
+          <p class="text-lg text-gray-900"><%= @student.name %></p>
+        </div>
+        <div>
+          <h4 class="text-sm font-medium text-gray-500">Title</h4>
+          <p class="text-sm text-gray-900"><%= @student.title.presence || 'Not specified' %></p>
+        </div>
+        <div>
+          <h4 class="text-sm font-medium text-gray-500">Organization</h4>
+          <p class="text-sm text-gray-900"><%= @student.organization.presence || 'Not specified' %></p>
+        </div>
+        <div>
+          <h4 class="text-sm font-medium text-gray-500">Location</h4>
+          <p class="text-sm text-gray-900"><%= @student.location.presence || 'Not specified' %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Form -->
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-medium text-gray-900">AI-Inferred Attributes</h3>
+      <p class="text-sm text-gray-600 mt-1">Review and modify the attributes inferred by AI. Changes will be marked as manually reviewed.</p>
+    </div>
+    
+    <div class="p-6">
+      <%= form_with(model: [@cohort, @import_session, @student], 
+                    url: cohort_import_session_import_review_path(@cohort, @import_session, @student),
+                    local: true, 
+                    class: "space-y-8") do |form| %>
+        
+        <% @inference_fields.each do |field| %>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="text-lg font-medium text-gray-900"><%= field.humanize %></h4>
+              
+              <!-- Current AI Inference -->
+              <% current_value = @student.get_inference_value(field) %>
+              <% current_confidence = @student.get_inference_confidence(field) %>
+              
+              <% if current_value && current_confidence %>
+                <div class="flex items-center space-x-2">
+                  <span class="text-sm text-gray-600">AI Inference:</span>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    <%= current_value.humanize %>
+                  </span>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full mr-1 <%= current_confidence >= 0.8 ? 'bg-green-400' : current_confidence >= 0.6 ? 'bg-yellow-400' : 'bg-red-400' %>"></div>
+                    <span class="text-xs text-gray-500"><%= (current_confidence * 100).round %>% confident</span>
+                  </div>
+                </div>
+              <% else %>
+                <span class="text-sm text-gray-400">No AI inference available</span>
+              <% end %>
+            </div>
+            
+            <!-- Selection Options -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <% @field_options[field].each do |option_label, option_value| %>
+                <label class="relative flex items-center">
+                  <%= form.radio_button "inferences][#{field}", option_value, 
+                        checked: (current_value == option_value),
+                        class: "sr-only peer" %>
+                  <div class="w-full p-3 text-sm text-center border rounded-lg cursor-pointer 
+                             peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:text-blue-600
+                             hover:bg-gray-50 border-gray-200 text-gray-900
+                             transition-colors">
+                    <%= option_label %>
+                    <% if current_value == option_value %>
+                      <div class="mt-1 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                      </div>
+                    <% end %>
+                  </div>
+                </label>
+              <% end %>
+            </div>
+            
+            <!-- Confidence Level Information -->
+            <% if current_confidence %>
+              <div class="bg-gray-50 p-3 rounded-md">
+                <div class="flex items-center justify-between text-xs text-gray-600">
+                  <span>AI Confidence Level: <%= (current_confidence * 100).round %>%</span>
+                  <span>
+                    <% case current_confidence %>
+                    <% when 0.8..1.0 %>
+                      <span class="text-green-600 font-medium">High - AI is very confident</span>
+                    <% when 0.6..0.79 %>
+                      <span class="text-yellow-600 font-medium">Medium - AI has moderate confidence</span>
+                    <% else %>
+                      <span class="text-red-600 font-medium">Low - AI is uncertain, review recommended</span>
+                    <% end %>
+                  </span>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+
+        <!-- Context Information -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h4 class="text-sm font-medium text-blue-900 mb-2">How AI Makes These Inferences</h4>
+          <div class="text-sm text-blue-800 space-y-1">
+            <p><strong>Gender:</strong> Inferred from first name using common naming patterns</p>
+            <p><strong>Agency Level:</strong> Analyzed from organization name and context</p>
+            <p><strong>Department Type:</strong> Determined from job title and organization keywords</p>
+            <p><strong>Seniority Level:</strong> Based on job title and organizational hierarchy indicators</p>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+          <div class="text-sm text-gray-500">
+            Your changes will be saved with high confidence (95%) as manually reviewed
+          </div>
+          
+          <div class="flex space-x-3">
+            <%= link_to 'Cancel', cohort_import_session_import_reviews_path(@cohort, @import_session), 
+                  class: 'inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50' %>
+            <%= form.submit "Save Changes", 
+                  class: 'inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500' %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Navigation to Other Students -->
+  <div class="mt-8 bg-white shadow rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-medium text-gray-900">Quick Navigation</h3>
+    </div>
+    
+    <div class="p-6">
+      <div class="flex items-center justify-between">
+        <div class="text-sm text-gray-600">
+          Edit attributes for other students in this import
+        </div>
+        
+        <div class="flex space-x-2">
+          <% # Find previous and next students %>
+          <% students = @import_session.student_import_records.includes(:student).map(&:student) %>
+          <% current_index = students.index(@student) %>
+          
+          <% if current_index && current_index > 0 %>
+            <% prev_student = students[current_index - 1] %>
+            <%= link_to "← #{prev_student.name}", 
+                  edit_cohort_import_session_import_review_path(@cohort, @import_session, prev_student),
+                  class: 'inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50' %>
+          <% end %>
+          
+          <% if current_index && current_index < students.size - 1 %>
+            <% next_student = students[current_index + 1] %>
+            <%= link_to "#{next_student.name} →", 
+                  edit_cohort_import_session_import_review_path(@cohort, @import_session, next_student),
+                  class: 'inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50' %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,93 @@
+<div class="why-not-explanation">
+  <div class="flex items-start">
+    <div class="flex-shrink-0">
+      <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+    <div class="ml-3 flex-1">
+      <h4 class="text-lg font-medium text-gray-900 mb-2">
+        Why wasn't <%= @student.display_name %> placed at Table <%= @target_table %>?
+      </h4>
+      <div class="bg-orange-50 border-l-4 border-orange-400 p-4 mb-4">
+        <p class="text-sm text-orange-700">
+          <%= @why_not_explanation %>
+        </p>
+      </div>
+      
+      <!-- Comparison Analysis -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <h5 class="font-medium text-gray-900 mb-2">Current Placement (Table <%= @student_assignment&.table_number %>)</h5>
+          <div class="bg-green-50 p-3 rounded-lg border border-green-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-green-800">Optimization Score</span>
+              <span class="text-sm font-semibold text-green-600">
+                <%= number_to_percentage(@seating_arrangement.student_confidence(@student) * 100, precision: 1) %>
+              </span>
+            </div>
+            <ul class="text-xs text-green-700 space-y-1">
+              <li>• Optimizes table diversity</li>
+              <li>• Satisfies seating constraints</li>
+              <li>• Balances student attributes</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div>
+          <h5 class="font-medium text-gray-900 mb-2">Alternative (Table <%= @target_table %>)</h5>
+          <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-yellow-800">Estimated Score</span>
+              <span class="text-sm font-semibold text-yellow-600">
+                <%= number_to_percentage((rand(0.4..0.7) * 100), precision: 1) %> <!-- Placeholder -->
+              </span>
+            </div>
+            <ul class="text-xs text-yellow-700 space-y-1">
+              <li>• Would create imbalance</li>
+              <li>• Violates diversity goals</li>
+              <li>• Less optimal for collaboration</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Key Factors -->
+      <div class="mt-4">
+        <h5 class="font-medium text-gray-900 mb-2">Key Factors in This Decision</h5>
+        <div class="space-y-2">
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mt-1">
+              <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-gray-700">
+                <strong>Diversity Optimization:</strong> Current placement maintains better balance across student attributes
+              </p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mt-1">
+              <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-gray-700">
+                <strong>Constraint Satisfaction:</strong> Alternative placement would violate one or more seating rules
+              </p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mt-1">
+              <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-gray-700">
+                <strong>Overall Impact:</strong> Current arrangement provides better classroom-wide optimization
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,274 @@
+<div class="max-w-4xl mx-auto">
+  <div class="bg-white shadow-sm rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+          <h1 class="text-xl font-semibold text-gray-900">Seating Rule Details</h1>
+          <div class="mt-2 flex items-center space-x-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= rule_type_color(@seating_rule.rule_type) %>">
+              <%= @seating_rule.rule_type.humanize %>
+            </span>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= @seating_rule.confidence_color_class %>">
+              <%= (@seating_rule.confidence_score * 100).round(1) %>% confidence
+            </span>
+            <span class="text-sm text-gray-500">Priority: <%= @seating_rule.priority %></span>
+            <% unless @seating_rule.active? %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                Inactive
+              </span>
+            <% end %>
+          </div>
+        </div>
+        <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none space-x-2">
+          <%= link_to "Edit Rule", edit_seating_event_seating_rule_path(@seating_event, @seating_rule), 
+                      class: "inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" %>
+          <%= link_to "Back to Rules", seating_event_seating_rules_path(@seating_event), 
+                      class: "inline-flex items-center justify-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Validation Results -->
+  <% unless @validation_result[:valid] %>
+    <div class="mt-6 bg-red-50 border-l-4 border-red-400 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">Validation Issues</h3>
+          <div class="mt-2 text-sm text-red-700">
+            <ul class="list-disc pl-5 space-y-1">
+              <% @validation_result[:conflicts].each do |conflict| %>
+                <li><%= conflict[:message] %> (Severity: <%= conflict[:severity] %>)</li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Rule Details -->
+  <div class="mt-6 bg-white shadow-sm rounded-lg overflow-hidden">
+    <div class="px-4 py-5 sm:p-6">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Rule Information</h2>
+      
+      <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Original Instruction</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            "<%= @seating_rule.natural_language_input %>"
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Rule Description</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            <%= @seating_rule.rule_description %>
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Rule Type</dt>
+          <dd class="mt-1">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= rule_type_color(@seating_rule.rule_type) %>">
+              <%= @seating_rule.rule_type.humanize %>
+            </span>
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Priority</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            <%= @seating_rule.priority %> 
+            <span class="text-gray-500">(1 = highest priority)</span>
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-medium text-gray-500">AI Confidence</dt>
+          <dd class="mt-1">
+            <div class="flex items-center">
+              <div class="flex-1 bg-gray-200 rounded-full h-2">
+                <div class="bg-indigo-600 h-2 rounded-full" style="width: <%= (@seating_rule.confidence_score * 100).round(1) %>%"></div>
+              </div>
+              <span class="ml-2 text-sm text-gray-900"><%= (@seating_rule.confidence_score * 100).round(1) %>%</span>
+            </div>
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Status</dt>
+          <dd class="mt-1">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= @seating_rule.active? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+              <%= @seating_rule.active? ? 'Active' : 'Inactive' %>
+            </span>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Target Attributes -->
+  <% if @seating_rule.target_attributes.present? %>
+    <div class="mt-6 bg-white shadow-sm rounded-lg overflow-hidden">
+      <div class="px-4 py-5 sm:p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Target Attributes</h2>
+        <p class="text-sm text-gray-600 mb-4">This rule applies to students with these attributes:</p>
+        
+        <div class="space-y-3">
+          <% @seating_rule.target_attributes.each do |field, values| %>
+            <div class="border border-gray-200 rounded-lg p-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-medium text-gray-900"><%= field.humanize %></h3>
+                  <div class="mt-1 flex flex-wrap gap-1">
+                    <% Array(values).each do |value| %>
+                      <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                        <%= value %>
+                      </span>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Constraints -->
+  <% if @seating_rule.constraints.present? %>
+    <div class="mt-6 bg-white shadow-sm rounded-lg overflow-hidden">
+      <div class="px-4 py-5 sm:p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Rule Constraints</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <% @seating_rule.constraints.each do |key, value| %>
+            <div class="border border-gray-200 rounded-lg p-3">
+              <div class="text-sm">
+                <span class="font-medium text-gray-900"><%= key.humanize %>:</span>
+                <span class="text-gray-700 ml-1"><%= value %></span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Affected Students Preview -->
+  <% if @affected_students.any? %>
+    <div class="mt-6 bg-white shadow-sm rounded-lg overflow-hidden">
+      <div class="px-4 py-5 sm:p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Affected Students (Preview)</h2>
+        <p class="text-sm text-gray-600 mb-4">Students who match this rule's criteria:</p>
+        
+        <div class="space-y-2">
+          <% @affected_students.each do |student_info| %>
+            <div class="border border-gray-200 rounded-lg p-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-medium text-gray-900"><%= student_info[:name] %></h3>
+                  <p class="text-xs text-gray-500"><%= student_info[:organization] %></p>
+                </div>
+                <div class="text-right">
+                  <div class="flex flex-wrap gap-1 justify-end">
+                    <% student_info[:matching_attributes].each do |field, value| %>
+                      <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-green-100 text-green-800">
+                        <%= field %>: <%= value %>
+                      </span>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          
+          <% if @affected_students.count >= 10 %>
+            <p class="text-xs text-gray-500 text-center pt-2">
+              ... and potentially more students in the cohort
+            </p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- AI Interpretation Details -->
+  <% if @seating_rule.parsed_rule.present? %>
+    <div class="mt-6 bg-white shadow-sm rounded-lg overflow-hidden">
+      <div class="px-4 py-5 sm:p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">AI Interpretation Details</h2>
+        
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <div class="space-y-3 text-sm">
+            <% if @seating_rule.parsed_rule['description'] %>
+              <div>
+                <span class="font-medium text-gray-900">AI Description:</span>
+                <span class="text-gray-700 ml-1"><%= @seating_rule.parsed_rule['description'] %></span>
+              </div>
+            <% end %>
+            
+            <% if @seating_rule.parsed_rule['examples'] %>
+              <div>
+                <span class="font-medium text-gray-900">Examples:</span>
+                <ul class="list-disc list-inside mt-1 text-gray-700">
+                  <% Array(@seating_rule.parsed_rule['examples']).each do |example| %>
+                    <li><%= example %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+            
+            <div>
+              <span class="font-medium text-gray-900">Created:</span>
+              <span class="text-gray-700 ml-1"><%= time_ago_in_words(@seating_rule.created_at) %> ago</span>
+            </div>
+            
+            <% if @seating_rule.updated_at != @seating_rule.created_at %>
+              <div>
+                <span class="font-medium text-gray-900">Last Updated:</span>
+                <span class="text-gray-700 ml-1"><%= time_ago_in_words(@seating_rule.updated_at) %> ago</span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Actions -->
+  <div class="mt-6 bg-white shadow-sm rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Actions</h2>
+      
+      <div class="flex flex-wrap gap-3">
+        <%= link_to edit_seating_event_seating_rule_path(@seating_event, @seating_rule), 
+                    class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" do %>
+          Edit Rule
+        <% end %>
+        
+        <%= link_to toggle_seating_event_seating_rule_path(@seating_event, @seating_rule), 
+                    method: :patch,
+                    class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" do %>
+          <%= @seating_rule.active? ? 'Deactivate Rule' : 'Activate Rule' %>
+        <% end %>
+        
+        <%= link_to seating_event_seating_rule_path(@seating_event, @seating_rule), 
+                    method: :delete,
+                    data: { 
+                      confirm: 'Are you sure you want to delete this rule? This action cannot be undone.' 
+                    },
+                    class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700" do %>
+          Delete Rule
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

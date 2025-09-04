@@ -1,0 +1,460 @@
+<div class="container mx-auto px-4 py-6">
+  <div class="mb-6">
+    <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-4">
+      <%= link_to "Dashboard", root_path, class: "hover:text-blue-600" %>
+      <span>/</span>
+      <%= link_to @cohort.name, cohort_path(@cohort), class: "hover:text-blue-600" %>
+      <span>/</span>
+      <%= link_to @seating_event.name, cohort_seating_event_path(@cohort, @seating_event), class: "hover:text-blue-600" %>
+      <span>/</span>
+      <span class="text-gray-900">Multi-Day Optimization</span>
+    </nav>
+    
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Multi-Day Workshop Optimization</h1>
+        <p class="text-gray-600 mt-1">Configure seating optimization across multiple days with intelligent rotation</p>
+      </div>
+      
+      <div class="text-right">
+        <div class="text-sm text-gray-600">Event Date</div>
+        <div class="font-semibold"><%= @seating_event.event_date.strftime("%B %d, %Y") %></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Multi-Day Event Summary -->
+  <div class="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+      <div>
+        <div class="text-2xl font-bold text-purple-700"><%= @student_count %></div>
+        <div class="text-sm text-purple-600">Total Students</div>
+      </div>
+      <div>
+        <div class="text-2xl font-bold text-purple-700"><%= @seating_event.total_tables %></div>
+        <div class="text-sm text-purple-600">Tables Available</div>
+      </div>
+      <div>
+        <div class="text-2xl font-bold text-purple-700"><%= @seating_event.table_size %></div>
+        <div class="text-sm text-purple-600">Students per Table</div>
+      </div>
+      <div>
+        <div class="text-2xl font-bold text-purple-700"><%= (@student_count * (@student_count - 1) / 2) %></div>
+        <div class="text-sm text-purple-600">Possible Interactions</div>
+      </div>
+    </div>
+    
+    <div class="mt-4 p-3 bg-white bg-opacity-60 rounded-md">
+      <p class="text-sm text-purple-700">
+        <strong>Multi-day optimization</strong> maximizes student interaction diversity by ensuring different tablemates across days,
+        promoting broader relationship building and collaborative learning experiences.
+      </p>
+    </div>
+  </div>
+
+  <%= form_with url: cohort_seating_event_multi_day_optimizations_path(@cohort, @seating_event), 
+                method: :post, local: true, class: "space-y-6" do |form| %>
+    
+    <!-- Workshop Configuration -->
+    <div class="bg-white border border-gray-200 rounded-lg p-6">
+      <h2 class="text-xl font-semibold mb-4 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+        </svg>
+        Workshop Configuration
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Number of Days
+          </label>
+          <%= select_tag "multi_day_config[total_days]", 
+                  options_for_select(@available_days.map { |d| [pluralize(d, 'day'), d] }, @multi_day_config[:total_days]),
+                  { 
+                    class: "block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-purple-500 focus:border-purple-500",
+                    onchange: "updateDaysConfiguration(this.value)"
+                  } %>
+          <p class="text-sm text-gray-500 mt-1">Typical workshops run 3-5 days for optimal interaction diversity.</p>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Maximum Runtime per Day (seconds)
+          </label>
+          <%= number_field_tag "multi_day_config[max_runtime_per_day]", @multi_day_config[:max_runtime_per_day],
+                  in: 10..120, step: 5,
+                  class: "block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-purple-500 focus:border-purple-500" %>
+          <p class="text-sm text-gray-500 mt-1">Total optimization time will be days × runtime per day.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rotation Strategy -->
+    <div class="bg-white border border-gray-200 rounded-lg p-6">
+      <h2 class="text-xl font-semibold mb-4 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
+        </svg>
+        Rotation Strategy
+      </h2>
+      <p class="text-gray-600 mb-4">Choose how students will be rotated between days to maximize interaction diversity.</p>
+      
+      <div class="space-y-3">
+        <% @rotation_strategies.each do |strategy_key, strategy_description| %>
+          <label class="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+            <%= radio_button_tag "multi_day_config[rotation_strategy]", strategy_key, 
+                    strategy_key.to_s == @multi_day_config[:rotation_strategy], 
+                    class: "mt-1", 
+                    onchange: "updateStrategyPreview('#{strategy_key}')" %>
+            <div class="flex-1">
+              <div class="font-medium text-gray-900"><%= strategy_key.to_s.humanize %></div>
+              <div class="text-sm text-gray-600 mt-1"><%= strategy_description %></div>
+              
+              <% case strategy_key %>
+              <% when :maximum_diversity %>
+                <div class="text-xs text-green-700 bg-green-50 px-2 py-1 rounded mt-2 inline-block">
+                  Recommended for most workshops
+                </div>
+              <% when :structured_rotation %>
+                <div class="text-xs text-blue-700 bg-blue-50 px-2 py-1 rounded mt-2 inline-block">
+                  Predictable patterns
+                </div>
+              <% when :progressive_mixing %>
+                <div class="text-xs text-purple-700 bg-purple-50 px-2 py-1 rounded mt-2 inline-block">
+                  Gradual relationship building
+                </div>
+              <% end %>
+            </div>
+          </label>
+        <% end %>
+      </div>
+      
+      <!-- Strategy Preview -->
+      <div id="strategy-preview" class="mt-4 p-3 bg-gray-50 rounded-md hidden">
+        <div class="flex items-center space-x-2 mb-2">
+          <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+          </svg>
+          <span class="text-sm font-medium text-gray-700">Strategy Preview</span>
+          <button type="button" onclick="generatePreview()" class="text-xs text-purple-600 hover:text-purple-800">
+            Generate Preview
+          </button>
+        </div>
+        <div id="preview-content" class="text-sm text-gray-600">
+          Select a strategy and click "Generate Preview" to see how students will be rotated.
+        </div>
+      </div>
+    </div>
+
+    <!-- Day-by-Day Configuration -->
+    <div class="bg-white border border-gray-200 rounded-lg p-6">
+      <h2 class="text-xl font-semibold mb-4 flex items-center justify-between">
+        <span class="flex items-center">
+          <svg class="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+          </svg>
+          Day-by-Day Configuration
+        </span>
+        <span class="text-sm text-gray-500">Optional: Configure specific requirements per day</span>
+      </h2>
+      
+      <div id="days-configuration" class="space-y-4">
+        <% @multi_day_config[:days_config].each_with_index do |day_config, index| %>
+          <div class="day-config border border-gray-200 rounded-lg p-4" data-day="<%= day_config[:day_number] %>">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-medium text-gray-900">Day <%= day_config[:day_number] %></h3>
+              <button type="button" class="text-sm text-gray-500 hover:text-gray-700" onclick="toggleDayAdvanced(<%= day_config[:day_number] %>)">
+                Advanced Options
+              </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <%= text_field_tag "multi_day_config[days_config][#{index}][day_name]", day_config[:day_name],
+                        placeholder: "e.g., Introduction Day, Team Building Day",
+                        class: "block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500" %>
+                <%= hidden_field_tag "multi_day_config[days_config][#{index}][day_number]", day_config[:day_number] %>
+              </div>
+              <div>
+                <%= text_field_tag "multi_day_config[days_config][#{index}][special_constraints]", day_config[:special_constraints],
+                        placeholder: "e.g., Keep department teams together",
+                        class: "block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500" %>
+              </div>
+            </div>
+            
+            <!-- Advanced Day Options (Hidden by default) -->
+            <div id="day-<%= day_config[:day_number] %>-advanced" class="mt-4 space-y-3 hidden">
+              <div class="border-t pt-3">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Students Absent This Day
+                </label>
+                <select name="multi_day_config[days_config][<%= index %>][absent_student_ids][]" 
+                        multiple 
+                        class="block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                  <% @seating_event.cohort.students.each do |student| %>
+                    <option value="<%= student.id %>"><%= student.name %></option>
+                  <% end %>
+                </select>
+                <p class="text-xs text-gray-500 mt-1">Hold Ctrl (Cmd on Mac) to select multiple students</p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Advanced Optimization Options -->
+    <div class="bg-white border border-gray-200 rounded-lg p-6">
+      <h2 class="text-xl font-semibold mb-4 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
+        </svg>
+        Advanced Options
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <h3 class="font-medium text-gray-800">Optimization Priorities</h3>
+          
+          <div class="space-y-3">
+            <div>
+              <label class="flex justify-between text-sm font-medium text-gray-700 mb-1">
+                Interaction Penalty Weight
+                <span class="text-gray-500">(<span id="interaction_penalty_value"><%= @multi_day_config[:advanced_options][:interaction_penalty_weight] %></span>)</span>
+              </label>
+              <%= range_field_tag "multi_day_config[advanced_options][interaction_penalty_weight]", 
+                      @multi_day_config[:advanced_options][:interaction_penalty_weight],
+                      in: 0.5..5.0, step: 0.1,
+                      class: "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer",
+                      oninput: "updateAdvancedValue('interaction_penalty', this.value)" %>
+              <p class="text-xs text-gray-500">Higher values more strongly avoid repeated interactions</p>
+            </div>
+            
+            <div>
+              <label class="flex justify-between text-sm font-medium text-gray-700 mb-1">
+                Diversity Weight
+                <span class="text-gray-500">(<span id="diversity_value"><%= @multi_day_config[:advanced_options][:diversity_weight] %></span>)</span>
+              </label>
+              <%= range_field_tag "multi_day_config[advanced_options][diversity_weight]", 
+                      @multi_day_config[:advanced_options][:diversity_weight],
+                      in: 0.1..2.0, step: 0.1,
+                      class: "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer",
+                      oninput: "updateAdvancedValue('diversity', this.value)" %>
+              <p class="text-xs text-gray-500">Importance of attribute diversity within each day</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="space-y-4">
+          <h3 class="font-medium text-gray-800">Additional Settings</h3>
+          
+          <div class="space-y-3">
+            <div>
+              <label class="flex justify-between text-sm font-medium text-gray-700 mb-1">
+                Stability Weight
+                <span class="text-gray-500">(<span id="stability_value"><%= @multi_day_config[:advanced_options][:stability_weight] %></span>)</span>
+              </label>
+              <%= range_field_tag "multi_day_config[advanced_options][stability_weight]", 
+                      @multi_day_config[:advanced_options][:stability_weight],
+                      in: 0.0..1.0, step: 0.05,
+                      class: "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer",
+                      oninput: "updateAdvancedValue('stability', this.value)" %>
+              <p class="text-xs text-gray-500">Balance between change and familiarity</p>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+              <%= check_box_tag "multi_day_config[allow_manual_adjustments]", true, @multi_day_config[:allow_manual_adjustments],
+                      class: "h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded" %>
+              <label class="text-sm font-medium text-gray-700">
+                Allow manual adjustments after optimization
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Actions -->
+    <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+      <div class="flex space-x-3">
+        <%= link_to "Cancel", cohort_seating_event_path(@cohort, @seating_event), 
+                class: "px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" %>
+      </div>
+      
+      <div class="flex space-x-3">
+        <button type="button" onclick="saveAsDraft()" 
+                class="px-4 py-2 border border-purple-300 rounded-md shadow-sm bg-white text-purple-700 hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+          Save as Draft
+        </button>
+        <%= submit_tag "Start Multi-Day Optimization", 
+                class: "px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500",
+                data: { disable_with: "Starting Optimization..." } %>
+      </div>
+    </div>
+
+  <% end %>
+  
+  <!-- Estimation Info -->
+  <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+    <div class="flex items-start">
+      <svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+      </svg>
+      <div>
+        <h3 class="text-sm font-medium text-yellow-800">Estimated Processing Time</h3>
+        <p class="text-sm text-yellow-700 mt-1">
+          Multi-day optimization will take approximately <strong><span id="estimated-time">60 seconds</span></strong> to complete.
+          You'll be redirected to a status page where you can monitor progress in real-time.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateDaysConfiguration(totalDays) {
+  const daysContainer = document.getElementById('days-configuration');
+  const currentDays = daysContainer.querySelectorAll('.day-config').length;
+  
+  if (totalDays > currentDays) {
+    // Add more day configurations
+    for (let i = currentDays + 1; i <= totalDays; i++) {
+      addDayConfiguration(i);
+    }
+  } else if (totalDays < currentDays) {
+    // Remove excess day configurations
+    const daysToRemove = daysContainer.querySelectorAll(`.day-config:nth-child(n+${parseInt(totalDays) + 1})`);
+    daysToRemove.forEach(day => day.remove());
+  }
+  
+  updateEstimatedTime();
+}
+
+function addDayConfiguration(dayNumber) {
+  const daysContainer = document.getElementById('days-configuration');
+  const dayHTML = `
+    <div class="day-config border border-gray-200 rounded-lg p-4" data-day="${dayNumber}">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-medium text-gray-900">Day ${dayNumber}</h3>
+        <button type="button" class="text-sm text-gray-500 hover:text-gray-700" onclick="toggleDayAdvanced(${dayNumber})">
+          Advanced Options
+        </button>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <input type="text" name="multi_day_config[days_config][${dayNumber - 1}][day_name]" 
+                 value="Day ${dayNumber}" placeholder="e.g., Introduction Day, Team Building Day"
+                 class="block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+          <input type="hidden" name="multi_day_config[days_config][${dayNumber - 1}][day_number]" value="${dayNumber}">
+        </div>
+        <div>
+          <input type="text" name="multi_day_config[days_config][${dayNumber - 1}][special_constraints]" 
+                 placeholder="e.g., Keep department teams together"
+                 class="block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+        </div>
+      </div>
+      
+      <div id="day-${dayNumber}-advanced" class="mt-4 space-y-3 hidden">
+        <div class="border-t pt-3">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Students Absent This Day</label>
+          <select name="multi_day_config[days_config][${dayNumber - 1}][absent_student_ids][]" multiple 
+                  class="block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+            <% @seating_event.cohort.students.each do |student| %>
+              <option value="<%= student.id %>"><%= student.name %></option>
+            <% end %>
+          </select>
+          <p class="text-xs text-gray-500 mt-1">Hold Ctrl (Cmd on Mac) to select multiple students</p>
+        </div>
+      </div>
+    </div>
+  `;
+  daysContainer.insertAdjacentHTML('beforeend', dayHTML);
+}
+
+function toggleDayAdvanced(dayNumber) {
+  const advancedDiv = document.getElementById(`day-${dayNumber}-advanced`);
+  advancedDiv.classList.toggle('hidden');
+}
+
+function updateAdvancedValue(param, value) {
+  document.getElementById(param + '_value').textContent = parseFloat(value).toFixed(1);
+  updateEstimatedTime();
+}
+
+function updateStrategyPreview(strategy) {
+  const previewDiv = document.getElementById('strategy-preview');
+  previewDiv.classList.remove('hidden');
+}
+
+function generatePreview() {
+  const strategy = document.querySelector('input[name="multi_day_config[rotation_strategy]"]:checked')?.value;
+  const totalDays = document.querySelector('select[name="multi_day_config[total_days]"]')?.value || 3;
+  
+  if (!strategy) return;
+  
+  const previewContent = document.getElementById('preview-content');
+  previewContent.innerHTML = '<div class="text-sm text-gray-500">Generating preview...</div>';
+  
+  fetch(`<%= cohort_seating_event_multi_day_optimizations_path(@cohort, @seating_event) %>/preview_rotation?strategy=${strategy}&days_count=${totalDays}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        displayPreview(data);
+      } else {
+        previewContent.innerHTML = `<div class="text-sm text-red-600">Error: ${data.error}</div>`;
+      }
+    })
+    .catch(error => {
+      previewContent.innerHTML = `<div class="text-sm text-red-600">Failed to generate preview</div>`;
+    });
+}
+
+function displayPreview(previewData) {
+  const previewContent = document.getElementById('preview-content');
+  let html = `<div class="text-xs text-gray-600 mb-2">Preview with ${previewData.student_sample_size} students</div>`;
+  
+  Object.entries(previewData.preview_arrangements).forEach(([day, arrangement]) => {
+    html += `<div class="mb-2">
+      <span class="font-medium text-sm">Day ${day}:</span>
+      <span class="text-xs text-gray-600">`;
+    
+    Object.entries(arrangement).forEach(([table, students]) => {
+      html += `T${table}(${students.length}) `;
+    });
+    
+    html += `</span></div>`;
+  });
+  
+  if (previewData.efficiency_metrics) {
+    html += `<div class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded mt-2">
+      Coverage: ${previewData.efficiency_metrics.interaction_coverage}% | 
+      Efficiency: ${previewData.efficiency_metrics.efficiency_score}%
+    </div>`;
+  }
+  
+  previewContent.innerHTML = html;
+}
+
+function updateEstimatedTime() {
+  const totalDays = document.querySelector('select[name="multi_day_config[total_days]"]')?.value || 3;
+  const runtimePerDay = document.querySelector('input[name="multi_day_config[max_runtime_per_day]"]')?.value || 20;
+  const estimatedTime = Math.ceil(totalDays * runtimePerDay * 1.2); // Add 20% buffer
+  
+  document.getElementById('estimated-time').textContent = `${estimatedTime} seconds`;
+}
+
+function saveAsDraft() {
+  // Implementation for saving configuration as draft
+  alert('Draft save functionality would be implemented here');
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+  updateEstimatedTime();
+  
+  // Auto-generate preview for default strategy
+  setTimeout(generatePreview, 500);
+});
+</script>

@@ -1,0 +1,326 @@
+<div class="max-w-7xl mx-auto">
+  <!-- Header -->
+  <div class="bg-white shadow-sm rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+          <h1 class="text-xl font-semibold text-gray-900">Seating Rules</h1>
+          <p class="mt-2 text-sm text-gray-700">
+            Manage natural language seating instructions for <%= @seating_event.name %>
+          </p>
+        </div>
+        <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none space-x-2">
+          <%= link_to "Validate All", validate_seating_event_seating_rules_path(@seating_event), 
+                      class: "inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50",
+                      data: { remote: true } %>
+          <%= link_to "Add Rule", new_seating_event_seating_rule_path(@seating_event), 
+                      class: "inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-4">
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-indigo-500 rounded-md flex items-center justify-center">
+              <span class="text-white text-sm font-bold"><%= @stats[:total_rules] %></span>
+            </div>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Total Rules</dt>
+              <dd class="text-lg font-medium text-gray-900"><%= @stats[:active_rules] %> active</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+              <span class="text-white text-sm font-bold"><%= @stats[:high_confidence] %></span>
+            </div>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">High Confidence</dt>
+              <dd class="text-lg font-medium text-gray-900">> 80%</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+              <span class="text-white text-sm font-bold"><%= @validation_result[:conflicts].count %></span>
+            </div>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Conflicts</dt>
+              <dd class="text-lg font-medium text-gray-900">
+                <% if @validation_result[:valid] %>
+                  <span class="text-green-600">Valid</span>
+                <% else %>
+                  <span class="text-red-600">Issues</span>
+                <% end %>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+              <span class="text-white text-sm font-bold"><%= @validation_result[:feasibility][:utilization] %>%</span>
+            </div>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Utilization</dt>
+              <dd class="text-lg font-medium text-gray-900">Expected</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Validation Results -->
+  <% unless @validation_result[:valid] %>
+    <div class="mt-6 bg-red-50 border-l-4 border-red-400 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">Rule Conflicts Detected</h3>
+          <div class="mt-2 text-sm text-red-700">
+            <ul class="list-disc pl-5 space-y-1">
+              <% @validation_result[:conflicts].each do |conflict| %>
+                <li><%= conflict[:message] %> (Severity: <%= conflict[:severity] %>)</li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Warnings -->
+  <% if @validation_result[:warnings].any? %>
+    <div class="mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-yellow-800">Warnings</h3>
+          <div class="mt-2 text-sm text-yellow-700">
+            <ul class="list-disc pl-5 space-y-1">
+              <% @validation_result[:warnings].each do |warning| %>
+                <li><%= warning[:message] %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Rules List -->
+  <div class="mt-6 bg-white shadow-sm rounded-lg overflow-hidden">
+    <div class="px-4 py-5 sm:p-6">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Active Rules</h2>
+      
+      <% if @seating_rules.any? %>
+        <div class="space-y-4">
+          <% @seating_rules.each do |rule| %>
+            <div class="border border-gray-200 rounded-lg p-4 <%= 'opacity-50' unless rule.active? %>">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-3">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= rule_type_color(rule.rule_type) %>">
+                      <%= rule.rule_type.humanize %>
+                    </span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= rule.confidence_color_class %>">
+                      <%= (rule.confidence_score * 100).round(1) %>% confidence
+                    </span>
+                    <span class="text-xs text-gray-500">Priority: <%= rule.priority %></span>
+                    <% unless rule.active? %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                        Inactive
+                      </span>
+                    <% end %>
+                  </div>
+                  
+                  <div class="mt-2">
+                    <p class="text-sm text-gray-900 font-medium">
+                      <%= rule.natural_language_input %>
+                    </p>
+                    <p class="text-sm text-gray-500 mt-1">
+                      <%= rule.rule_description %>
+                    </p>
+                  </div>
+
+                  <% if rule.target_attributes.present? %>
+                    <div class="mt-3">
+                      <p class="text-xs text-gray-500 mb-1">Target Attributes:</p>
+                      <div class="flex flex-wrap gap-1">
+                        <% rule.target_attributes.each do |field, values| %>
+                          <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                            <%= field %>: <%= Array(values).join(', ') %>
+                          </span>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+
+                  <% if rule.constraints.present? %>
+                    <div class="mt-2">
+                      <p class="text-xs text-gray-500 mb-1">Constraints:</p>
+                      <div class="text-xs text-gray-600">
+                        <% rule.constraints.each do |key, value| %>
+                          <span class="mr-3"><%= key.humanize %>: <%= value %></span>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+
+                <div class="ml-4 flex-shrink-0 flex space-x-2">
+                  <%= link_to seating_event_seating_rule_path(@seating_event, rule), 
+                              class: "text-indigo-600 hover:text-indigo-900 text-sm" do %>
+                    View
+                  <% end %>
+                  
+                  <%= link_to edit_seating_event_seating_rule_path(@seating_event, rule), 
+                              class: "text-indigo-600 hover:text-indigo-900 text-sm" do %>
+                    Edit
+                  <% end %>
+                  
+                  <%= link_to toggle_seating_event_seating_rule_path(@seating_event, rule), 
+                              method: :patch,
+                              class: "text-gray-600 hover:text-gray-900 text-sm" do %>
+                    <%= rule.active? ? 'Deactivate' : 'Activate' %>
+                  <% end %>
+                  
+                  <%= link_to seating_event_seating_rule_path(@seating_event, rule), 
+                              method: :delete,
+                              data: { confirm: 'Are you sure?' },
+                              class: "text-red-600 hover:text-red-900 text-sm" do %>
+                    Delete
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="text-center py-12">
+          <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+            <path d="M34 40h10v-4a6 6 0 00-10.712-3.714M34 40H14m20 0v-4a9.971 9.971 0 00-.712-3.714M14 40H4v-4a6 6 0 0110.713-3.714M14 40v-4c0-1.313.253-2.566.713-3.714m0 0A9.971 9.971 0 0124 24a9.971 9.971 0 019.287 6.286m-18.574 0A9.971 9.971 0 0124 12a9.971 9.971 0 019.287 6.286" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No seating rules</h3>
+          <p class="mt-1 text-sm text-gray-500">Get started by creating your first seating rule.</p>
+          <div class="mt-6">
+            <%= link_to new_seating_event_seating_rule_path(@seating_event), 
+                        class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" do %>
+              Add Seating Rule
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Natural Language Instructions History -->
+  <% if @natural_language_instructions.any? %>
+    <div class="mt-6 bg-white shadow-sm rounded-lg overflow-hidden">
+      <div class="px-4 py-5 sm:p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Parsing History</h2>
+        
+        <div class="space-y-3">
+          <% @natural_language_instructions.each do |instruction| %>
+            <div class="border-l-4 <%= instruction_border_color(instruction.parsing_status) %> pl-4">
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <p class="text-sm text-gray-900"><%= instruction.instruction_text %></p>
+                  <div class="mt-1 flex items-center space-x-3 text-xs text-gray-500">
+                    <span class="<%= instruction.status_color_class %> px-2 py-1 rounded">
+                      <%= instruction.parsing_status.humanize %>
+                    </span>
+                    <% if instruction.completed? %>
+                      <span>Generated <%= instruction.rule_count %> rule(s)</span>
+                      <span><%= (instruction.confidence_score * 100).round(1) %>% confidence</span>
+                    <% end %>
+                    <span>by <%= instruction.created_by.email %></span>
+                    <span><%= time_ago_in_words(instruction.created_at) %> ago</span>
+                  </div>
+                  <% if instruction.failed? && instruction.error_message.present? %>
+                    <p class="text-xs text-red-600 mt-1">Error: <%= instruction.error_message %></p>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<% content_for :head do %>
+  <style>
+    .rule-type-separation { @apply bg-red-100 text-red-800; }
+    .rule-type-clustering { @apply bg-green-100 text-green-800; }
+    .rule-type-distribution { @apply bg-blue-100 text-blue-800; }
+    .rule-type-proximity { @apply bg-purple-100 text-purple-800; }
+    .rule-type-custom { @apply bg-gray-100 text-gray-800; }
+  </style>
+<% end %>
+
+<% content_for :javascript do %>
+  <script>
+    function rule_type_color(type) {
+      const colors = {
+        'separation': 'bg-red-100 text-red-800',
+        'clustering': 'bg-green-100 text-green-800',
+        'distribution': 'bg-blue-100 text-blue-800',
+        'proximity': 'bg-purple-100 text-purple-800',
+        'custom': 'bg-gray-100 text-gray-800'
+      };
+      return colors[type] || 'bg-gray-100 text-gray-800';
+    }
+
+    function instruction_border_color(status) {
+      const colors = {
+        'completed': 'border-green-400',
+        'processing': 'border-blue-400', 
+        'pending': 'border-gray-400',
+        'failed': 'border-red-400',
+        'needs_review': 'border-yellow-400'
+      };
+      return colors[status] || 'border-gray-400';
+    }
+  </script>
+<% end %>

@@ -1,0 +1,302 @@
+<div class="diversity-analysis">
+  <!-- AI Explanation -->
+  <% if @diversity_explanation&.dig('explanation') %>
+    <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h4 class="text-sm font-medium text-green-800">Diversity Analysis</h4>
+          <div class="mt-2 text-sm text-green-700">
+            <p><%= @diversity_explanation['explanation'] %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Overall Diversity Metrics -->
+  <div class="mb-8">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Overall Diversity Scores</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Diversity Metrics Chart -->
+      <div class="bg-white border border-gray-200 rounded-lg p-4">
+        <h4 class="font-medium text-gray-900 mb-3">Diversity Breakdown</h4>
+        <canvas id="diversityBreakdownChart" width="300" height="200"></canvas>
+      </div>
+      
+      <!-- Diversity Scores List -->
+      <div class="bg-white border border-gray-200 rounded-lg p-4">
+        <h4 class="font-medium text-gray-900 mb-3">Score Details</h4>
+        <div class="space-y-3">
+          <% if @diversity_metrics.present? %>
+            <% @diversity_metrics.each do |metric, score| %>
+              <div class="flex justify-between items-center">
+                <div>
+                  <span class="text-sm font-medium text-gray-700"><%= metric.humanize %></span>
+                  <% if @diversity_explanation&.dig('score_interpretation', metric) %>
+                    <p class="text-xs text-gray-500"><%= @diversity_explanation['score_interpretation'][metric]['description'] %></p>
+                  <% end %>
+                </div>
+                <div class="flex items-center">
+                  <div class="w-24 bg-gray-200 rounded-full h-2 mr-3">
+                    <% score_value = score.to_f %>
+                    <div class="bg-<%= score_value >= 0.8 ? 'green' : (score_value >= 0.6 ? 'blue' : (score_value >= 0.4 ? 'yellow' : 'red')) %>-500 h-2 rounded-full" 
+                         style="width: <%= (score_value * 100).round(1) %>%"></div>
+                  </div>
+                  <span class="text-sm font-semibold text-gray-900">
+                    <%= number_to_percentage(score_value * 100, precision: 1) %>
+                  </span>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="text-gray-500 italic">No diversity metrics available.</div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table-by-Table Diversity -->
+  <div class="mb-8">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Table-by-Table Diversity</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <% if @table_diversity_breakdown.present? %>
+        <% @table_diversity_breakdown.each do |table_number, table_metrics| %>
+          <div class="bg-white border border-gray-200 rounded-lg p-4">
+            <div class="flex justify-between items-center mb-3">
+              <h4 class="font-medium text-gray-900">Table <%= table_number %></h4>
+              <% table_score = table_metrics.values.map(&:to_f).average || 0 %>
+              <span class="bg-<%= table_score >= 0.8 ? 'green' : (table_score >= 0.6 ? 'blue' : 'yellow') %>-100 text-<%= table_score >= 0.8 ? 'green' : (table_score >= 0.6 ? 'blue' : 'yellow') %>-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                <%= number_to_percentage(table_score * 100, precision: 0) %> avg
+              </span>
+            </div>
+            <div class="space-y-2">
+              <% if table_metrics.present? %>
+                <% table_metrics.each do |metric, score| %>
+                  <div class="flex justify-between items-center text-sm">
+                    <span class="text-gray-600"><%= metric.humanize %></span>
+                    <div class="flex items-center">
+                      <div class="w-16 bg-gray-200 rounded-full h-1 mr-2">
+                        <% score_value = score.to_f %>
+                        <div class="bg-<%= score_value >= 0.7 ? 'green' : (score_value >= 0.5 ? 'yellow' : 'red') %>-500 h-1 rounded-full" 
+                             style="width: <%= (score_value * 100).round(1) %>%"></div>
+                      </div>
+                      <span class="text-xs text-gray-900 font-medium">
+                        <%= number_to_percentage(score_value * 100, precision: 0) %>
+                      </span>
+                    </div>
+                  </div>
+                <% end %>
+              <% else %>
+                <div class="text-gray-400 text-sm italic">No metrics available</div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="col-span-2 text-center text-gray-500 italic py-8">
+          Table-level diversity breakdown not available.
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Diversity Heatmap -->
+  <div class="mb-8">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Diversity Heatmap</h3>
+    <div class="bg-white border border-gray-200 rounded-lg p-4">
+      <div id="diversityHeatmap" class="min-h-64">
+        <!-- Heatmap visualization will be loaded here -->
+      </div>
+      <div class="mt-4 flex justify-center">
+        <div class="flex items-center space-x-4 text-xs">
+          <div class="flex items-center">
+            <div class="w-4 h-4 bg-red-200 rounded mr-2"></div>
+            <span>Low Diversity</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-4 h-4 bg-yellow-300 rounded mr-2"></div>
+            <span>Medium Diversity</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-4 h-4 bg-green-400 rounded mr-2"></div>
+            <span>High Diversity</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Score Interpretation Guide -->
+  <% if @diversity_explanation&.dig('score_interpretation') %>
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Score Interpretation</h3>
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <% @diversity_explanation['score_interpretation'].each do |metric, data| %>
+            <div class="flex items-start">
+              <div class="flex-shrink-0 mt-1">
+                <div class="w-3 h-3 bg-<%= data['score'].to_f >= 0.8 ? 'green' : (data['score'].to_f >= 0.6 ? 'blue' : (data['score'].to_f >= 0.4 ? 'yellow' : 'red')) %>-500 rounded-full"></div>
+              </div>
+              <div class="ml-3">
+                <h4 class="text-sm font-medium text-gray-900"><%= metric.humanize %></h4>
+                <p class="text-sm text-gray-600"><%= data['interpretation'] %></p>
+                <p class="text-xs text-gray-500 mt-1"><%= data['description'] %></p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Improvement Suggestions -->
+  <% if @diversity_explanation&.dig('improvement_areas')&.any? %>
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Areas for Improvement</h3>
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div class="space-y-2">
+          <% @diversity_explanation['improvement_areas'].each do |suggestion| %>
+            <div class="flex items-start">
+              <svg class="w-4 h-4 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+              <p class="text-sm text-yellow-800"><%= suggestion %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Comparative Analysis -->
+  <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">How This Compares</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="text-center">
+        <div class="text-2xl font-bold text-blue-600">
+          <%= number_to_percentage((@diversity_metrics.values.map(&:to_f).average || 0) * 100, precision: 0) %>
+        </div>
+        <div class="text-sm text-gray-600">Overall Diversity</div>
+        <div class="text-xs text-gray-500 mt-1">
+          <%= (@diversity_metrics.values.map(&:to_f).average || 0) >= 0.8 ? 'Excellent' : ((@diversity_metrics.values.map(&:to_f).average || 0) >= 0.6 ? 'Good' : 'Fair') %>
+        </div>
+      </div>
+      
+      <div class="text-center">
+        <div class="text-2xl font-bold text-green-600">
+          <%= @table_diversity_breakdown.values.count { |metrics| (metrics.values.map(&:to_f).average || 0) >= 0.7 } %>
+          /
+          <%= @table_diversity_breakdown.count %>
+        </div>
+        <div class="text-sm text-gray-600">High-Diversity Tables</div>
+        <div class="text-xs text-gray-500 mt-1">
+          <%= number_to_percentage((@table_diversity_breakdown.values.count { |metrics| (metrics.values.map(&:to_f).average || 0) >= 0.7 }.to_f / @table_diversity_breakdown.count * 100), precision: 0) %> of tables
+        </div>
+      </div>
+      
+      <div class="text-center">
+        <div class="text-2xl font-bold text-purple-600">
+          <%= @diversity_metrics.count { |k, v| v.to_f >= 0.8 } %>
+          /
+          <%= @diversity_metrics.count %>
+        </div>
+        <div class="text-sm text-gray-600">Strong Metrics</div>
+        <div class="text-xs text-gray-500 mt-1">
+          Scoring above 80%
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  loadDiversityBreakdownChart();
+  loadDiversityHeatmap();
+});
+
+function loadDiversityBreakdownChart() {
+  const ctx = document.getElementById('diversityBreakdownChart')?.getContext('2d');
+  if (!ctx) return;
+  
+  const chartData = <%= raw({
+    labels: @diversity_metrics.keys.map(&:humanize),
+    data: @diversity_metrics.values.map { |v| (v.to_f * 100).round(1) },
+    backgroundColor: [
+      '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+      '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
+    ]
+  }.to_json) %>;
+  
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: chartData.labels,
+      datasets: [{
+        data: chartData.data,
+        backgroundColor: chartData.backgroundColor.slice(0, chartData.labels.length),
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            callback: function(value) {
+              return value + '%';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function loadDiversityHeatmap() {
+  const container = document.getElementById('diversityHeatmap');
+  if (!container) return;
+  
+  const heatmapData = <%= raw @heatmap_data.to_json %>;
+  
+  // Simple heatmap implementation using divs
+  let html = '<div class="grid grid-cols-4 gap-2">';
+  
+  heatmapData.forEach(function(tableData) {
+    const score = tableData.diversity_score || 0;
+    const colorClass = score >= 0.8 ? 'bg-green-400' : 
+                      (score >= 0.6 ? 'bg-yellow-300' : 
+                      (score >= 0.4 ? 'bg-orange-300' : 'bg-red-300'));
+    
+    html += `
+      <div class="text-center p-4 rounded-lg ${colorClass} hover:shadow-lg transition-shadow cursor-pointer"
+           title="Table ${tableData.table}: ${Math.round(score * 100)}% diversity"
+           onclick="showTableDetails(${tableData.table})">
+        <div class="font-semibold">Table ${tableData.table}</div>
+        <div class="text-sm">${tableData.students} students</div>
+        <div class="text-xs">${Math.round(score * 100)}%</div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showTableDetails(tableNumber) {
+  showTableExplanation(tableNumber);
+}
+</script>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Export Ready</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #1f2937; color: white; padding: 20px; text-align: center; }
+    .content { padding: 20px; background: #f9f9f9; }
+    .button { display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0; }
+    .details { background: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
+    .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Export Ready!</h1>
+    </div>
+    
+    <div class="content">
+      <p>Hello <%= @user.name || @user.email %>,</p>
+      
+      <p>Your seating chart export has been generated successfully and is ready for download.</p>
+      
+      <div class="details">
+        <h3>Export Details</h3>
+        <ul>
+          <li><strong>Event:</strong> <%= @arrangement.seating_event.name %></li>
+          <% if @arrangement.multi_day? %>
+            <li><strong>Day:</strong> <%= @arrangement.day_name %></li>
+          <% end %>
+          <li><strong>Format:</strong> <%= @export_record[:format].humanize %></li>
+          <li><strong>Filename:</strong> <%= @export_record[:filename] %></li>
+          <li><strong>Students:</strong> <%= @arrangement.students_count %></li>
+          <li><strong>Tables:</strong> <%= @arrangement.tables_count %></li>
+          <li><strong>Generated:</strong> <%= @export_record[:created_at].strftime('%B %d, %Y at %I:%M %p') %></li>
+        </ul>
+      </div>
+      
+      <p><a href="<%= @download_url %>" class="button">Download Export</a></p>
+      
+      <p><strong>Important:</strong> This download link will expire on <%= @export_record[:expires_at].strftime('%B %d, %Y at %I:%M %p') %>. Please download your file before this time.</p>
+      
+      <p>If you have any questions or need assistance, please don't hesitate to contact support.</p>
+      
+      <p>Best regards,<br>
+      CHDS Seating Charter System</p>
+    </div>
+    
+    <div class="footer">
+      <p>This is an automated message from CHDS Seating Charter. Please do not reply directly to this email.</p>
+    </div>
+  </div>
+</body>
+</html>

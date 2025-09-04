@@ -1,0 +1,306 @@
+<div class="container mx-auto px-4 py-6">
+  <!-- Header -->
+  <div class="mb-6">
+    <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-4">
+      <%= link_to "Dashboard", root_path, class: "hover:text-blue-600" %>
+      <span>/</span>
+      <%= link_to @seating_event.cohort.name, cohort_path(@seating_event.cohort), class: "hover:text-blue-600" %>
+      <span>/</span>
+      <%= link_to @seating_event.name, seating_event_path(@seating_event), class: "hover:text-blue-600" %>
+      <span>/</span>
+      <span class="text-gray-900">Compare Arrangements</span>
+    </nav>
+    
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Compare Seating Arrangements</h1>
+        <p class="text-gray-600 mt-1">Side-by-side comparison of different optimization results</p>
+      </div>
+      
+      <div class="flex space-x-3">
+        <%= link_to "New Optimization", 
+                new_seating_event_seating_optimization_path(@seating_event), 
+                class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+      </div>
+    </div>
+  </div>
+
+  <% if @comparison_data.empty? %>
+    <!-- Empty State -->
+    <div class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+        <path d="M34 40h10v-4a6 6 0 00-10.712-3.714M34 40H14m20 0v-4a9.971 9.971 0 00-.712-3.714M14 40H4v-4a6 6 0 0110.713-3.714M14 40v-4c0-1.313.253-2.566.713-3.714m0 0A9.971 9.971 0 0124 24c4.004 0 7.625 2.347 9.287 6m-9.287-6c-4.004 0-7.625 2.347-9.287 6m0 0A9.971 9.971 0 0014 40v-4c0-1.313-.253-2.566-.713-3.714zM24 12a6 6 0 100 12 6 6 0 000-12z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No arrangements to compare</h3>
+      <p class="mt-1 text-sm text-gray-500">Get started by creating your first optimized seating arrangement.</p>
+      <div class="mt-6">
+        <%= link_to "Create First Arrangement", 
+                new_seating_event_seating_optimization_path(@seating_event), 
+                class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700" %>
+      </div>
+    </div>
+  <% else %>
+    <!-- Comparison Overview -->
+    <div class="mb-8">
+      <div class="bg-white border border-gray-200 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Overview Comparison</h2>
+        
+        <div class="overflow-x-auto">
+          <table class="min-w-full">
+            <thead>
+              <tr class="border-b border-gray-200">
+                <th class="text-left py-3 px-4 font-medium text-gray-900">Arrangement</th>
+                <th class="text-center py-3 px-4 font-medium text-gray-900">Overall Score</th>
+                <th class="text-center py-3 px-4 font-medium text-gray-900">Agency</th>
+                <th class="text-center py-3 px-4 font-medium text-gray-900">Geographic</th>
+                <th class="text-center py-3 px-4 font-medium text-gray-900">Role</th>
+                <th class="text-center py-3 px-4 font-medium text-gray-900">Gender</th>
+                <th class="text-center py-3 px-4 font-medium text-gray-900">Experience</th>
+                <th class="text-center py-3 px-4 font-medium text-gray-900">Violations</th>
+                <th class="text-center py-3 px-4 font-medium text-gray-900">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <% @comparison_data.each_with_index do |data, index| %>
+                <tr class="<%= 'bg-green-50' if index == 0 %>">
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <% if index == 0 %>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mr-2">
+                          Best
+                        </span>
+                      <% end %>
+                      <div>
+                        <div class="font-medium text-gray-900">
+                          #<%= data[:arrangement].id %>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          <%= data[:arrangement].created_at.strftime("%m/%d/%Y %l:%M%p") %>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  
+                  <td class="text-center py-4 px-4">
+                    <div class="text-lg font-bold text-gray-900">
+                      <%= (data[:score] * 100).round(1) %>%
+                    </div>
+                  </td>
+                  
+                  <% if data[:metrics][:overall] %>
+                    <% %w[agency_diversity geographic_diversity role_diversity gender_diversity experience_diversity].each do |dimension| %>
+                      <td class="text-center py-4 px-4">
+                        <div class="text-sm font-medium text-gray-900">
+                          <%= (data[:metrics][:overall][dimension][:score] * 100).round(1) %>%
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-1 mt-1">
+                          <div class="bg-blue-600 h-1 rounded-full" 
+                               style="width: <%= (data[:metrics][:overall][dimension][:score] * 100) %>%"></div>
+                        </div>
+                      </td>
+                    <% end %>
+                  <% else %>
+                    <td colspan="5" class="text-center py-4 px-4 text-gray-500">No metrics available</td>
+                  <% end %>
+                  
+                  <td class="text-center py-4 px-4">
+                    <% if data[:violations].any? %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        <%= data[:violations].size %> violations
+                      </span>
+                    <% else %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        No violations
+                      </span>
+                    <% end %>
+                  </td>
+                  
+                  <td class="text-center py-4 px-4">
+                    <%= link_to "View", 
+                            seating_event_seating_optimization_path(@seating_event, data[:arrangement]), 
+                            class: "text-blue-600 hover:text-blue-800 text-sm font-medium" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Comparison -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <% @comparison_data.first(3).each_with_index do |data, index| %>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 <%= 'ring-2 ring-green-500 ring-opacity-50' if index == 0 %>">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">
+              Arrangement #<%= data[:arrangement].id %>
+              <% if index == 0 %>
+                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  Best
+                </span>
+              <% end %>
+            </h3>
+            <div class="text-right">
+              <div class="text-2xl font-bold text-gray-900"><%= (data[:score] * 100).round(1) %>%</div>
+              <div class="text-sm text-gray-500">Overall Score</div>
+            </div>
+          </div>
+
+          <!-- Diversity Metrics Chart -->
+          <div class="mb-4">
+            <h4 class="font-medium text-gray-800 mb-2">Diversity Breakdown</h4>
+            <% if data[:metrics][:overall] %>
+              <div class="space-y-2">
+                <% data[:metrics][:overall].each do |dimension, metrics| %>
+                  <div>
+                    <div class="flex justify-between text-sm mb-1">
+                      <span class="text-gray-600 capitalize"><%= dimension.to_s.humanize %></span>
+                      <span class="font-medium"><%= (metrics[:score] * 100).round(1) %>%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                      <div class="<%= score_color_class(metrics[:score]) %> h-2 rounded-full" 
+                           style="width: <%= (metrics[:score] * 100) %>%"></div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Constraint Violations -->
+          <div class="mb-4">
+            <h4 class="font-medium text-gray-800 mb-2">Constraints</h4>
+            <% if data[:violations].any? %>
+              <div class="space-y-1">
+                <% data[:violations].first(3).each do |violation| %>
+                  <div class="text-xs p-2 rounded 
+                              <%= violation[:severity] == :hard ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' %>">
+                    <span class="font-medium"><%= violation[:severity].upcase %>:</span>
+                    <%= truncate(violation[:description], length: 60) %>
+                  </div>
+                <% end %>
+                <% if data[:violations].size > 3 %>
+                  <div class="text-xs text-gray-500">+ <%= data[:violations].size - 3 %> more</div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="text-sm text-green-600 bg-green-50 p-2 rounded">
+                No constraint violations
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Stats -->
+          <div class="pt-3 border-t border-gray-200">
+            <div class="text-xs text-gray-500 space-y-1">
+              <div>Created: <%= data[:arrangement].created_at.strftime("%m/%d/%Y %l:%M%p") %></div>
+              <% if data[:arrangement].optimization_scores %>
+                <div>Strategy: <%= data[:arrangement].optimization_scores['strategy']&.humanize || 'N/A' %></div>
+                <div>Runtime: <%= data[:arrangement].optimization_scores['runtime'] || 'N/A' %>s</div>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="mt-4 pt-3 border-t border-gray-200">
+            <div class="flex space-x-2">
+              <%= link_to "View Details", 
+                      seating_event_seating_optimization_path(@seating_event, data[:arrangement]), 
+                      class: "flex-1 text-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" %>
+              <%= link_to "Export", 
+                      export_seating_event_seating_optimization_path(@seating_event, data[:arrangement], format: :csv), 
+                      class: "px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Performance Comparison Chart -->
+    <% if @comparison_data.size > 1 %>
+      <div class="mt-8">
+        <div class="bg-white border border-gray-200 rounded-lg p-6">
+          <h2 class="text-xl font-semibold mb-4">Performance Trends</h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Score Distribution -->
+            <div>
+              <h3 class="font-medium text-gray-800 mb-3">Score Distribution</h3>
+              <div class="space-y-2">
+                <% @comparison_data.each_with_index do |data, index| %>
+                  <div class="flex items-center">
+                    <div class="w-16 text-sm text-gray-600">#<%= data[:arrangement].id %></div>
+                    <div class="flex-1 mx-3">
+                      <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div class="bg-blue-600 h-3 rounded-full" 
+                             style="width: <%= (data[:score] * 100) %>%"></div>
+                      </div>
+                    </div>
+                    <div class="w-12 text-sm font-medium text-gray-900"><%= (data[:score] * 100).round(1) %>%</div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+            
+            <!-- Violation Count -->
+            <div>
+              <h3 class="font-medium text-gray-800 mb-3">Constraint Violations</h3>
+              <div class="space-y-2">
+                <% @comparison_data.each_with_index do |data, index| %>
+                  <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-600">Arrangement #<%= data[:arrangement].id %></div>
+                    <div class="flex items-center space-x-2">
+                      <% hard_violations = data[:violations].count { |v| v[:severity] == :hard } %>
+                      <% soft_violations = data[:violations].count { |v| v[:severity] == :soft } %>
+                      
+                      <% if hard_violations > 0 %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          <%= hard_violations %> hard
+                        </span>
+                      <% end %>
+                      
+                      <% if soft_violations > 0 %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                          <%= soft_violations %> soft
+                        </span>
+                      <% end %>
+                      
+                      <% if data[:violations].empty? %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          None
+                        </span>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+
+<% content_for :head do %>
+  <style>
+    .score-bar {
+      transition: width 0.5s ease-in-out;
+    }
+  </style>
+<% end %>
+
+<%
+def score_color_class(score)
+  if score >= 0.8
+    'bg-green-600'
+  elsif score >= 0.6
+    'bg-yellow-500'
+  elsif score >= 0.4
+    'bg-orange-500'
+  else
+    'bg-red-500'
+  end
+end
+%>

@@ -1,0 +1,415 @@
+<div class="container mx-auto px-4 py-6">
+  <div class="mb-6">
+    <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-4">
+      <%= link_to "Dashboard", root_path, class: "hover:text-blue-600" %>
+      <span>/</span>
+      <%= link_to @cohort.name, cohort_path(@cohort), class: "hover:text-blue-600" %>
+      <span>/</span>
+      <%= link_to @seating_event.name, cohort_seating_event_path(@cohort, @seating_event), class: "hover:text-blue-600" %>
+      <span>/</span>
+      <%= link_to "Results", cohort_seating_event_multi_day_optimization_path(@cohort, @seating_event), class: "hover:text-blue-600" %>
+      <span>/</span>
+      <span class="text-gray-900">Calendar View</span>
+    </nav>
+    
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Multi-Day Calendar View</h1>
+        <p class="text-gray-600 mt-1">Workshop seating arrangements across <%= @calendar_data.keys.count %> days</p>
+      </div>
+      
+      <div class="flex space-x-3">
+        <%= link_to "Results View", cohort_seating_event_multi_day_optimization_path(@cohort, @seating_event),
+                class: "px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50" %>
+        <%= link_to "Interactions", interactions_cohort_seating_event_multi_day_optimization_path(@cohort, @seating_event),
+                class: "px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Navigation -->
+  <div class="mb-6 bg-white border border-gray-200 rounded-lg p-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <h2 class="text-lg font-semibold text-gray-900">
+          <%= @seating_event.event_date.strftime("%B %Y") %>
+        </h2>
+        <div class="text-sm text-gray-600">
+          <%= @seating_event.name %> • <%= @calendar_data.keys.count %> days
+        </div>
+      </div>
+      
+      <!-- View Mode Toggle -->
+      <div class="flex items-center space-x-2">
+        <span class="text-sm text-gray-600">View:</span>
+        <div class="flex bg-gray-100 rounded-lg p-1">
+          <button onclick="setViewMode('calendar')" id="calendar-view-btn"
+                  class="px-3 py-1 text-sm rounded-md bg-white shadow text-gray-900 font-medium">
+            Calendar
+          </button>
+          <button onclick="setViewMode('timeline')" id="timeline-view-btn"
+                  class="px-3 py-1 text-sm rounded-md text-gray-600 hover:text-gray-900">
+            Timeline
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Grid View -->
+  <div id="calendar-view" class="calendar-container">
+    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      
+      <!-- Calendar Header -->
+      <div class="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
+        <% %w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday].each do |day_name| %>
+          <div class="p-4 text-center text-sm font-medium text-gray-700">
+            <%= day_name %>
+          </div>
+        <% end %>
+      </div>
+      
+      <!-- Calendar Body -->
+      <div class="grid grid-cols-7">
+        <% 
+          start_date = @seating_event.event_date.beginning_of_month.beginning_of_week(:sunday)
+          end_date = @seating_event.event_date.end_of_month.end_of_week(:sunday)
+          current_date = start_date
+        %>
+        
+        <% while current_date <= end_date %>
+          <%
+            is_current_month = current_date.month == @seating_event.event_date.month
+            workshop_day = get_workshop_day_for_date(current_date)
+            has_arrangement = workshop_day && @calendar_data[workshop_day]
+          %>
+          
+          <div class="<%= is_current_month ? 'bg-white' : 'bg-gray-50' %> border-r border-b border-gray-200 min-h-[120px] p-2">
+            
+            <!-- Date Number -->
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm <%= is_current_month ? 'text-gray-900' : 'text-gray-400' %> font-medium">
+                <%= current_date.day %>
+              </span>
+              
+              <% if has_arrangement %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                  Day <%= workshop_day %>
+                </span>
+              <% end %>
+            </div>
+            
+            <!-- Workshop Day Content -->
+            <% if has_arrangement %>
+              <div class="space-y-1">
+                <div class="text-xs font-medium text-purple-900 mb-1">
+                  Workshop Day <%= workshop_day %>
+                </div>
+                
+                <!-- Mini seating preview -->
+                <div class="space-y-1">
+                  <% @calendar_data[workshop_day][:tables].first(3).each do |table_number, students| %>
+                    <div class="text-xs text-gray-600 truncate">
+                      T<%= table_number %>: <%= students.count %> students
+                    </div>
+                  <% end %>
+                  
+                  <% if @calendar_data[workshop_day][:tables].count > 3 %>
+                    <div class="text-xs text-gray-500">
+                      +<%= @calendar_data[workshop_day][:tables].count - 3 %> more tables
+                    </div>
+                  <% end %>
+                </div>
+                
+                <!-- Day metrics -->
+                <div class="mt-2 flex items-center justify-between">
+                  <span class="text-xs text-green-600 font-medium">
+                    <%= number_with_precision(@calendar_data[workshop_day][:metrics][:overall_score] * 100, precision: 0) %>% score
+                  </span>
+                  <button onclick="showDayDetails(<%= workshop_day %>, '<%= current_date.strftime('%B %d') %>')"
+                          class="text-xs text-purple-600 hover:text-purple-800">
+                    Details →
+                  </button>
+                </div>
+              </div>
+            <% end %>
+            
+            <!-- Today indicator -->
+            <% if current_date == Date.current %>
+              <div class="absolute top-2 right-2">
+                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+              </div>
+            <% end %>
+          </div>
+          
+          <% current_date += 1.day %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline View -->
+  <div id="timeline-view" class="timeline-container hidden">
+    <div class="space-y-6">
+      <% @day_navigation.each_with_index do |day_info, index| %>
+        <div class="bg-white border border-gray-200 rounded-lg p-6">
+          <div class="flex items-start">
+            <!-- Timeline indicator -->
+            <div class="flex flex-col items-center mr-4">
+              <div class="w-4 h-4 bg-purple-500 rounded-full"></div>
+              <% unless index == @day_navigation.count - 1 %>
+                <div class="w-0.5 h-16 bg-gray-300 mt-2"></div>
+              <% end %>
+            </div>
+            
+            <!-- Day content -->
+            <div class="flex-1">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900">
+                    <%= day_info[:day_name] %> - Day <%= day_info[:day_number] %>
+                  </h3>
+                  <p class="text-sm text-gray-600">
+                    <%= day_info[:date].strftime("%A, %B %d, %Y") %>
+                  </p>
+                </div>
+                
+                <div class="text-right">
+                  <div class="text-lg font-bold text-purple-600">
+                    <%= number_with_precision(day_info[:metrics_summary][:overall_score], precision: 1) %>%
+                  </div>
+                  <div class="text-sm text-gray-500">Overall Score</div>
+                </div>
+              </div>
+              
+              <!-- Day summary -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div class="p-3 bg-blue-50 rounded-lg">
+                  <div class="text-sm text-blue-600">Tables Used</div>
+                  <div class="text-lg font-semibold text-blue-900">
+                    <%= @calendar_data[day_info[:day_number]][:tables].keys.count %>
+                  </div>
+                </div>
+                
+                <div class="p-3 bg-green-50 rounded-lg">
+                  <div class="text-sm text-green-600">Students Seated</div>
+                  <div class="text-lg font-semibold text-green-900">
+                    <%= @calendar_data[day_info[:day_number]][:tables].values.map(&:count).sum %>
+                  </div>
+                </div>
+                
+                <div class="p-3 bg-purple-50 rounded-lg">
+                  <div class="text-sm text-purple-600">Interactions</div>
+                  <div class="text-lg font-semibold text-purple-900">
+                    <%= calculate_day_interactions(@calendar_data[day_info[:day_number]][:tables]) %>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Mini table preview -->
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <% @calendar_data[day_info[:day_number]][:tables].first(4).each do |table_number, students| %>
+                  <div class="p-2 border border-gray-200 rounded text-center">
+                    <div class="text-xs font-medium text-gray-900">Table <%= table_number %></div>
+                    <div class="text-xs text-gray-600"><%= students.count %> students</div>
+                  </div>
+                <% end %>
+                
+                <% if @calendar_data[day_info[:day_number]][:tables].count > 4 %>
+                  <div class="p-2 border border-gray-200 rounded text-center bg-gray-50">
+                    <div class="text-xs text-gray-500">+<%= @calendar_data[day_info[:day_number]][:tables].count - 4 %> more</div>
+                  </div>
+                <% end %>
+              </div>
+              
+              <div class="mt-4">
+                <button onclick="showDayDetails(<%= day_info[:day_number] %>, '<%= day_info[:date].strftime('%B %d') %>')"
+                        class="text-sm text-purple-600 hover:text-purple-800 font-medium">
+                  View Full Day Arrangement →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Day Details Modal -->
+  <div id="day-details-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl max-h-[90vh] overflow-y-auto w-full mx-4">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 id="modal-day-title" class="text-xl font-semibold text-gray-900"></h3>
+          <button onclick="closeDayDetails()" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <div id="modal-day-content" class="space-y-4">
+          <!-- Day details will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="mt-6 bg-white border border-gray-200 rounded-lg p-4">
+    <h3 class="font-medium text-gray-900 mb-3">Legend</h3>
+    <div class="flex flex-wrap gap-4 text-sm">
+      <div class="flex items-center">
+        <div class="w-4 h-4 bg-purple-500 rounded-full mr-2"></div>
+        <span class="text-gray-700">Workshop Day</span>
+      </div>
+      <div class="flex items-center">
+        <div class="w-4 h-4 bg-blue-500 rounded-full mr-2"></div>
+        <span class="text-gray-700">Today</span>
+      </div>
+      <div class="flex items-center">
+        <div class="w-4 h-2 bg-green-100 mr-2"></div>
+        <span class="text-gray-700">High Diversity Score (80%+)</span>
+      </div>
+      <div class="flex items-center">
+        <div class="w-4 h-2 bg-yellow-100 mr-2"></div>
+        <span class="text-gray-700">Medium Diversity Score (60-79%)</span>
+      </div>
+      <div class="flex items-center">
+        <div class="w-4 h-2 bg-red-100 mr-2"></div>
+        <span class="text-gray-700">Low Diversity Score (<60%)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex items-center justify-between pt-6 border-t border-gray-200 mt-6">
+    <div class="flex space-x-3">
+      <%= link_to "Back to Results", cohort_seating_event_multi_day_optimization_path(@cohort, @seating_event),
+              class: "px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50" %>
+    </div>
+    
+    <div class="flex space-x-3">
+      <button onclick="printCalendar()" 
+              class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
+        Print Calendar
+      </button>
+      <%= link_to "Export Calendar", export_cohort_seating_event_multi_day_optimization_path(@cohort, @seating_event, format: :pdf, view: :calendar),
+              class: "px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700" %>
+    </div>
+  </div>
+</div>
+
+<script>
+function setViewMode(mode) {
+  const calendarView = document.getElementById('calendar-view');
+  const timelineView = document.getElementById('timeline-view');
+  const calendarBtn = document.getElementById('calendar-view-btn');
+  const timelineBtn = document.getElementById('timeline-view-btn');
+  
+  if (mode === 'calendar') {
+    calendarView.classList.remove('hidden');
+    timelineView.classList.add('hidden');
+    calendarBtn.classList.add('bg-white', 'shadow', 'text-gray-900', 'font-medium');
+    calendarBtn.classList.remove('text-gray-600');
+    timelineBtn.classList.remove('bg-white', 'shadow', 'text-gray-900', 'font-medium');
+    timelineBtn.classList.add('text-gray-600');
+  } else {
+    calendarView.classList.add('hidden');
+    timelineView.classList.remove('hidden');
+    timelineBtn.classList.add('bg-white', 'shadow', 'text-gray-900', 'font-medium');
+    timelineBtn.classList.remove('text-gray-600');
+    calendarBtn.classList.remove('bg-white', 'shadow', 'text-gray-900', 'font-medium');
+    calendarBtn.classList.add('text-gray-600');
+  }
+}
+
+function showDayDetails(dayNumber, dateString) {
+  const modal = document.getElementById('day-details-modal');
+  const title = document.getElementById('modal-day-title');
+  const content = document.getElementById('modal-day-content');
+  
+  title.textContent = `Day ${dayNumber} Details - ${dateString}`;
+  content.innerHTML = '<div class="text-gray-500">Loading...</div>';
+  
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  
+  // Load day details via AJAX
+  fetch(`<%= cohort_seating_event_multi_day_optimization_path(@cohort, @seating_event) %>/day_arrangement?day_number=${dayNumber}`)
+    .then(response => response.text())
+    .then(html => {
+      content.innerHTML = html;
+    })
+    .catch(error => {
+      content.innerHTML = '<div class="text-red-600">Failed to load day details.</div>';
+    });
+}
+
+function closeDayDetails() {
+  const modal = document.getElementById('day-details-modal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+
+function printCalendar() {
+  window.print();
+}
+
+// Close modal when clicking outside
+document.getElementById('day-details-modal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeDayDetails();
+  }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeDayDetails();
+  }
+  if (e.key === 'c' && e.ctrlKey) {
+    setViewMode('calendar');
+  }
+  if (e.key === 't' && e.ctrlKey) {
+    setViewMode('timeline');
+  }
+});
+</script>
+
+<% content_for :head do %>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      .calendar-container { page-break-inside: avoid; }
+    }
+    
+    .calendar-container .grid > div {
+      position: relative;
+    }
+    
+    .timeline-container .bg-purple-500 {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+  </style>
+<% end %>
+
+<%# Helper methods that would be defined in the controller or helper %>
+<%
+def get_workshop_day_for_date(date)
+  @day_navigation&.find { |day_info| day_info[:date].to_date == date.to_date }&.dig(:day_number)
+end
+
+def calculate_day_interactions(tables)
+  total_interactions = 0
+  tables.each do |table_number, students|
+    total_interactions += students.combination(2).count
+  end
+  total_interactions
+end
+%>

@@ -1,0 +1,366 @@
+<div class="container mx-auto px-4 py-6">
+  <div class="mb-6">
+    <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-4">
+      <%= link_to "Dashboard", root_path, class: "hover:text-blue-600" %>
+      <span>/</span>
+      <%= link_to @cohort.name, cohort_path(@cohort), class: "hover:text-blue-600" %>
+      <span>/</span>
+      <%= link_to @seating_event.name, cohort_seating_event_path(@cohort, @seating_event), class: "hover:text-blue-600" %>
+      <span>/</span>
+      <span class="text-gray-900">Multi-Day Results</span>
+    </nav>
+    
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Multi-Day Workshop Results</h1>
+        <p class="text-gray-600 mt-1">Optimized seating arrangements across <%= @daily_arrangements.keys.count %> days</p>
+      </div>
+      
+      <div class="flex space-x-3">
+        <%= link_to "View Calendar", calendar_cohort_seating_event_multi_day_optimization_path(@cohort, @seating_event),
+                class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" %>
+        <%= link_to "View Interactions", interactions_cohort_seating_event_multi_day_optimization_path(@cohort, @seating_event),
+                class: "px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors" %>
+        <%= link_to "Analytics", analytics_cohort_seating_event_multi_day_optimization_path(@cohort, @seating_event),
+                class: "px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overall Metrics Summary -->
+  <div class="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-4 text-green-900">Optimization Summary</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="text-center">
+        <div class="text-3xl font-bold text-green-700">
+          <%= number_with_precision(@overall_metrics[:average_daily_score] * 100, precision: 1) %>%
+        </div>
+        <div class="text-sm text-green-600">Average Daily Score</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl font-bold text-blue-700">
+          <%= number_with_precision(@overall_metrics[:interaction_coverage], precision: 1) %>%
+        </div>
+        <div class="text-sm text-blue-600">Interaction Coverage</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl font-bold text-purple-700">
+          <%= @overall_metrics[:total_unique_interactions] %>
+        </div>
+        <div class="text-sm text-purple-600">Unique Interactions</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl font-bold text-indigo-700">
+          <%= number_with_precision(@optimization_stats[:total_runtime], precision: 1) %>s
+        </div>
+        <div class="text-sm text-indigo-600">Total Runtime</div>
+      </div>
+    </div>
+    
+    <!-- Diversity Trend Indicator -->
+    <div class="mt-4 p-3 bg-white bg-opacity-60 rounded-md">
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-gray-700">Diversity Trend Across Days:</span>
+        <div class="flex items-center">
+          <% if @overall_metrics[:diversity_trend] > 0 %>
+            <svg class="w-4 h-4 text-green-600 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm text-green-700">Improving (+<%= number_with_precision(@overall_metrics[:diversity_trend], precision: 3) %>)</span>
+          <% elsif @overall_metrics[:diversity_trend] < 0 %>
+            <svg class="w-4 h-4 text-red-600 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm text-red-700">Declining (<%= number_with_precision(@overall_metrics[:diversity_trend], precision: 3) %>)</span>
+          <% else %>
+            <span class="text-sm text-gray-600">Stable</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day Navigation Tabs -->
+  <div class="mb-6">
+    <div class="border-b border-gray-200">
+      <nav class="-mb-px flex space-x-8" aria-label="Days">
+        <% @daily_arrangements.keys.sort.each_with_index do |day_number, index| %>
+          <button onclick="showDay(<%= day_number %>)" 
+                  id="day-tab-<%= day_number %>"
+                  class="<%= index == 0 ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %> 
+                         whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors">
+            Day <%= day_number %>
+            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+              <%= @daily_metrics[day_number] ? number_with_precision(@daily_metrics[day_number][:overall_score] * 100, precision: 0) : '0' %>%
+            </span>
+          </button>
+        <% end %>
+        
+        <!-- All Days Overview Tab -->
+        <button onclick="showAllDays()" 
+                id="day-tab-all"
+                class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+          All Days Overview
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Day Content Areas -->
+  <% @daily_arrangements.each_with_index do |(day_number, arrangement), index| %>
+    <div id="day-content-<%= day_number %>" class="day-content <%= index == 0 ? '' : 'hidden' %>">
+      <div class="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold">Day <%= day_number %> Seating Arrangement</h2>
+          <div class="flex items-center space-x-4 text-sm text-gray-600">
+            <span>Tables: <%= arrangement.keys.count %></span>
+            <span>Students: <%= arrangement.values.map(&:count).sum %></span>
+            <span>Score: <%= @daily_metrics[day_number] ? number_with_precision(@daily_metrics[day_number][:overall_score] * 100, precision: 1) : '0' %>%</span>
+          </div>
+        </div>
+        
+        <!-- Seating Arrangement Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <% arrangement.sort.each do |table_number, students| %>
+            <div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+              <div class="text-center mb-3">
+                <h3 class="font-medium text-gray-900">Table <%= table_number %></h3>
+                <p class="text-sm text-gray-500"><%= students.count %> students</p>
+              </div>
+              
+              <div class="space-y-2">
+                <% students.each_with_index do |student, seat_index| %>
+                  <div class="flex items-center justify-between p-2 bg-white rounded border">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-xs font-medium text-blue-700 mr-2">
+                        <%= seat_index + 1 %>
+                      </div>
+                      <span class="text-sm font-medium text-gray-900"><%= student.name %></span>
+                    </div>
+                    
+                    <!-- Student interaction indicator -->
+                    <% interaction_count = get_student_interaction_count(student, day_number) %>
+                    <% if interaction_count > 0 %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <%= interaction_count %> interactions
+                      </span>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+              
+              <!-- Table diversity info -->
+              <div class="mt-3 pt-3 border-t border-gray-200">
+                <div class="text-xs text-gray-600 space-y-1">
+                  <% if @daily_metrics[day_number] && @daily_metrics[day_number][:table_diversity] %>
+                    <div>Diversity Score: <%= number_with_precision(@daily_metrics[day_number][:table_diversity][table_number] || 0, precision: 2) %></div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        
+        <!-- Day-specific metrics -->
+        <% if @daily_metrics[day_number] %>
+          <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+            <h3 class="font-medium text-blue-900 mb-3">Day <%= day_number %> Metrics</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div>
+                <span class="text-blue-600">Overall Score:</span>
+                <span class="font-medium ml-1"><%= number_with_precision(@daily_metrics[day_number][:overall_score] * 100, precision: 1) %>%</span>
+              </div>
+              <div>
+                <span class="text-blue-600">Interactions:</span>
+                <span class="font-medium ml-1"><%= @daily_metrics[day_number][:interactions_count] || 0 %></span>
+              </div>
+              <div>
+                <span class="text-blue-600">Avg Table Size:</span>
+                <span class="font-medium ml-1"><%= number_with_precision(arrangement.values.map(&:count).sum.to_f / arrangement.keys.count, precision: 1) %></span>
+              </div>
+              <div>
+                <span class="text-blue-600">Utilization:</span>
+                <span class="font-medium ml-1"><%= number_with_precision((arrangement.values.map(&:count).sum.to_f / (@seating_event.total_tables * @seating_event.table_size)) * 100, precision: 0) %>%</span>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- All Days Overview -->
+  <div id="day-content-all" class="day-content hidden">
+    <div class="bg-white border border-gray-200 rounded-lg p-6">
+      <h2 class="text-xl font-semibold mb-6">Multi-Day Overview</h2>
+      
+      <!-- Daily Scores Chart -->
+      <div class="mb-8">
+        <h3 class="font-medium text-gray-900 mb-4">Daily Optimization Scores</h3>
+        <div class="relative">
+          <div class="flex items-end space-x-4 h-32">
+            <% @daily_arrangements.keys.sort.each do |day_number| %>
+              <% score = @daily_metrics[day_number] ? @daily_metrics[day_number][:overall_score] : 0 %>
+              <div class="flex flex-col items-center">
+                <div class="bg-purple-600 rounded-t" style="height: <%= [score * 120, 5].max %>px; width: 40px;"></div>
+                <div class="text-xs text-gray-600 mt-2">Day <%= day_number %></div>
+                <div class="text-xs font-medium text-purple-600"><%= number_with_precision(score * 100, precision: 0) %>%</div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Interaction Summary -->
+      <div class="mb-8">
+        <h3 class="font-medium text-gray-900 mb-4">Interaction Summary</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="p-4 bg-green-50 rounded-lg">
+            <div class="text-2xl font-bold text-green-700"><%= @overall_metrics[:total_unique_interactions] %></div>
+            <div class="text-sm text-green-600">Total Unique Interactions</div>
+            <div class="text-xs text-gray-500 mt-1">Out of <%= @overall_metrics[:possible_interactions] %> possible</div>
+          </div>
+          
+          <div class="p-4 bg-blue-50 rounded-lg">
+            <div class="text-2xl font-bold text-blue-700"><%= number_with_precision(@overall_metrics[:interaction_coverage], precision: 1) %>%</div>
+            <div class="text-sm text-blue-600">Coverage Rate</div>
+            <div class="text-xs text-gray-500 mt-1">Percentage of possible pairs that interacted</div>
+          </div>
+          
+          <div class="p-4 bg-purple-50 rounded-lg">
+            <div class="text-2xl font-bold text-purple-700"><%= @overall_metrics[:days_optimized] %></div>
+            <div class="text-sm text-purple-600">Days Optimized</div>
+            <div class="text-xs text-gray-500 mt-1">Using <%= @optimization_stats[:rotation_strategy].humanize %> strategy</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Student Interaction Distribution -->
+      <% if @interaction_analysis && @interaction_analysis[:student_interaction_counts] %>
+        <div class="mb-6">
+          <h3 class="font-medium text-gray-900 mb-4">Student Interaction Distribution</h3>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
+                  <% @daily_arrangements.keys.sort.each do |day_number| %>
+                    <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Day <%= day_number %></th>
+                  <% end %>
+                  <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Total</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <% @interaction_analysis[:student_interaction_counts].first(10).each do |student_data| %>
+                  <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-900"><%= student_data[:name] %></td>
+                    <% @daily_arrangements.keys.sort.each do |day_number| %>
+                      <td class="px-4 py-2 text-center text-sm text-gray-600">
+                        <%= student_data[:daily_interactions][day_number] || 0 %>
+                      </td>
+                    <% end %>
+                    <td class="px-4 py-2 text-center text-sm font-medium text-gray-900">
+                      <%= student_data[:total_interactions] %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+          <% if @interaction_analysis[:student_interaction_counts].count > 10 %>
+            <p class="text-sm text-gray-500 mt-2">Showing top 10 students. 
+              <%= link_to "View all students", interactions_cohort_seating_event_multi_day_optimization_path(@cohort, @seating_event), 
+                      class: "text-purple-600 hover:text-purple-800" %>
+            </p>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+    <div class="flex space-x-3">
+      <%= link_to "New Optimization", new_cohort_seating_event_multi_day_optimization_path(@cohort, @seating_event), 
+              class: "px-4 py-2 border border-purple-300 rounded-md shadow-sm bg-white text-purple-700 hover:bg-purple-50" %>
+      <%= link_to "Single-Day Optimization", new_cohort_seating_event_seating_optimization_path(@cohort, @seating_event), 
+              class: "px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50" %>
+    </div>
+    
+    <div class="flex space-x-3">
+      <%= link_to "Export CSV", export_cohort_seating_event_multi_day_optimization_path(@cohort, @seating_event, format: :csv),
+              class: "px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700" %>
+      <%= link_to "Export PDF", export_cohort_seating_event_multi_day_optimization_path(@cohort, @seating_event, format: :pdf),
+              class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700" %>
+    </div>
+  </div>
+</div>
+
+<script>
+function showDay(dayNumber) {
+  // Hide all day contents
+  document.querySelectorAll('.day-content').forEach(content => {
+    content.classList.add('hidden');
+  });
+  
+  // Remove active state from all tabs
+  document.querySelectorAll('[id^="day-tab-"]').forEach(tab => {
+    tab.classList.remove('border-purple-500', 'text-purple-600');
+    tab.classList.add('border-transparent', 'text-gray-500');
+  });
+  
+  // Show selected day content
+  document.getElementById(`day-content-${dayNumber}`).classList.remove('hidden');
+  
+  // Add active state to selected tab
+  const activeTab = document.getElementById(`day-tab-${dayNumber}`);
+  activeTab.classList.add('border-purple-500', 'text-purple-600');
+  activeTab.classList.remove('border-transparent', 'text-gray-500');
+}
+
+function showAllDays() {
+  // Hide all individual day contents
+  document.querySelectorAll('.day-content').forEach(content => {
+    content.classList.add('hidden');
+  });
+  
+  // Remove active state from all tabs
+  document.querySelectorAll('[id^="day-tab-"]').forEach(tab => {
+    tab.classList.remove('border-purple-500', 'text-purple-600');
+    tab.classList.add('border-transparent', 'text-gray-500');
+  });
+  
+  // Show all days overview
+  document.getElementById('day-content-all').classList.remove('hidden');
+  
+  // Add active state to all days tab
+  const activeTab = document.getElementById('day-tab-all');
+  activeTab.classList.add('border-purple-500', 'text-purple-600');
+  activeTab.classList.remove('border-transparent', 'text-gray-500');
+}
+
+// Auto-refresh interaction data every 30 seconds if optimization is still running
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize with first day visible
+  const firstDay = document.querySelector('[id^="day-tab-"]:not([id$="-all"])');
+  if (firstDay) {
+    const dayNumber = firstDay.id.split('-')[2];
+    showDay(dayNumber);
+  }
+});
+</script>
+
+<% content_for :head do %>
+  <style>
+    .day-content {
+      min-height: 400px;
+    }
+    
+    .table-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+  </style>
+<% end %>

@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  seating_event: one
+  rule_type: MyString
+  natural_language_input: MyText
+  parsed_rule: 
+  confidence_score: 9.99
+  target_attributes: 
+  constraints: 
+  priority: 1
+  active: false
+
+two:
+  seating_event: two
+  rule_type: MyString
+  natural_language_input: MyText
+  parsed_rule: 
+  confidence_score: 9.99
+  target_attributes: 
+  constraints: 
+  priority: 1
+  active: false

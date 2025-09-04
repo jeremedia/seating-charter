@@ -1,0 +1,569 @@
+<% content_for :title, "Seating Arrangement Explanations" %>
+<% content_for :breadcrumbs do %>
+  <%= link_to "Home", root_path, class: "text-blue-600 hover:text-blue-800" %>
+  <span class="mx-2">/</span>
+  <%= link_to @seating_event.name, seating_event_path(@seating_event), class: "text-blue-600 hover:text-blue-800" %>
+  <span class="mx-2">/</span>
+  <%= link_to "Arrangement", seating_arrangement_path(@seating_event, @seating_arrangement), class: "text-blue-600 hover:text-blue-800" %>
+  <span class="mx-2">/</span>
+  <span class="text-gray-500">Explanations</span>
+<% end %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- Header Section -->
+  <div class="bg-white shadow-sm rounded-lg mb-8">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">
+            AI Seating Arrangement Explanations
+          </h1>
+          <p class="text-gray-600 mt-1">
+            Understand how and why students were arranged in this configuration
+          </p>
+        </div>
+        <div class="flex space-x-3">
+          <%= link_to "Export PDF", 
+                      seating_arrangement_explanations_export_path(@seating_event, @seating_arrangement, format: :pdf), 
+                      class: "btn btn-outline-primary",
+                      method: :get %>
+          <%= link_to "Regenerate", 
+                      seating_arrangement_explanations_generate_path(@seating_event, @seating_arrangement), 
+                      class: "btn btn-primary",
+                      method: :post,
+                      data: { confirm: "This will regenerate all explanations. Continue?" } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="px-6 py-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-blue-50 p-4 rounded-lg">
+          <h3 class="text-sm font-medium text-blue-800">Overall Score</h3>
+          <p class="text-2xl font-bold text-blue-600"><%= @seating_arrangement.formatted_score %></p>
+        </div>
+        <div class="bg-green-50 p-4 rounded-lg">
+          <h3 class="text-sm font-medium text-green-800">Confidence</h3>
+          <p class="text-2xl font-bold text-green-600"><%= number_to_percentage(@seating_arrangement.overall_confidence * 100, precision: 1) %></p>
+        </div>
+        <div class="bg-purple-50 p-4 rounded-lg">
+          <h3 class="text-sm font-medium text-purple-800">Students</h3>
+          <p class="text-2xl font-bold text-purple-600"><%= @seating_arrangement.students_count %></p>
+        </div>
+        <div class="bg-yellow-50 p-4 rounded-lg">
+          <h3 class="text-sm font-medium text-yellow-800">Tables</h3>
+          <p class="text-2xl font-bold text-yellow-600"><%= @seating_arrangement.tables_count %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="mb-8">
+    <nav class="flex space-x-8" aria-label="Tabs">
+      <a href="#overview" class="explanation-tab active" data-tab="overview">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        Overview
+      </a>
+      <a href="#seating-chart" class="explanation-tab" data-tab="seating-chart">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        Interactive Chart
+      </a>
+      <a href="#diversity" class="explanation-tab" data-tab="diversity">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        Diversity Analysis
+      </a>
+      <a href="#constraints" class="explanation-tab" data-tab="constraints">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Constraints
+      </a>
+      <a href="#optimization" class="explanation-tab" data-tab="optimization">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        Optimization Process
+      </a>
+    </nav>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    <!-- Overview Tab -->
+    <div id="overview" class="tab-pane active">
+      <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Overall Summary</h2>
+        <div class="prose max-w-none">
+          <p class="text-gray-700 leading-relaxed">
+            <%= @explanation_data['overall_summary'] || "This seating arrangement was optimized using advanced AI algorithms to maximize diversity and educational outcomes while respecting your specified constraints." %>
+          </p>
+        </div>
+        
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Diversity Chart -->
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="text-lg font-medium text-gray-900 mb-3">Diversity Scores</h3>
+            <canvas id="diversityChart" width="300" height="200"></canvas>
+          </div>
+          
+          <!-- Table Scores -->
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="text-lg font-medium text-gray-900 mb-3">Table Performance</h3>
+            <div class="space-y-2">
+              <% @table_scores.each do |table_number, score| %>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-medium text-gray-700">Table <%= table_number %></span>
+                  <div class="flex items-center">
+                    <div class="w-24 bg-gray-200 rounded-full h-2 mr-2">
+                      <div class="bg-blue-600 h-2 rounded-full" style="width: <%= (score * 100).round(1) %>%"></div>
+                    </div>
+                    <span class="text-sm text-gray-600"><%= number_to_percentage(score * 100, precision: 1) %></span>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Insights -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white shadow-sm rounded-lg p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-lg font-medium text-gray-900">Strengths</h3>
+              <ul class="mt-2 text-sm text-gray-600">
+                <% if @explanation_data['diversity_analysis']&.dig('score_interpretation') %>
+                  <% @explanation_data['diversity_analysis']['score_interpretation'].select { |k, v| v['score'] > 0.7 }.each do |metric, data| %>
+                    <li>• Strong <%= metric.humanize.downcase %></li>
+                  <% end %>
+                <% else %>
+                  <li>• Good overall diversity balance</li>
+                  <li>• Effective constraint satisfaction</li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white shadow-sm rounded-lg p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-lg font-medium text-gray-900">Areas for Improvement</h3>
+              <ul class="mt-2 text-sm text-gray-600">
+                <% if @explanation_data['diversity_analysis']&.dig('improvement_areas') %>
+                  <% @explanation_data['diversity_analysis']['improvement_areas'].each do |suggestion| %>
+                    <li>• <%= suggestion %></li>
+                  <% end %>
+                <% else %>
+                  <li>• Consider manual adjustments</li>
+                  <li>• Review constraint priorities</li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white shadow-sm rounded-lg p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-lg font-medium text-gray-900">Optimization Stats</h3>
+              <ul class="mt-2 text-sm text-gray-600">
+                <li>• Strategy: <%= @seating_arrangement.optimization_strategy %></li>
+                <li>• Improvements: <%= @seating_arrangement.total_improvements %></li>
+                <li>• Runtime: <%= @seating_arrangement.runtime_seconds.round(1) %>s</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive Seating Chart Tab -->
+    <div id="seating-chart" class="tab-pane hidden">
+      <div class="bg-white shadow-sm rounded-lg p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-900">Interactive Seating Chart</h2>
+          <div class="flex space-x-2">
+            <button id="toggleExplanations" class="btn btn-outline-primary btn-sm">
+              Show Explanations
+            </button>
+            <button id="toggleConfidence" class="btn btn-outline-secondary btn-sm">
+              Show Confidence
+            </button>
+          </div>
+        </div>
+        
+        <div id="interactiveSeatingChart" class="min-h-96">
+          <!-- Interactive seating chart will be loaded here -->
+        </div>
+
+        <!-- Legend -->
+        <div class="mt-4 flex justify-center">
+          <div class="flex space-x-6 text-sm">
+            <div class="flex items-center">
+              <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
+              <span>High Confidence (>80%)</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-4 h-4 bg-yellow-500 rounded mr-2"></div>
+              <span>Medium Confidence (60-80%)</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-4 h-4 bg-red-500 rounded mr-2"></div>
+              <span>Low Confidence (<60%)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Details Modal will be inserted here via JavaScript -->
+    </div>
+
+    <!-- Diversity Analysis Tab -->
+    <div id="diversity" class="tab-pane hidden">
+      <div class="bg-white shadow-sm rounded-lg p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Diversity Analysis</h2>
+        <div id="diversityContent">
+          <!-- Content loaded via AJAX -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Constraints Tab -->
+    <div id="constraints" class="tab-pane hidden">
+      <div class="bg-white shadow-sm rounded-lg p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Constraint Analysis</h2>
+        <div id="constraintsContent">
+          <!-- Content loaded via AJAX -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Optimization Process Tab -->
+    <div id="optimization" class="tab-pane hidden">
+      <div class="bg-white shadow-sm rounded-lg p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Optimization Process</h2>
+        <div id="optimizationContent">
+          <!-- Content loaded via AJAX -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Student Detail Modal -->
+<div id="studentModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Student Placement Explanation</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="studentModalContent">
+        <!-- Student explanation content loaded here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table Detail Modal -->
+<div id="tableModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Table Composition Explanation</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="tableModalContent">
+        <!-- Table explanation content loaded here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.explanation-tab {
+  @apply flex items-center px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent hover:border-gray-300 transition-colors duration-200;
+}
+
+.explanation-tab.active {
+  @apply text-blue-600 border-blue-600;
+}
+
+.tab-pane {
+  @apply block;
+}
+
+.tab-pane.hidden {
+  @apply hidden;
+}
+
+.student-seat {
+  @apply w-12 h-12 rounded-full border-2 border-gray-300 flex items-center justify-center text-xs font-medium cursor-pointer transition-all duration-200;
+}
+
+.student-seat:hover {
+  @apply shadow-lg transform scale-110;
+}
+
+.student-seat.high-confidence {
+  @apply border-green-500 bg-green-100 text-green-800;
+}
+
+.student-seat.medium-confidence {
+  @apply border-yellow-500 bg-yellow-100 text-yellow-800;
+}
+
+.student-seat.low-confidence {
+  @apply border-red-500 bg-red-100 text-red-800;
+}
+
+.table-container {
+  @apply bg-white border-2 border-gray-200 rounded-lg p-4 m-2;
+}
+
+.table-container:hover {
+  @apply border-blue-300 shadow-md;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize the explanations interface
+  initializeExplanationsInterface();
+  
+  // Load diversity chart
+  loadDiversityChart();
+  
+  // Setup tab navigation
+  setupTabNavigation();
+  
+  // Load interactive seating chart
+  loadInteractiveSeatingChart();
+});
+
+function initializeExplanationsInterface() {
+  // Add click handlers for interactive elements
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('student-seat')) {
+      showStudentExplanation(e.target.dataset.studentId);
+    }
+    
+    if (e.target.classList.contains('table-container') || e.target.closest('.table-container')) {
+      const tableContainer = e.target.classList.contains('table-container') ? e.target : e.target.closest('.table-container');
+      showTableExplanation(tableContainer.dataset.tableNumber);
+    }
+  });
+}
+
+function loadDiversityChart() {
+  const ctx = document.getElementById('diversityChart')?.getContext('2d');
+  if (!ctx) return;
+  
+  const chartData = <%= raw @diversity_chart_data.to_json %>;
+  
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: chartData.labels || [],
+      datasets: [{
+        data: chartData.data || [],
+        backgroundColor: chartData.backgroundColor || ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+}
+
+function setupTabNavigation() {
+  document.querySelectorAll('.explanation-tab').forEach(tab => {
+    tab.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Remove active class from all tabs
+      document.querySelectorAll('.explanation-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
+      
+      // Add active class to clicked tab
+      this.classList.add('active');
+      
+      // Show corresponding tab pane
+      const targetTab = this.getAttribute('data-tab');
+      const targetPane = document.getElementById(targetTab);
+      if (targetPane) {
+        targetPane.classList.remove('hidden');
+        
+        // Load content if not already loaded
+        loadTabContent(targetTab);
+      }
+    });
+  });
+}
+
+function loadTabContent(tabName) {
+  const contentMap = {
+    'diversity': '<%= seating_arrangement_explanations_diversity_path(@seating_event, @seating_arrangement) %>',
+    'constraints': '<%= seating_arrangement_explanations_constraints_path(@seating_event, @seating_arrangement) %>',
+    'optimization': '<%= seating_arrangement_explanations_optimization_path(@seating_event, @seating_arrangement) %>'
+  };
+  
+  const url = contentMap[tabName];
+  if (!url) return;
+  
+  const contentDiv = document.getElementById(tabName + 'Content');
+  if (!contentDiv || contentDiv.dataset.loaded === 'true') return;
+  
+  fetch(url, { headers: { 'Accept': 'text/html' } })
+    .then(response => response.text())
+    .then(html => {
+      contentDiv.innerHTML = html;
+      contentDiv.dataset.loaded = 'true';
+    })
+    .catch(error => {
+      console.error('Error loading tab content:', error);
+      contentDiv.innerHTML = '<div class="text-red-600">Error loading content. Please try again.</div>';
+    });
+}
+
+function loadInteractiveSeatingChart() {
+  fetch('<%= seating_arrangement_explanations_interactive_chart_path(@seating_event, @seating_arrangement, chart_type: "seating_chart") %>')
+    .then(response => response.json())
+    .then(data => {
+      renderInteractiveSeatingChart(data);
+    })
+    .catch(error => {
+      console.error('Error loading interactive chart:', error);
+      document.getElementById('interactiveSeatingChart').innerHTML = 
+        '<div class="text-red-600 text-center p-8">Error loading seating chart. Please refresh the page.</div>';
+    });
+}
+
+function renderInteractiveSeatingChart(data) {
+  const container = document.getElementById('interactiveSeatingChart');
+  if (!container) return;
+  
+  let html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
+  
+  Object.entries(data.tables || {}).forEach(([tableNumber, tableData]) => {
+    html += `
+      <div class="table-container" data-table-number="${tableNumber}">
+        <div class="text-center mb-3">
+          <h3 class="text-lg font-semibold text-gray-900">Table ${tableNumber}</h3>
+          <div class="text-sm text-gray-600">
+            Score: ${Math.round(tableData.table_score * 100)}%
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+    `;
+    
+    tableData.students.forEach(student => {
+      const confidenceClass = getConfidenceClass(student.confidence);
+      html += `
+        <div class="student-seat ${confidenceClass}" 
+             data-student-id="${student.id}"
+             title="${student.name} (${Math.round(student.confidence * 100)}% confidence)">
+          ${student.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+        </div>
+      `;
+    });
+    
+    html += `
+        </div>
+        <div class="mt-2 text-xs text-gray-500 truncate" title="${tableData.explanation_summary}">
+          ${tableData.explanation_summary || 'Click for explanation'}
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function getConfidenceClass(confidence) {
+  if (confidence >= 0.8) return 'high-confidence';
+  if (confidence >= 0.6) return 'medium-confidence';
+  return 'low-confidence';
+}
+
+function showStudentExplanation(studentId) {
+  const url = '<%= seating_arrangement_explanations_student_path(@seating_event, @seating_arrangement, student_id: "__STUDENT_ID__") %>'.replace('__STUDENT_ID__', studentId);
+  
+  fetch(url, { headers: { 'Accept': 'text/html' } })
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('studentModalContent').innerHTML = html;
+      $('#studentModal').modal('show');
+    })
+    .catch(error => {
+      console.error('Error loading student explanation:', error);
+      alert('Error loading explanation. Please try again.');
+    });
+}
+
+function showTableExplanation(tableNumber) {
+  const url = '<%= seating_arrangement_explanations_table_path(@seating_event, @seating_arrangement, table_number: "__TABLE_NUMBER__") %>'.replace('__TABLE_NUMBER__', tableNumber);
+  
+  fetch(url, { headers: { 'Accept': 'text/html' } })
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('tableModalContent').innerHTML = html;
+      $('#tableModal').modal('show');
+    })
+    .catch(error => {
+      console.error('Error loading table explanation:', error);
+      alert('Error loading explanation. Please try again.');
+    });
+}
+
+// Toggle explanation display modes
+document.getElementById('toggleExplanations')?.addEventListener('click', function() {
+  document.querySelectorAll('.table-container .text-xs').forEach(el => {
+    el.classList.toggle('hidden');
+  });
+  this.textContent = this.textContent.includes('Show') ? 'Hide Explanations' : 'Show Explanations';
+});
+
+document.getElementById('toggleConfidence')?.addEventListener('click', function() {
+  document.querySelectorAll('.student-seat').forEach(seat => {
+    seat.classList.toggle('show-confidence');
+  });
+  this.textContent = this.textContent.includes('Show') ? 'Hide Confidence' : 'Show Confidence';
+});
+</script>

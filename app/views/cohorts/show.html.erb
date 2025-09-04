@@ -1,0 +1,334 @@
+<% content_for :title, @cohort.name %>
+
+<div class="max-w-7xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900"><%= @cohort.name %></h1>
+        <p class="text-gray-600 mt-2"><%= @cohort.description if @cohort.description.present? %></p>
+        <div class="flex items-center space-x-4 mt-2">
+          <span class="text-sm text-gray-500">
+            <%= @cohort.start_date.strftime("%B %d") %> - <%= @cohort.end_date.strftime("%B %d, %Y") %>
+          </span>
+          <span class="text-sm text-gray-500">
+            Duration: <%= @cohort.duration_in_days %> days
+          </span>
+        </div>
+      </div>
+      
+      <div class="flex space-x-3">
+        <%= link_to 'Edit Cohort', edit_cohort_path(@cohort), 
+              class: 'inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50' %>
+        <%= link_to 'Back to Dashboard', dashboard_path, 
+              class: 'inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50' %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-gray-500">Students</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @cohort.students_count %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-gray-500">Available Spots</p>
+            <p class="text-2xl font-semibold <%= @cohort.available_spots > 0 ? 'text-green-600' : 'text-red-600' %>">
+              <%= @cohort.available_spots %>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-gray-500">Seating Events</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @seating_events.count %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-gray-500">Imports</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @recent_imports.count %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main Content Area -->
+    <div class="lg:col-span-2 space-y-8">
+      <!-- Import Section -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold text-gray-900">Student Roster Management</h2>
+            <%= link_to 'Import Roster', new_cohort_import_path(@cohort), 
+                  class: 'inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700' %>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <% if @recent_imports.any? %>
+            <div class="space-y-4">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Imports</h3>
+              <% @recent_imports.each do |import_session| %>
+                <div class="border border-gray-200 rounded-lg p-4">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <h4 class="font-medium text-gray-900"><%= import_session.file_name %></h4>
+                      <p class="text-sm text-gray-500">
+                        Imported <%= time_ago_in_words(import_session.created_at) %> ago
+                      </p>
+                      <div class="flex items-center space-x-4 mt-2">
+                        <span class="text-sm text-gray-600">
+                          <span class="font-medium"><%= import_session.students_imported %></span> students
+                        </span>
+                        <span class="text-sm text-gray-600">
+                          <span class="font-medium"><%= import_session.file_size_human %></span>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                      <% case import_session.status %>
+                      <% when 'completed' %>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Completed
+                        </span>
+                      <% when 'processing' %>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          Processing
+                        </span>
+                      <% when 'failed' %>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          Failed
+                        </span>
+                      <% else %>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                          Pending
+                        </span>
+                      <% end %>
+                      
+                      <%= link_to 'View', cohort_import_path(@cohort, import_session), 
+                            class: 'text-blue-600 hover:text-blue-500 text-sm' %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-center py-8">
+              <div class="text-gray-400 text-4xl mb-4">📋</div>
+              <h3 class="text-lg font-medium text-gray-900 mb-2">No roster imported yet</h3>
+              <p class="text-gray-500 mb-4">Upload a roster file to get started with AI-powered seating optimization.</p>
+              <%= link_to "Import Roster", new_cohort_import_path(@cohort), 
+                    class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Students List -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold text-gray-900">Students</h2>
+            <% if @students.any? %>
+              <span class="text-sm text-gray-500"><%= pluralize(@students.count, 'student') %></span>
+            <% end %>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <% if @students.any? %>
+            <div class="space-y-4">
+              <% @students.limit(10).each do |student| %>
+                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10">
+                      <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                        <span class="text-sm font-medium text-gray-700">
+                          <%= student.name.split(' ').map(&:first).join('').upcase %>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900"><%= student.name %></div>
+                      <div class="text-sm text-gray-500"><%= student.title %></div>
+                      <div class="text-xs text-gray-400"><%= student.organization %></div>
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-center space-x-2">
+                    <% if student.gender %>
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <%= student.gender.humanize %>
+                      </span>
+                    <% end %>
+                    <% if student.agency_level %>
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <%= student.agency_level.humanize %>
+                      </span>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+              
+              <% if @students.count > 10 %>
+                <div class="text-center pt-4">
+                  <p class="text-sm text-gray-500">Showing 10 of <%= @students.count %> students</p>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-center py-8">
+              <div class="text-gray-400 text-4xl mb-4">👥</div>
+              <h3 class="text-lg font-medium text-gray-900 mb-2">No students enrolled</h3>
+              <p class="text-gray-500 mb-4">Import a roster file to add students to this cohort.</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-8">
+      <!-- Quick Actions -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
+        </div>
+        
+        <div class="p-6 space-y-3">
+          <%= link_to new_cohort_import_path(@cohort), 
+                class: "flex items-center p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors group w-full" do %>
+            <div class="flex-shrink-0 mr-3">
+              <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="text-left">
+              <p class="font-medium text-blue-900 group-hover:text-blue-700">Import Roster</p>
+              <p class="text-sm text-blue-600">Upload student roster file</p>
+            </div>
+          <% end %>
+
+          <% if @students.any? %>
+            <div class="flex items-center p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div class="flex-shrink-0 mr-3">
+                <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <p class="font-medium text-green-900">Create Seating</p>
+                <p class="text-sm text-green-600">Generate seating arrangements</p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Cohort Status -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Cohort Status</h3>
+        </div>
+        
+        <div class="p-6">
+          <div class="space-y-4">
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500">Status:</span>
+              <% if @cohort.active? %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  Active
+                </span>
+              <% elsif @cohort.upcoming? %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  Upcoming
+                </span>
+              <% else %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  Past
+                </span>
+              <% end %>
+            </div>
+            
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500">Capacity:</span>
+              <span class="font-medium">
+                <%= @cohort.students_count %>/<%= @cohort.max_students %>
+                (<%= number_to_percentage((@cohort.students_count.to_f / @cohort.max_students * 100), precision: 0) %>)
+              </span>
+            </div>
+            
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500">Days remaining:</span>
+              <span class="font-medium">
+                <% if @cohort.active? %>
+                  <%= (@cohort.end_date - Date.current).to_i + 1 %> days
+                <% elsif @cohort.upcoming? %>
+                  Starts in <%= (@cohort.start_date - Date.current).to_i %> days
+                <% else %>
+                  Completed
+                <% end %>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,789 @@
+<div class="editor-toolbar" data-seating-editor-target="toolbar">
+  
+  <!-- Main Tool Groups -->
+  <div class="toolbar-groups">
+    
+    <!-- Table Management -->
+    <div class="tool-group">
+      <label class="tool-group-label">Tables</label>
+      <div class="tool-buttons">
+        <button type="button" 
+                class="tool-btn" 
+                data-action="click->seating-editor#createTable"
+                title="Add new table (Ctrl+T)">
+          <span class="tool-icon">➕</span>
+          <span class="tool-text">Add Table</span>
+        </button>
+        
+        <button type="button" 
+                class="tool-btn" 
+                data-action="click->seating-editor#balanceTables"
+                title="Balance student distribution across tables">
+          <span class="tool-icon">⚖️</span>
+          <span class="tool-text">Balance</span>
+        </button>
+        
+        <div class="dropdown">
+          <button type="button" 
+                  class="tool-btn dropdown-toggle" 
+                  data-bs-toggle="dropdown"
+                  title="Table templates">
+            <span class="tool-icon">📐</span>
+            <span class="tool-text">Templates</span>
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <button class="dropdown-item" 
+                      data-action="click->seating-editor#applyTemplate"
+                      data-template="u_shape">
+                <span class="template-icon">🔄</span> U-Shape Layout
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" 
+                      data-action="click->seating-editor#applyTemplate"
+                      data-template="classroom">
+                <span class="template-icon">📚</span> Classroom Rows
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" 
+                      data-action="click->seating-editor#applyTemplate"
+                      data-template="roundtables">
+                <span class="template-icon">⭕</span> Round Tables
+              </button>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <button class="dropdown-item" 
+                      onclick="alert('Custom templates coming soon!')">
+                <span class="template-icon">⚙️</span> Custom Template...
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Operations -->
+    <div class="tool-group">
+      <label class="tool-group-label">Students</label>
+      <div class="tool-buttons">
+        <button type="button" 
+                class="tool-btn" 
+                id="shuffleAllBtn"
+                onclick="if(confirm('Shuffle all students randomly?')) alert('Feature coming soon!')"
+                title="Randomly shuffle all students">
+          <span class="tool-icon">🔀</span>
+          <span class="tool-text">Shuffle All</span>
+        </button>
+        
+        <button type="button" 
+                class="tool-btn" 
+                id="bulkSelectBtn"
+                onclick="toggleBulkMode()"
+                title="Select multiple students for bulk operations">
+          <span class="tool-icon">☑️</span>
+          <span class="tool-text">Bulk Select</span>
+        </button>
+        
+        <div class="dropdown">
+          <button type="button" 
+                  class="tool-btn dropdown-toggle" 
+                  data-bs-toggle="dropdown"
+                  title="Auto-arrange options">
+            <span class="tool-icon">🤖</span>
+            <span class="tool-text">Auto-Arrange</span>
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <button class="dropdown-item" onclick="autoArrangeByAttribute('gender')">
+                <span class="arrange-icon">👥</span> Balance by Gender
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" onclick="autoArrangeByAttribute('agency_level')">
+                <span class="arrange-icon">🏛️</span> Mix Agency Levels
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" onclick="autoArrangeByAttribute('department_type')">
+                <span class="arrange-icon">🏢</span> Distribute Departments
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" onclick="autoArrangeByAttribute('seniority_level')">
+                <span class="arrange-icon">📊</span> Balance Seniority
+              </button>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <button class="dropdown-item" onclick="optimizeAllTables()">
+                <span class="arrange-icon">⚡</span> AI Optimize All
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Options -->
+    <div class="tool-group">
+      <label class="tool-group-label">View</label>
+      <div class="tool-buttons">
+        <div class="dropdown">
+          <button type="button" 
+                  class="tool-btn dropdown-toggle" 
+                  data-bs-toggle="dropdown"
+                  title="Color coding options">
+            <span class="tool-icon">🎨</span>
+            <span class="tool-text">Color By</span>
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <button class="dropdown-item" 
+                      data-action="click->seating-editor#setColorMode"
+                      data-color-mode="none">
+                <span class="color-sample"></span> No Color Coding
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" 
+                      data-action="click->seating-editor#setColorMode"
+                      data-color-mode="gender">
+                <span class="color-sample gender"></span> Gender
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" 
+                      data-action="click->seating-editor#setColorMode"
+                      data-color-mode="agency">
+                <span class="color-sample agency"></span> Agency Level
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" 
+                      data-action="click->seating-editor#setColorMode"
+                      data-color-mode="department">
+                <span class="color-sample department"></span> Department
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" 
+                      data-action="click->seating-editor#setColorMode"
+                      data-color-mode="seniority">
+                <span class="color-sample seniority"></span> Seniority
+              </button>
+            </li>
+          </ul>
+        </div>
+        
+        <button type="button" 
+                class="tool-btn" 
+                id="gridViewBtn"
+                onclick="toggleGridView()"
+                title="Toggle between grid and visual table view">
+          <span class="tool-icon">⊞</span>
+          <span class="tool-text">Grid View</span>
+        </button>
+        
+        <button type="button" 
+                class="tool-btn" 
+                id="fullscreenBtn"
+                onclick="toggleFullscreen()"
+                title="Toggle fullscreen editor">
+          <span class="tool-icon">⛶</span>
+          <span class="tool-text">Fullscreen</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="tool-group">
+      <label class="tool-group-label">Actions</label>
+      <div class="tool-buttons">
+        <button type="button" 
+                class="tool-btn" 
+                data-action="click->seating-editor#undo"
+                title="Undo last action (Ctrl+Z)">
+          <span class="tool-icon">↶</span>
+          <span class="tool-text">Undo</span>
+        </button>
+        
+        <div class="dropdown">
+          <button type="button" 
+                  class="tool-btn dropdown-toggle" 
+                  data-bs-toggle="dropdown"
+                  title="Export options">
+            <span class="tool-icon">💾</span>
+            <span class="tool-text">Export</span>
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item" 
+                 href="/seating_arrangements/<%= @seating_arrangement.id %>/export?format=csv"
+                 download>
+                <span class="export-icon">📊</span> Export as CSV
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" 
+                 href="/seating_arrangements/<%= @seating_arrangement.id %>/export?format=json"
+                 download>
+                <span class="export-icon">📄</span> Export as JSON
+              </a>
+            </li>
+            <li>
+              <button class="dropdown-item" onclick="printArrangement()">
+                <span class="export-icon">🖨️</span> Print Layout
+              </button>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <button class="dropdown-item" onclick="shareArrangement()">
+                <span class="export-icon">🔗</span> Share Link
+              </button>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="dropdown">
+          <button type="button" 
+                  class="tool-btn dropdown-toggle" 
+                  data-bs-toggle="dropdown"
+                  title="Help and shortcuts">
+            <span class="tool-icon">❓</span>
+            <span class="tool-text">Help</span>
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <button class="dropdown-item" 
+                      data-bs-toggle="modal" 
+                      data-bs-target="#shortcutsModal">
+                <span class="help-icon">⌨️</span> Keyboard Shortcuts
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" 
+                      data-bs-toggle="modal" 
+                      data-bs-target="#tutorialModal">
+                <span class="help-icon">🎓</span> Tutorial
+              </button>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <button class="dropdown-item" onclick="resetToDefaults()">
+                <span class="help-icon">🔄</span> Reset to Defaults
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Indicators -->
+  <div class="toolbar-status">
+    <div class="status-indicators">
+      <div class="status-item">
+        <span class="status-label">Auto-save:</span>
+        <span class="status-value" data-seating-editor-target="autoSaveStatus">
+          <span class="status-dot active"></span>
+          <span class="status-text">Active</span>
+        </span>
+      </div>
+      
+      <div class="status-item">
+        <span class="status-label">Changes:</span>
+        <span class="status-value" data-seating-editor-target="changesStatus">
+          <span class="changes-count">0</span>
+        </span>
+      </div>
+      
+      <div class="status-item">
+        <span class="status-label">Last saved:</span>
+        <span class="status-value" data-seating-editor-target="lastSavedTime">
+          Just now
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Keyboard Shortcuts Modal -->
+<div class="modal fade" id="shortcutsModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Keyboard Shortcuts</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="shortcuts-grid">
+          <div class="shortcut-item">
+            <kbd>Ctrl</kbd> + <kbd>Z</kbd>
+            <span>Undo last action</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Ctrl</kbd> + <kbd>S</kbd>
+            <span>Save changes</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Ctrl</kbd> + <kbd>F</kbd>
+            <span>Focus search</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Ctrl</kbd> + <kbd>T</kbd>
+            <span>Add new table</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Escape</kbd>
+            <span>Clear selection</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Delete</kbd>
+            <span>Remove selected students</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Double-click</kbd>
+            <span>Shuffle table</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Right-click</kbd>
+            <span>Context menu</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tutorial Modal -->
+<div class="modal fade" id="tutorialModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Seating Editor Tutorial</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="tutorial-steps">
+          <div class="tutorial-step">
+            <h6>1. Drag and Drop</h6>
+            <p>Click and drag student cards between tables to rearrange seating. The editor will automatically save your changes and update diversity scores.</p>
+          </div>
+          
+          <div class="tutorial-step">
+            <h6>2. Table Management</h6>
+            <p>Use the "Add Table" button to create new tables. Right-click on tables for options like shuffle, rename, or delete.</p>
+          </div>
+          
+          <div class="tutorial-step">
+            <h6>3. Auto-Arrange</h6>
+            <p>Use the "Auto-Arrange" dropdown to automatically distribute students based on various attributes for optimal diversity.</p>
+          </div>
+          
+          <div class="tutorial-step">
+            <h6>4. Search and Filter</h6>
+            <p>Use the search box to quickly find specific students. Click on search results to highlight students in the editor.</p>
+          </div>
+          
+          <div class="tutorial-step">
+            <h6>5. Visual Feedback</h6>
+            <p>Watch the diversity scores and constraint violations panel to see how your changes affect the overall arrangement quality.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .editor-toolbar {
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .toolbar-groups {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  
+  .tool-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .tool-group-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin: 0;
+  }
+  
+  .tool-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .tool-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    background: white;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+    min-width: 60px;
+  }
+  
+  .tool-btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+    transform: translateY(-1px);
+  }
+  
+  .tool-btn:active {
+    transform: translateY(0);
+    background: #dee2e6;
+  }
+  
+  .tool-btn.active {
+    background: #007bff;
+    color: white;
+    border-color: #0056b3;
+  }
+  
+  .tool-icon {
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+  
+  .tool-text {
+    font-size: 0.7rem;
+    font-weight: 500;
+    line-height: 1;
+    text-align: center;
+  }
+  
+  .toolbar-status {
+    display: flex;
+    align-items: center;
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
+  
+  .status-indicators {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .status-label {
+    font-weight: 500;
+  }
+  
+  .status-value {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6c757d;
+    flex-shrink: 0;
+  }
+  
+  .status-dot.active {
+    background: #28a745;
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  
+  .changes-count {
+    background: #dc3545;
+    color: white;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+  }
+  
+  .changes-count:empty {
+    display: none;
+  }
+  
+  /* Dropdown customizations */
+  .dropdown-menu {
+    font-size: 0.9rem;
+  }
+  
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  .template-icon,
+  .arrange-icon,
+  .export-icon,
+  .help-icon {
+    width: 16px;
+    text-align: center;
+  }
+  
+  .color-sample {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid #dee2e6;
+    background: linear-gradient(45deg, transparent 30%, #999 30%, #999 50%, transparent 50%);
+  }
+  
+  .color-sample.gender {
+    background: linear-gradient(45deg, #007bff 50%, #e83e8c 50%);
+  }
+  
+  .color-sample.agency {
+    background: linear-gradient(120deg, #28a745 33%, #17a2b8 33%, #17a2b8 66%, #ffc107 66%);
+  }
+  
+  .color-sample.department {
+    background: linear-gradient(90deg, #3f51b5 50%, #7b1fa2 50%);
+  }
+  
+  .color-sample.seniority {
+    background: linear-gradient(45deg, #ef6c00 25%, #f9a825 25%, #f9a825 50%, #388e3c 50%, #388e3c 75%, #c2185b 75%);
+  }
+  
+  /* Modal customizations */
+  .shortcuts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .shortcut-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 0.25rem;
+  }
+  
+  .shortcut-item kbd {
+    background: #e9ecef;
+    border: 1px solid #adb5bd;
+    border-radius: 0.25rem;
+    padding: 0.1rem 0.3rem;
+    font-size: 0.8rem;
+    font-family: monospace;
+  }
+  
+  .tutorial-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .tutorial-step h6 {
+    color: #007bff;
+    margin-bottom: 0.5rem;
+  }
+  
+  .tutorial-step p {
+    margin: 0;
+    color: #6c757d;
+    line-height: 1.5;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .editor-toolbar {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+    }
+    
+    .toolbar-groups {
+      justify-content: space-around;
+      gap: 1rem;
+    }
+    
+    .tool-group {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .tool-buttons {
+      justify-content: center;
+    }
+    
+    .tool-btn {
+      min-width: 50px;
+      padding: 0.4rem;
+    }
+    
+    .tool-text {
+      font-size: 0.6rem;
+    }
+    
+    .toolbar-status {
+      justify-content: center;
+    }
+    
+    .status-indicators {
+      gap: 1rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .tool-text {
+      display: none;
+    }
+    
+    .tool-btn {
+      min-width: 40px;
+    }
+    
+    .status-indicators {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: center;
+    }
+  }
+</style>
+
+<script>
+  // Toolbar functionality
+  function toggleBulkMode() {
+    const editor = document.querySelector('[data-controller="seating-editor"]');
+    const cards = document.querySelectorAll('.student-card');
+    const btn = document.getElementById('bulkSelectBtn');
+    
+    const isBulkMode = editor.classList.contains('bulk-mode');
+    
+    if (isBulkMode) {
+      editor.classList.remove('bulk-mode');
+      cards.forEach(card => card.classList.remove('bulk-mode'));
+      btn.classList.remove('active');
+      btn.querySelector('.tool-text').textContent = 'Bulk Select';
+    } else {
+      editor.classList.add('bulk-mode');
+      cards.forEach(card => card.classList.add('bulk-mode'));
+      btn.classList.add('active');
+      btn.querySelector('.tool-text').textContent = 'Exit Bulk';
+    }
+  }
+  
+  function toggleGridView() {
+    const main = document.querySelector('.editor-main');
+    const btn = document.getElementById('gridViewBtn');
+    
+    const isGridView = main.classList.contains('grid-view');
+    
+    if (isGridView) {
+      main.classList.remove('grid-view');
+      btn.classList.remove('active');
+      btn.querySelector('.tool-text').textContent = 'Grid View';
+    } else {
+      main.classList.add('grid-view');
+      btn.classList.add('active');
+      btn.querySelector('.tool-text').textContent = 'Visual View';
+    }
+  }
+  
+  function toggleFullscreen() {
+    const editor = document.querySelector('.seating-editor');
+    const btn = document.getElementById('fullscreenBtn');
+    
+    if (!document.fullscreenElement) {
+      editor.requestFullscreen().then(() => {
+        btn.classList.add('active');
+        btn.querySelector('.tool-text').textContent = 'Exit Fullscreen';
+      });
+    } else {
+      document.exitFullscreen().then(() => {
+        btn.classList.remove('active');
+        btn.querySelector('.tool-text').textContent = 'Fullscreen';
+      });
+    }
+  }
+  
+  function autoArrangeByAttribute(attribute) {
+    if (confirm(`Auto-arrange students to balance ${attribute.replace('_', ' ')}?`)) {
+      // This would integrate with the Stimulus controller
+      alert('Auto-arrange feature coming soon!');
+    }
+  }
+  
+  function optimizeAllTables() {
+    if (confirm('Use AI to optimize all table arrangements? This will rearrange all students.')) {
+      alert('AI optimization feature coming soon!');
+    }
+  }
+  
+  function printArrangement() {
+    window.print();
+  }
+  
+  function shareArrangement() {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({
+        title: 'Seating Arrangement',
+        url: url
+      });
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Link copied to clipboard!');
+      });
+    }
+  }
+  
+  function resetToDefaults() {
+    if (confirm('Reset editor to default settings? This will not affect your seating arrangement.')) {
+      location.reload();
+    }
+  }
+</script>

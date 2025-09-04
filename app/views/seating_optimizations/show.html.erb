@@ -1,0 +1,231 @@
+<div class="container mx-auto px-4 py-6">
+  <!-- Header -->
+  <div class="mb-6">
+    <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-4">
+      <%= link_to "Dashboard", root_path, class: "hover:text-blue-600" %>
+      <span>/</span>
+      <%= link_to @seating_event.cohort.name, cohort_path(@seating_event.cohort), class: "hover:text-blue-600" %>
+      <span>/</span>
+      <%= link_to @seating_event.name, seating_event_path(@seating_event), class: "hover:text-blue-600" %>
+      <span>/</span>
+      <span class="text-gray-900">Optimized Arrangement</span>
+    </nav>
+    
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Seating Arrangement</h1>
+        <p class="text-gray-600 mt-1">
+          Optimized on <%= @seating_arrangement.created_at.strftime("%B %d, %Y at %l:%M %p") %>
+          by <%= @seating_arrangement.created_by.first_name %> <%= @seating_arrangement.created_by.last_name %>
+        </p>
+      </div>
+      
+      <div class="flex space-x-3">
+        <%= link_to "Compare Arrangements", 
+                compare_seating_event_seating_optimizations_path(@seating_event), 
+                class: "px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50" %>
+        <%= link_to "Export CSV", 
+                export_seating_event_seating_optimization_path(@seating_event, @seating_arrangement, format: :csv), 
+                class: "px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50" %>
+        <%= link_to "New Optimization", 
+                new_seating_event_seating_optimization_path(@seating_event), 
+                class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overall Score and Metrics -->
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Overall Score -->
+    <div class="bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-lg p-6">
+      <div class="text-center">
+        <div class="text-4xl font-bold"><%= (@overall_score * 100).round(1) %>%</div>
+        <div class="text-blue-100 mt-1">Overall Diversity Score</div>
+        <div class="mt-2 text-xs text-blue-200">
+          <% if @overall_score >= 0.8 %>
+            Excellent diversity
+          <% elsif @overall_score >= 0.6 %>
+            Good diversity
+          <% elsif @overall_score >= 0.4 %>
+            Moderate diversity
+          <% else %>
+            Needs improvement
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diversity Breakdown -->
+    <div class="lg:col-span-3 bg-white border border-gray-200 rounded-lg p-6">
+      <h3 class="text-lg font-semibold mb-4">Diversity Metrics</h3>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <% if @diversity_metrics[:overall] %>
+          <% @diversity_metrics[:overall].each do |dimension, metrics| %>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-gray-800"><%= (metrics[:score] * 100).round(1) %>%</div>
+              <div class="text-sm text-gray-600 capitalize"><%= dimension.to_s.humanize %></div>
+              <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: <%= (metrics[:score] * 100) %>%"></div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Constraint Violations (if any) -->
+  <% if @constraint_violations.any? %>
+    <div class="mb-6">
+      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-yellow-800">Constraint Violations</h3>
+            <div class="mt-2 text-sm text-yellow-700">
+              <ul class="list-disc pl-5 space-y-1">
+                <% @constraint_violations.each do |violation| %>
+                  <li>
+                    <span class="font-medium"><%= violation[:severity].upcase %>:</span>
+                    <%= violation[:description] %>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Seating Chart Visualization -->
+  <div class="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-4">Seating Chart</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @tables_data.each do |table_number, table_data| %>
+        <div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-semibold text-gray-800">Table <%= table_number %></h3>
+            <div class="flex items-center space-x-2">
+              <div class="text-sm text-gray-600"><%= table_data[:size] %> students</div>
+              <div class="px-2 py-1 rounded-full text-xs font-medium 
+                          <%= table_data[:diversity_score] >= 0.7 ? 'bg-green-100 text-green-800' :
+                              table_data[:diversity_score] >= 0.5 ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-red-100 text-red-800' %>">
+                <%= (table_data[:diversity_score] * 100).round %>% diverse
+              </div>
+            </div>
+          </div>
+          
+          <div class="space-y-2">
+            <% table_data[:students].each_with_index do |student, index| %>
+              <div class="bg-white border border-gray-200 rounded p-2 text-sm">
+                <div class="font-medium text-gray-900"><%= student.name %></div>
+                <div class="text-gray-600"><%= student.title %></div>
+                <div class="text-gray-500 text-xs"><%= student.organization %></div>
+                <% if student.location.present? %>
+                  <div class="text-gray-500 text-xs"><%= student.location %></div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+          
+          <!-- Table Diversity Metrics -->
+          <div class="mt-3 pt-3 border-t border-gray-200">
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <% if table_data[:metrics].present? %>
+                <% table_data[:metrics].each do |dimension, metrics| %>
+                  <div class="flex items-center justify-between">
+                    <span class="text-gray-600 capitalize"><%= dimension.to_s.split('_').first %></span>
+                    <span class="font-medium"><%= (metrics[:score] * 100).round %>%</span>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Detailed Analytics -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Optimization Stats -->
+    <div class="bg-white border border-gray-200 rounded-lg p-6">
+      <h3 class="text-lg font-semibold mb-4">Optimization Statistics</h3>
+      
+      <% if @seating_arrangement.optimization_scores.present? %>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Strategy Used:</span>
+            <span class="font-medium capitalize"><%= @seating_arrangement.optimization_scores['strategy']&.humanize || 'N/A' %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Iterations:</span>
+            <span class="font-medium"><%= @seating_arrangement.optimization_scores['iterations']&.to_s || 'N/A' %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Improvements:</span>
+            <span class="font-medium"><%= @seating_arrangement.optimization_scores['improvements']&.to_s || 'N/A' %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Runtime:</span>
+            <span class="font-medium"><%= @seating_arrangement.optimization_scores['runtime']&.to_s || 'N/A' %>s</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Initial Score:</span>
+            <span class="font-medium"><%= (@seating_arrangement.optimization_scores['initial_score']&.to_f&.* 100)&.round(1) || 'N/A' %>%</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Final Score:</span>
+            <span class="font-medium"><%= (@seating_arrangement.optimization_scores['final_score']&.to_f&.* 100)&.round(1) || 'N/A' %>%</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Improvement:</span>
+            <span class="font-medium text-green-600">+<%= @seating_arrangement.optimization_scores['improvement']&.to_s || 'N/A' %>%</span>
+          </div>
+        </div>
+      <% else %>
+        <p class="text-gray-500">No optimization statistics available.</p>
+      <% end %>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="bg-white border border-gray-200 rounded-lg p-6">
+      <h3 class="text-lg font-semibold mb-4">Summary Statistics</h3>
+      
+      <% if @diversity_metrics[:summary] %>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Total Students:</span>
+            <span class="font-medium"><%= @diversity_metrics[:summary][:total_students] %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Total Tables:</span>
+            <span class="font-medium"><%= @diversity_metrics[:summary][:total_tables] %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Average Table Size:</span>
+            <span class="font-medium"><%= @diversity_metrics[:summary][:average_table_size] %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Score Range:</span>
+            <span class="font-medium">
+              <%= (@diversity_metrics[:summary][:score_distribution][:min] * 100).round(1) %>% - 
+              <%= (@diversity_metrics[:summary][:score_distribution][:max] * 100).round(1) %>%
+            </span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Score Std Dev:</span>
+            <span class="font-medium"><%= (@diversity_metrics[:summary][:score_distribution][:avg_std_dev] * 100).round(1) %>%</span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

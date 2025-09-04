@@ -1,0 +1,246 @@
+<div class="max-w-4xl mx-auto">
+  <div class="bg-white shadow-sm rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+          <h1 class="text-xl font-semibold text-gray-900">Edit Seating Rule</h1>
+          <p class="mt-2 text-sm text-gray-700">
+            Refine and adjust your seating rule parameters.
+          </p>
+        </div>
+        <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none space-x-2">
+          <%= link_to "View Rule", seating_event_seating_rule_path(@seating_event, @seating_rule), 
+                      class: "inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" %>
+          <%= link_to "Back to Rules", seating_event_seating_rules_path(@seating_event), 
+                      class: "inline-flex items-center justify-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Validation Results -->
+  <% unless @validation_result[:valid] %>
+    <div class="mt-6 bg-red-50 border-l-4 border-red-400 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">Validation Issues</h3>
+          <div class="mt-2 text-sm text-red-700">
+            <ul class="list-disc pl-5 space-y-1">
+              <% @validation_result[:conflicts].each do |conflict| %>
+                <li><%= conflict[:message] %> (Severity: <%= conflict[:severity] %>)</li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Edit Form -->
+  <div class="mt-6 bg-white shadow-sm rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <%= form_with model: [@seating_event, @seating_rule], local: true, class: "space-y-6" do |form| %>
+        
+        <!-- Original Natural Language Input -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">
+            Original Natural Language Input
+          </label>
+          <div class="mt-1 p-3 bg-gray-50 border border-gray-200 rounded-md">
+            <p class="text-sm text-gray-900"><%= @seating_rule.natural_language_input %></p>
+          </div>
+          <p class="mt-1 text-sm text-gray-500">
+            This is the original instruction that was parsed to create this rule.
+          </p>
+        </div>
+
+        <!-- Rule Type -->
+        <div>
+          <%= form.label :rule_type, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.select :rule_type, 
+                          options_for_select(SeatingRule::RULE_TYPES.map { |type| [type.humanize, type] }, @seating_rule.rule_type),
+                          { prompt: "Select rule type" },
+                          { class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" } %>
+          <% if @seating_rule.errors[:rule_type].any? %>
+            <p class="mt-2 text-sm text-red-600"><%= @seating_rule.errors[:rule_type].first %></p>
+          <% end %>
+        </div>
+
+        <!-- Priority -->
+        <div>
+          <%= form.label :priority, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.number_field :priority, 
+                                min: 1, max: 10,
+                                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+          <p class="mt-1 text-sm text-gray-500">
+            Priority determines rule precedence (1 = highest priority).
+          </p>
+          <% if @seating_rule.errors[:priority].any? %>
+            <p class="mt-2 text-sm text-red-600"><%= @seating_rule.errors[:priority].first %></p>
+          <% end %>
+        </div>
+
+        <!-- Active Status -->
+        <div class="flex items-center">
+          <%= form.check_box :active, 
+                             class: "h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" %>
+          <%= form.label :active, "Rule is active", 
+                         class: "ml-2 block text-sm font-medium text-gray-700" %>
+          <p class="mt-1 text-sm text-gray-500">
+            Inactive rules are ignored during seating arrangement generation.
+          </p>
+        </div>
+
+        <!-- Target Attributes -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Target Attributes
+          </label>
+          <div id="target-attributes-container" class="space-y-2">
+            <% if @seating_rule.target_attributes.present? %>
+              <% @seating_rule.target_attributes.each_with_index do |(field, values), index| %>
+                <div class="flex items-center space-x-2 attribute-pair">
+                  <input type="text" 
+                         name="seating_rule[target_attributes][<%= index %>][field]" 
+                         value="<%= field %>"
+                         placeholder="Attribute name" 
+                         class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                  <input type="text" 
+                         name="seating_rule[target_attributes][<%= index %>][values]" 
+                         value="<%= Array(values).join(', ') %>"
+                         placeholder="Values (comma-separated)" 
+                         class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                  <button type="button" 
+                          onclick="removeAttributePair(this)"
+                          class="text-red-600 hover:text-red-800 text-sm">Remove</button>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+          
+          <button type="button" 
+                  onclick="addAttributePair()"
+                  class="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Add Attribute
+          </button>
+          
+          <p class="mt-1 text-sm text-gray-500">
+            Specify which student attributes this rule should target.
+          </p>
+        </div>
+
+        <!-- Constraints -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Constraints
+          </label>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Min Distance (for separation rules) -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600">Minimum Distance</label>
+              <input type="number" 
+                     name="seating_rule[constraints][min_distance]"
+                     value="<%= @seating_rule.constraints&.dig('min_distance') %>"
+                     min="0"
+                     placeholder="Tables apart"
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+              <p class="text-xs text-gray-500 mt-1">For separation rules</p>
+            </div>
+
+            <!-- Max Per Table (for clustering/distribution) -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600">Max Per Table</label>
+              <input type="number" 
+                     name="seating_rule[constraints][max_per_table]"
+                     value="<%= @seating_rule.constraints&.dig('max_per_table') %>"
+                     min="1"
+                     placeholder="Number"
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+              <p class="text-xs text-gray-500 mt-1">Maximum students per table</p>
+            </div>
+
+            <!-- Distribution Strategy -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600">Distribution Strategy</label>
+              <select name="seating_rule[constraints][distribution_strategy]"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                <option value="">Select strategy</option>
+                <option value="even" <%= 'selected' if @seating_rule.constraints&.dig('distribution_strategy') == 'even' %>>Even distribution</option>
+                <option value="random" <%= 'selected' if @seating_rule.constraints&.dig('distribution_strategy') == 'random' %>>Random distribution</option>
+                <option value="balanced" <%= 'selected' if @seating_rule.constraints&.dig('distribution_strategy') == 'balanced' %>>Balanced distribution</option>
+              </select>
+              <p class="text-xs text-gray-500 mt-1">For distribution rules</p>
+            </div>
+
+            <!-- Custom Logic -->
+            <div>
+              <label class="block text-xs font-medium text-gray-600">Custom Logic</label>
+              <input type="text" 
+                     name="seating_rule[constraints][custom_logic]"
+                     value="<%= @seating_rule.constraints&.dig('custom_logic') %>"
+                     placeholder="Additional constraints"
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+              <p class="text-xs text-gray-500 mt-1">For custom rules</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Parsing Information -->
+        <div class="bg-gray-50 border border-gray-200 rounded-md p-4">
+          <h3 class="text-sm font-medium text-gray-900 mb-2">Current AI Interpretation</h3>
+          <div class="text-sm text-gray-700">
+            <p><strong>Rule Type:</strong> <%= @seating_rule.rule_type.humanize %></p>
+            <p><strong>Confidence:</strong> <%= (@seating_rule.confidence_score * 100).round(1) %>%</p>
+            <% if @seating_rule.parsed_rule.present? && @seating_rule.parsed_rule['description'] %>
+              <p><strong>AI Description:</strong> <%= @seating_rule.parsed_rule['description'] %></p>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+          <%= link_to "Cancel", seating_event_seating_rule_path(@seating_event, @seating_rule), 
+                      class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+          
+          <%= form.submit "Update Rule", 
+                          class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+  let attributeIndex = <%= @seating_rule.target_attributes&.count || 0 %>;
+
+  function addAttributePair() {
+    const container = document.getElementById('target-attributes-container');
+    const div = document.createElement('div');
+    div.className = 'flex items-center space-x-2 attribute-pair';
+    div.innerHTML = `
+      <input type="text" 
+             name="seating_rule[target_attributes][${attributeIndex}][field]" 
+             placeholder="Attribute name" 
+             class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+      <input type="text" 
+             name="seating_rule[target_attributes][${attributeIndex}][values]" 
+             placeholder="Values (comma-separated)" 
+             class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+      <button type="button" 
+              onclick="removeAttributePair(this)"
+              class="text-red-600 hover:text-red-800 text-sm">Remove</button>
+    `;
+    container.appendChild(div);
+    attributeIndex++;
+  }
+
+  function removeAttributePair(button) {
+    button.closest('.attribute-pair').remove();
+  }
+</script>

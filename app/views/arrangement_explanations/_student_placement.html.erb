@@ -1,0 +1,313 @@
+<div class="student-placement-explanation">
+  <!-- Student Header -->
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center">
+      <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg font-medium mr-4">
+        <%= @student.display_name.split(' ').map(&:first).join('').first(2) %>
+      </div>
+      <div>
+        <h3 class="text-xl font-semibold text-gray-900"><%= @student.display_name %></h3>
+        <p class="text-sm text-gray-600">
+          Currently at Table <%= @student_assignment&.table_number %>, Seat <%= @student_assignment&.seat_position %>
+        </p>
+      </div>
+    </div>
+    <div class="text-right">
+      <div class="text-sm text-gray-600 mb-1">Placement Confidence</div>
+      <div class="flex items-center">
+        <div class="w-20 bg-gray-200 rounded-full h-3 mr-2">
+          <div class="bg-<%= @student_confidence >= 0.8 ? 'green' : (@student_confidence >= 0.6 ? 'yellow' : 'red') %>-500 h-3 rounded-full" 
+               style="width: <%= (@student_confidence * 100).round(1) %>%"></div>
+        </div>
+        <span class="text-lg font-semibold text-gray-900">
+          <%= number_to_percentage(@student_confidence * 100, precision: 1) %>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Explanation -->
+  <div class="bg-indigo-50 border-l-4 border-indigo-400 p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <h4 class="text-sm font-medium text-indigo-800">Why This Placement?</h4>
+        <div class="mt-2 text-sm text-indigo-700">
+          <p><%= @student_explanation&.dig('explanation') || "#{@student.display_name} was placed at this table to optimize classroom diversity and foster collaborative learning opportunities." %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Student Attributes -->
+  <div class="mb-6">
+    <h4 class="text-lg font-medium text-gray-900 mb-3">Student Profile</h4>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <% if @student.custom_attributes.any? %>
+        <% @student.custom_attributes.each do |attribute| %>
+          <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+            <span class="text-sm font-medium text-gray-700"><%= attribute.attribute_name.humanize %></span>
+            <span class="text-sm text-gray-600 font-medium"><%= attribute.attribute_value %></span>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="col-span-2 text-center text-gray-500 italic py-4">
+          No additional attributes available for this student.
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Table Mates -->
+  <div class="mb-6">
+    <h4 class="text-lg font-medium text-gray-900 mb-3">Table Mates</h4>
+    <div class="space-y-2">
+      <% table_mates = @seating_arrangement.table_assignments
+                                         .includes(:student)
+                                         .where(table_number: @student_assignment.table_number)
+                                         .where.not(student: @student)
+                                         .map(&:student) %>
+      <% if table_mates.any? %>
+        <% table_mates.each do |mate| %>
+          <div class="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+               onclick="showStudentComparison(<%= @student.id %>, <%= mate.id %>)">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                <%= mate.display_name.split(' ').map(&:first).join('').first(2) %>
+              </div>
+            </div>
+            <div class="ml-3 flex-1">
+              <p class="text-sm font-medium text-gray-900"><%= mate.display_name %></p>
+              <p class="text-xs text-gray-500">
+                <% if mate.custom_attributes.any? %>
+                  <%= mate.custom_attributes.limit(2).map { |attr| "#{attr.attribute_name}: #{attr.attribute_value}" }.join(', ') %>
+                <% else %>
+                  Seat <%= @seating_arrangement.table_assignments.find_by(student: mate).seat_position %>
+                <% end %>
+              </p>
+            </div>
+            <div class="flex-shrink-0">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="text-center text-gray-500 italic py-4">
+          This student is sitting alone at their table.
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Contributing Factors -->
+  <div class="mb-6">
+    <h4 class="text-lg font-medium text-gray-900 mb-3">Key Factors in This Placement</h4>
+    <div class="space-y-2">
+      <% contributing_factors = @student_explanation&.dig('contributing_factors') || [
+           "Optimizes table diversity",
+           "Satisfies seating constraints", 
+           "Balances student attributes",
+           "Promotes collaborative learning"
+         ] %>
+      <% contributing_factors.each_with_index do |factor, index| %>
+        <div class="flex items-start">
+          <div class="flex-shrink-0 mt-1">
+            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-gray-700"><%= factor %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Alternative Placements -->
+  <% if @alternative_placements&.any? %>
+    <div class="mb-6">
+      <h4 class="text-lg font-medium text-gray-900 mb-3">Alternative Placements Considered</h4>
+      <div class="space-y-3">
+        <% @alternative_placements.each do |alternative| %>
+          <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p class="text-sm font-medium text-gray-900">Table <%= alternative[:table] %></p>
+                <p class="text-xs text-gray-600"><%= alternative[:reason] %></p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-semibold text-yellow-800">
+                <%= number_to_percentage(alternative[:confidence] * 100, precision: 0) %>
+              </p>
+              <p class="text-xs text-yellow-600">confidence</p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Diversity Impact -->
+  <div class="mb-6">
+    <h4 class="text-lg font-medium text-gray-900 mb-3">Diversity Impact</h4>
+    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+      <div class="flex items-start">
+        <svg class="w-5 h-5 text-green-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div>
+          <p class="text-sm font-medium text-green-800">Positive Impact</p>
+          <p class="text-sm text-green-700 mt-1">
+            This placement contributes to the overall diversity goals by creating a balanced mix of student attributes at Table <%= @student_assignment&.table_number %>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Constraint Considerations -->
+  <% if @seating_event.seating_rules.active.any? %>
+    <div class="mb-6">
+      <h4 class="text-lg font-medium text-gray-900 mb-3">Constraint Considerations</h4>
+      <div class="space-y-2">
+        <% @seating_event.seating_rules.active.limit(3).each do |rule| %>
+          <div class="flex items-center justify-between p-2 bg-blue-50 rounded">
+            <span class="text-sm text-gray-700"><%= rule.description %></span>
+            <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+              <%= rule.priority&.humanize || 'Normal' %>
+            </span>
+          </div>
+        <% end %>
+        <% if @seating_event.seating_rules.active.count > 3 %>
+          <div class="text-xs text-gray-500 text-center">
+            + <%= @seating_event.seating_rules.active.count - 3 %> more constraints considered
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Performance Metrics -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+    <div class="bg-blue-50 p-4 rounded-lg">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-blue-800">Placement Quality</p>
+          <p class="text-2xl font-bold text-blue-600">
+            <%= @student_confidence >= 0.8 ? 'Excellent' : (@student_confidence >= 0.6 ? 'Good' : 'Fair') %>
+          </p>
+        </div>
+        <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="bg-purple-50 p-4 rounded-lg">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-purple-800">Table Contribution</p>
+          <p class="text-2xl font-bold text-purple-600">
+            <%= @seating_arrangement.table_confidence(@student_assignment&.table_number) >= 0.8 ? 'High' : 'Medium' %>
+          </p>
+        </div>
+        <svg class="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex justify-between items-center pt-4 border-t border-gray-200">
+    <div class="flex space-x-3">
+      <button onclick="exploreWhyNot(<%= @student.id %>)" 
+              class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Why Not Other Tables?
+      </button>
+      
+      <button onclick="showTableAnalysis(<%= @student_assignment&.table_number %>)" 
+              class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        View Table Analysis
+      </button>
+    </div>
+    
+    <div class="text-xs text-gray-500">
+      Confidence: <%= number_to_percentage(@student_confidence * 100, precision: 1) %>
+    </div>
+  </div>
+</div>
+
+<script>
+function showStudentComparison(student1Id, student2Id) {
+  // Implementation for comparing two students
+  alert(`Student comparison feature coming soon! (${student1Id} vs ${student2Id})`);
+}
+
+function exploreWhyNot(studentId) {
+  // Implementation for exploring why student wasn't placed elsewhere
+  const tables = [1, 2, 3, 4, 5]; // This should come from the actual table data
+  let html = '<div class="space-y-3">';
+  
+  tables.forEach(tableNum => {
+    if (tableNum !== <%= @student_assignment&.table_number %>) {
+      html += `
+        <button onclick="showWhyNotTable(${studentId}, ${tableNum})" 
+                class="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+          <div class="flex justify-between items-center">
+            <span class="font-medium">Table ${tableNum}</span>
+            <span class="text-sm text-blue-600">Why not here?</span>
+          </div>
+        </button>
+      `;
+    }
+  });
+  
+  html += '</div>';
+  
+  // This would ideally show in a modal or expand the current view
+  if (confirm('Show why this student was not placed at other tables?')) {
+    // Implementation would go here
+    alert('Why not analysis feature coming soon!');
+  }
+}
+
+function showWhyNotTable(studentId, tableNumber) {
+  // Make AJAX request to get why-not explanation
+  fetch(`<%= seating_arrangement_explanations_why_not_path(@seating_event, @seating_arrangement) %>?student_id=${studentId}&table_number=${tableNumber}`, {
+    headers: { 'Accept': 'application/json' }
+  })
+  .then(response => response.json())
+  .then(data => {
+    alert(`Why not Table ${tableNumber}: ${data.explanation}`);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error loading explanation. Please try again.');
+  });
+}
+
+function showTableAnalysis(tableNumber) {
+  // Close current modal and show table analysis
+  $('#studentModal').modal('hide');
+  setTimeout(() => {
+    showTableExplanation(tableNumber);
+  }, 300);
+}
+</script>

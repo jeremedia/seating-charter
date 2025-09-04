@@ -1,9 +1,14 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
-  pull_request:
   push:
+    branches: [ main, development ]
+  pull_request:
     branches: [ main ]
+
+env:
+  RUBY_VERSION: 3.2.0
+  NODE_VERSION: 18
 
 jobs:
   scan_ruby:
@@ -20,7 +25,16 @@ jobs:
           bundler-cache: true
 
       - name: Scan for common Rails security vulnerabilities using static analysis
-        run: bin/brakeman --no-pager
+        run: |
+          bundle exec brakeman --no-pager --format json --output tmp/brakeman.json
+          bundle exec brakeman --no-pager
+
+      - name: Upload security scan results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-scan
+          path: tmp/brakeman.json
 
   scan_js:
     runs-on: ubuntu-latest
@@ -51,7 +65,16 @@ jobs:
           bundler-cache: true
 
       - name: Lint code for consistent style
-        run: bin/rubocop -f github
+        run: |
+          bundle exec rubocop --format json --out tmp/rubocop.json
+          bundle exec rubocop -f github
+          
+      - name: Upload code quality results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: code-quality
+          path: tmp/rubocop.json
 
   test:
     runs-on: ubuntu-latest
@@ -85,12 +108,28 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
-      - name: Run tests
+      - name: Run RSpec tests
         env:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
-          # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:test:prepare test test:system
+          OPENAI_API_KEY: test-key
+        run: |
+          bin/rails db:test:prepare
+          bundle exec rspec --format RspecJunitFormatter --out tmp/rspec_results.xml --format progress
+        
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: tmp/rspec_results.xml
+
+      - name: Upload coverage results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4
@@ -99,3 +138,110 @@ jobs:
           name: screenshots
           path: ${{ github.workspace }}/tmp/screenshots
           if-no-files-found: ignore
+
+  performance_test:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: seating_charter_test
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Install packages
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Setup test database
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432
+        run: bin/rails db:create db:schema:load
+
+      - name: Run performance benchmarks
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432
+        run: |
+          mkdir -p tmp/benchmarks
+          echo "Creating performance benchmark script..."
+          cat > tmp/benchmark_runner.rb << 'EOF'
+          require_relative '../config/environment'
+          require 'benchmark'
+          
+          puts "Running seating optimization performance benchmarks..."
+          
+          cohort = FactoryBot.create(:cohort, :with_students, students_count: 30)
+          seating_event = FactoryBot.create(:seating_event, cohort: cohort)
+          
+          service = SeatingOptimizationService.new(seating_event)
+          
+          benchmark_results = Benchmark.measure do
+            result = service.optimize(max_runtime: 10.seconds)
+            puts "Optimization completed with score: #{result[:score]}"
+          end
+          
+          File.write('tmp/benchmarks/optimization_results.txt', benchmark_results.to_s)
+          puts "Benchmark results saved to tmp/benchmarks/optimization_results.txt"
+          EOF
+          
+          bundle exec ruby tmp/benchmark_runner.rb
+          
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmarks
+          path: tmp/benchmarks/
+
+  security_audit:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: .ruby-version
+        bundler-cache: true
+
+    - name: Run bundle-audit
+      run: |
+        gem install bundler-audit
+        bundle-audit update
+        bundle-audit check
+
+    - name: Run additional security checks
+      run: |
+        # Check for sensitive files
+        echo "Checking for sensitive files..."
+        if find . -name "*.pem" -o -name "*.key" -o -name ".env" | grep -v ".env.example" | head -1; then
+          echo "Sensitive files detected!"
+          exit 1
+        fi
+        
+        # Check for hardcoded secrets
+        echo "Checking for hardcoded API keys..."
+        if grep -r "sk-" --include="*.rb" --include="*.yml" --exclude-dir=.git . | grep -v "test-key" | head -1; then
+          echo "Potential API keys detected!"
+          exit 1
+        fi
+        
+        echo "Security checks passed!"

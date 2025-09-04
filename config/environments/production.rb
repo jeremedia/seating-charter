@@ -58,7 +58,7 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "example.com" }
+  config.action_mailer.default_url_options = { host: ENV.fetch("DOMAIN_NAME", "seating.chds.gov") }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via rails credentials:edit.
   # config.action_mailer.smtp_settings = {
@@ -78,6 +78,111 @@ Rails.application.configure do
 
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
+
+  # Production-specific configurations for CHDS Seating Charter
+  
+  # Security headers
+  config.force_ssl = true
+  config.ssl_options = {
+    hsts: {
+      expires: 1.year,
+      subdomains: true,
+      preload: true
+    }
+  }
+
+  # FERPA Compliance - Enhanced logging for audit trail
+  config.log_level = :info
+  config.lograge.enabled = true if defined?(Lograge)
+  config.lograge.formatter = Lograge::Formatters::Json.new if defined?(Lograge)
+  
+  # Rate limiting for API endpoints
+  config.middleware.use Rack::Attack if defined?(Rack::Attack)
+  
+  # Performance monitoring
+  if defined?(NewRelic)
+    config.after_initialize do
+      NewRelic::Agent.manual_start
+    end
+  end
+
+  # Error tracking
+  if defined?(Rollbar)
+    Rollbar.configure do |rollbar_config|
+      rollbar_config.access_token = ENV['ROLLBAR_ACCESS_TOKEN']
+      rollbar_config.environment = Rails.env
+      rollbar_config.enabled = ENV['ROLLBAR_ACCESS_TOKEN'].present?
+      
+      # FERPA Compliance - Scrub sensitive data
+      rollbar_config.scrub_fields |= [
+        :student_name, :name, :first_name, :last_name, :email,
+        :student_attributes, :inferences, :organization, :title,
+        :password, :password_confirmation, :current_password
+      ]
+    end
+  end
+
+  # Health check configuration
+  if defined?(HealthCheck)
+    HealthCheck.setup do |health_config|
+      health_config.success = 200
+      health_config.smtp_timeout = 60.0
+      health_config.max_age = 600
+      
+      # Add custom health checks
+      health_config.add_custom_check('openai_service') do
+        OpenaiService.configured? ? '' : 'OpenAI service not configured'
+      end
+      
+      health_config.add_custom_check('database_performance') do
+        start_time = Time.current
+        ActiveRecord::Base.connection.execute('SELECT 1')
+        runtime = Time.current - start_time
+        runtime > 1.0 ? "Database slow: #{runtime}s" : ''
+      end
+    end
+  end
+
+  # AI service configuration
+  config.x.openai.rate_limit = ENV.fetch('OPENAI_RATE_LIMIT', '50').to_i
+  config.x.openai.timeout = ENV.fetch('OPENAI_TIMEOUT', '30').to_i
+
+  # Optimization constraints for production
+  config.x.optimization.max_runtime = ENV.fetch('OPTIMIZATION_MAX_RUNTIME', '60').to_i
+  config.x.optimization.max_students = ENV.fetch('OPTIMIZATION_MAX_STUDENTS', '40').to_i
+  
+  # File upload constraints
+  config.active_storage.variant_processor = :mini_magick
+  config.x.upload.max_file_size = ENV.fetch('MAX_UPLOAD_SIZE', '5').to_i.megabytes
+  
+  # Session and cookie security
+  config.session_store :cookie_store, 
+    key: '_seating_charter_session',
+    secure: Rails.env.production?,
+    httponly: true,
+    expire_after: 8.hours
+
+  # Content Security Policy
+  config.content_security_policy do |policy|
+    policy.default_src :self, :https
+    policy.font_src    :self, :https, :data
+    policy.img_src     :self, :https, :data, 'blob:'
+    policy.object_src  :none
+    policy.script_src  :self, :https, :unsafe_inline
+    policy.style_src   :self, :https, :unsafe_inline
+    
+    # Report violations in development
+    if Rails.env.development?
+      policy.report_uri "/csp-violation-report-endpoint"
+    end
+  end
+  
+  # Prevent MIME type confusion attacks  
+  config.content_security_policy_nonce_generator = ->(request) { SecureRandom.base64(16) }
+  config.content_security_policy_nonce_directives = %w(script-src)
+  
+  # Referrer policy
+  config.content_security_policy_report_only = false
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [

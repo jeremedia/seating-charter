@@ -1,0 +1,424 @@
+<% content_for :title, "Seating Editor" %>
+<% content_for :javascript do %>
+  <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js" %>
+<% end %>
+
+<div class="seating-editor" 
+     data-controller="seating-editor"
+     data-seating-editor-arrangement-id-value="<%= @seating_arrangement.id %>"
+     data-seating-editor-csrf-token-value="<%= form_authenticity_token %>"
+     data-seating-editor-auto-save-interval-value="30000">
+  
+  <!-- Header -->
+  <div class="editor-header">
+    <div class="header-left">
+      <h1 class="editor-title">
+        Seating Editor: <%= @seating_arrangement.seating_event.event_name %>
+      </h1>
+      <div class="arrangement-info">
+        <span class="student-count"><%= @seating_arrangement.students_count %> students</span>
+        <span class="table-count"><%= @seating_arrangement.tables_count %> tables</span>
+        <span class="overall-score">Score: <%= @seating_arrangement.formatted_score %></span>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <div class="save-status" data-seating-editor-target="saveStatus"></div>
+      
+      <div class="action-buttons">
+        <button type="button" 
+                class="btn btn-secondary"
+                data-action="click->seating-editor#undo"
+                title="Undo last action (Ctrl+Z)">
+          <span class="icon">↶</span> Undo
+        </button>
+        
+        <button type="button" 
+                class="btn btn-primary"
+                data-action="click->seating-editor#manualSave"
+                title="Save changes (Ctrl+S)">
+          <span class="icon">💾</span> Save
+        </button>
+        
+        <div class="dropdown">
+          <button type="button" class="btn btn-secondary dropdown-toggle">
+            <span class="icon">⚙️</span> Options
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="<%= seating_arrangement_path(@seating_arrangement) %>">View Arrangement</a>
+            <a class="dropdown-item" href="<%= seating_arrangement_path(@seating_arrangement, format: :csv) %>">Export CSV</a>
+            <a class="dropdown-item" href="<%= seating_arrangement_path(@seating_arrangement, format: :json) %>">Export JSON</a>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" data-action="click->seating-editor#balanceTables">Balance Tables</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <%= render 'toolbar' %>
+
+  <!-- Main Content -->
+  <div class="editor-content">
+    
+    <!-- Left Sidebar -->
+    <div class="editor-sidebar">
+      
+      <!-- Search -->
+      <div class="search-panel">
+        <h3>Search Students</h3>
+        <input type="text" 
+               class="form-control search-input" 
+               placeholder="Search by name, organization..."
+               data-seating-editor-target="searchInput"
+               data-action="input->seating-editor#onSearchInput">
+        
+        <div class="search-results" data-seating-editor-target="searchResults">
+          <!-- Search results will be populated here -->
+        </div>
+      </div>
+
+      <!-- Unassigned Students -->
+      <div class="unassigned-panel">
+        <h3>
+          Unassigned Students 
+          <span class="count-badge"><%= @unassigned_students.length %></span>
+        </h3>
+        
+        <div class="unassigned-area" 
+             data-seating-editor-target="unassignedArea"
+             data-table-number="0">
+          <div class="student-cards">
+            <% @unassigned_students.each do |student| %>
+              <%= render 'student_card', student: student %>
+            <% end %>
+          </div>
+          
+          <% if @unassigned_students.empty? %>
+            <div class="empty-state">
+              <p>All students are assigned to tables</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Diversity Scores -->
+      <div class="scores-panel">
+        <h3>Diversity Scores</h3>
+        <div class="diversity-scores" 
+             data-seating-editor-target="diversityScores"
+             data-scores="<%= @diversity_scores.to_json %>">
+          
+          <div class="score-item">
+            <span class="score-label">Overall</span>
+            <span class="score-value" data-score="overall_score">
+              <%= (@diversity_scores['overall_score'] || 0) * 100 %>%
+            </span>
+          </div>
+          
+          <div class="score-item">
+            <span class="score-label">Gender Balance</span>
+            <span class="score-value" data-score="gender_balance">
+              <%= (@diversity_scores['gender_balance'] || 0) * 100 %>%
+            </span>
+          </div>
+          
+          <div class="score-item">
+            <span class="score-label">Agency Distribution</span>
+            <span class="score-value" data-score="agency_distribution">
+              <%= (@diversity_scores['agency_distribution'] || 0) * 100 %>%
+            </span>
+          </div>
+          
+          <div class="score-item">
+            <span class="score-label">Department Mix</span>
+            <span class="score-value" data-score="department_mix">
+              <%= (@diversity_scores['department_mix'] || 0) * 100 %>%
+            </span>
+          </div>
+          
+          <div class="score-item">
+            <span class="score-label">Seniority Spread</span>
+            <span class="score-value" data-score="seniority_spread">
+              <%= (@diversity_scores['seniority_spread'] || 0) * 100 %>%
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Constraint Violations -->
+      <div class="violations-panel">
+        <h3>Constraint Violations</h3>
+        <div class="constraint-violations" 
+             data-seating-editor-target="constraintViolations"
+             data-violations="<%= @constraint_violations.to_json %>">
+          
+          <% if @constraint_violations.empty? %>
+            <div class="no-violations">
+              <span class="icon">✅</span>
+              <span>No constraint violations</span>
+            </div>
+          <% else %>
+            <% @constraint_violations.each do |violation| %>
+              <div class="violation <%= violation['severity'] %>">
+                <span class="violation-icon">⚠️</span>
+                <span class="violation-message"><%= violation['message'] %></span>
+                <% if violation['table_number'] %>
+                  <span class="violation-table">Table <%= violation['table_number'] %></span>
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Editor Area -->
+    <div class="editor-main" data-seating-editor-target="editorContainer">
+      
+      <!-- Tables Grid -->
+      <div class="tables-grid">
+        <% @table_layout.each do |table_number, table_data| %>
+          <% next if table_number == 0 %> <!-- Skip unassigned -->
+          <%= render 'table', table_number: table_number, table_data: table_data %>
+        <% end %>
+        
+        <!-- Add New Table Button -->
+        <div class="add-table-container">
+          <button type="button" 
+                  class="add-table-btn"
+                  data-action="click->seating-editor#createTable"
+                  title="Add new table">
+            <span class="icon">➕</span>
+            <span class="text">Add Table</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Editor Instructions -->
+      <div class="editor-instructions">
+        <h4>How to use the editor:</h4>
+        <ul>
+          <li>Drag students between tables to rearrange seating</li>
+          <li>Double-click a table to shuffle its students</li>
+          <li>Right-click a student for context menu options</li>
+          <li>Use <kbd>Ctrl+Z</kbd> to undo actions</li>
+          <li>Use <kbd>Ctrl+S</kbd> to save manually</li>
+          <li>Use <kbd>Ctrl+F</kbd> to focus search</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Templates Modal -->
+  <div class="modal fade" id="templatesModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Apply Seating Template</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Choose a seating template to automatically arrange students:</p>
+          
+          <div class="template-options">
+            <div class="template-option">
+              <button class="btn btn-outline-primary template-btn" 
+                      data-action="click->seating-editor#applyTemplate" 
+                      data-template="u_shape">
+                <div class="template-icon">🔄</div>
+                <div class="template-info">
+                  <h6>U-Shape</h6>
+                  <p>Arrange tables in a U formation for better interaction</p>
+                </div>
+              </button>
+            </div>
+            
+            <div class="template-option">
+              <button class="btn btn-outline-primary template-btn" 
+                      data-action="click->seating-editor#applyTemplate" 
+                      data-template="classroom">
+                <div class="template-icon">📚</div>
+                <div class="template-info">
+                  <h6>Classroom</h6>
+                  <p>Traditional classroom rows facing forward</p>
+                </div>
+              </button>
+            </div>
+            
+            <div class="template-option">
+              <button class="btn btn-outline-primary template-btn" 
+                      data-action="click->seating-editor#applyTemplate" 
+                      data-template="roundtables">
+                <div class="template-icon">⭕</div>
+                <div class="template-info">
+                  <h6>Round Tables</h6>
+                  <p>Evenly distributed round tables for collaboration</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Processing...</p>
+    </div>
+  </div>
+</div>
+
+<!-- Error Notification Template -->
+<div id="errorNotificationTemplate" style="display: none;">
+  <div class="error-notification">
+    <span class="error-icon">❌</span>
+    <span class="error-message"></span>
+    <button class="error-close">×</button>
+  </div>
+</div>
+
+<script>
+  // Additional JavaScript for templates modal
+  document.addEventListener('DOMContentLoaded', function() {
+    const templateButtons = document.querySelectorAll('.template-btn');
+    
+    templateButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const template = this.dataset.template;
+        const modal = bootstrap.Modal.getInstance(document.getElementById('templatesModal'));
+        if (modal) {
+          modal.hide();
+        }
+        
+        // The actual template application is handled by the Stimulus controller
+      });
+    });
+  });
+</script>
+
+<style>
+  /* Additional inline styles for immediate functionality */
+  .seating-editor {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .editor-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+  
+  .editor-sidebar {
+    width: 300px;
+    background: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+  
+  .editor-main {
+    flex: 1;
+    padding: 1rem;
+    overflow: auto;
+  }
+  
+  .tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .drag-preview {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.8;
+    transform: rotate(5deg);
+  }
+  
+  .sortable-ghost {
+    opacity: 0.3;
+  }
+  
+  .sortable-chosen {
+    opacity: 0.8;
+  }
+  
+  .drop-zone-available {
+    border: 2px dashed #28a745;
+    background-color: rgba(40, 167, 69, 0.1);
+  }
+  
+  .drop-zone-full {
+    border: 2px dashed #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+  }
+  
+  .highlighted {
+    animation: highlight 1s ease-in-out;
+    border: 2px solid #ffc107 !important;
+  }
+  
+  @keyframes highlight {
+    0%, 100% { box-shadow: 0 0 0 rgba(255, 193, 7, 0); }
+    50% { box-shadow: 0 0 20px rgba(255, 193, 7, 0.8); }
+  }
+  
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .error-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #dc3545;
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1050;
+    max-width: 400px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .error-notification.show {
+    transform: translateX(0);
+  }
+</style>

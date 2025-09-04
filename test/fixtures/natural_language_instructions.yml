@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  seating_event: one
+  instruction_text: MyText
+  parsing_status: MyString
+  parsed_rules: 
+  ai_interpretation: 
+  confidence_score: 9.99
+  created_by: one
+  error_message: MyText
+
+two:
+  seating_event: two
+  instruction_text: MyText
+  parsing_status: MyString
+  parsed_rules: 
+  ai_interpretation: 
+  confidence_score: 9.99
+  created_by: two
+  error_message: MyText
