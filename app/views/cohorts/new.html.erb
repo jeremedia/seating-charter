@@ -96,7 +96,21 @@
         </div>
       </div>
 
-      <!-- Upload Progress -->
+      <!-- Real-time Progress Updates (Turbo Frame) -->
+      <div data-cohort-upload-target="progressContainer" class="mt-6 hidden">
+        <turbo-frame id="upload_progress">
+          <!-- Progress updates will be inserted here via Turbo Streams -->
+        </turbo-frame>
+      </div>
+
+      <!-- Extracted Data Display (Turbo Frame) -->
+      <div data-cohort-upload-target="extractedContainer" class="mt-6 hidden">
+        <turbo-frame id="extracted_data">
+          <!-- Extracted data will be inserted here via Turbo Streams -->
+        </turbo-frame>
+      </div>
+
+      <!-- Legacy Upload Progress (fallback) -->
       <div data-cohort-upload-target="uploadProgress" class="mt-6 hidden">
         <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
           <div class="flex items-center">

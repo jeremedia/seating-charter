@@ -1,0 +1,122 @@
+<% if defined?(metadata) && defined?(students_preview) %>
+  <div class="space-y-6" data-cohort-upload-target="extractedDataContent">
+    <!-- Metadata Display -->
+    <div class="bg-blue-50 rounded-lg p-4">
+      <h4 class="text-lg font-medium text-blue-900 mb-3">Extracted Cohort Information</h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <% if metadata[:name] %>
+          <div>
+            <span class="font-medium text-blue-800">Name:</span>
+            <span class="text-blue-700"><%= metadata[:name] %></span>
+            <% if metadata[:confidence] && metadata[:confidence]["name"] %>
+              <span class="ml-2 text-xs px-2 py-1 rounded-full <%= metadata[:confidence]["name"] > 0.7 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+                <%= (metadata[:confidence]["name"] * 100).round %>% confidence
+              </span>
+            <% end %>
+          </div>
+        <% end %>
+        
+        <% if metadata[:start_date] || metadata[:end_date] %>
+          <div>
+            <span class="font-medium text-blue-800">Dates:</span>
+            <span class="text-blue-700">
+              <%= metadata[:start_date]&.strftime("%m/%d/%Y") || "?" %>
+              to
+              <%= metadata[:end_date]&.strftime("%m/%d/%Y") || "?" %>
+            </span>
+          </div>
+        <% end %>
+        
+        <% if metadata[:description] %>
+          <div class="md:col-span-2">
+            <span class="font-medium text-blue-800">Description:</span>
+            <span class="text-blue-700"><%= metadata[:description] %></span>
+          </div>
+        <% end %>
+        
+        <% if metadata[:location] %>
+          <div>
+            <span class="font-medium text-blue-800">Location:</span>
+            <span class="text-blue-700"><%= metadata[:location] %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Students Preview -->
+    <div class="bg-green-50 rounded-lg p-4">
+      <h4 class="text-lg font-medium text-green-900 mb-3">
+        Student Roster Preview
+        <span class="ml-2 text-sm font-normal text-green-700">
+          (<%= students_preview[:estimated_total] || 0 %> students detected)
+        </span>
+      </h4>
+      
+      <% if students_preview[:sample] && students_preview[:sample].any? %>
+        <div class="space-y-2">
+          <% students_preview[:sample].each_with_index do |student, index| %>
+            <div class="flex items-center justify-between p-2 bg-white rounded border border-green-200">
+              <div class="flex items-center space-x-3">
+                <span class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center text-xs font-medium text-green-800">
+                  <%= index + 1 %>
+                </span>
+                <div>
+                  <div class="font-medium text-gray-900"><%= student[:name] %></div>
+                  <div class="text-sm text-gray-600">
+                    <% if student[:title] %>
+                      <%= student[:title] %>
+                      <% if student[:organization] %> • <% end %>
+                    <% end %>
+                    <% if student[:organization] %>
+                      <%= student[:organization] %>
+                    <% end %>
+                    <% if student[:location] %>
+                      • <%= student[:location] %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          
+          <% if students_preview[:estimated_total] && students_preview[:sample].length < students_preview[:estimated_total] %>
+            <div class="text-center py-2 text-sm text-green-600">
+              ... and <%= students_preview[:estimated_total] - students_preview[:sample].length %> more students
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-green-700 text-sm">No students detected in the PDF roster.</p>
+      <% end %>
+    </div>
+
+    <!-- Confidence Indicators -->
+    <% if metadata[:confidence] %>
+      <div class="bg-gray-50 rounded-lg p-4">
+        <h4 class="text-sm font-medium text-gray-900 mb-3">Extraction Confidence</h4>
+        <div class="space-y-2">
+          <% metadata[:confidence].each do |field, score| %>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-700 capitalize"><%= field.humanize %>:</span>
+              <div class="flex items-center space-x-2">
+                <div class="w-24 bg-gray-200 rounded-full h-2">
+                  <div class="h-2 rounded-full <%= score > 0.7 ? 'bg-green-500' : score > 0.4 ? 'bg-yellow-500' : 'bg-red-500' %>" 
+                       style="width: <%= (score * 100).round %>%"></div>
+                </div>
+                <span class="text-xs text-gray-600 w-8"><%= (score * 100).round %>%</span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Hidden input to store extracted data -->
+  <script data-cohort-upload-target="extractedMetadata" type="application/json">
+    <%= {
+      metadata: metadata,
+      students_preview: students_preview
+    }.to_json.html_safe %>
+  </script>
+<% end %>

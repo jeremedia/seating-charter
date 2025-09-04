@@ -24,7 +24,10 @@ export default class extends Controller {
     "pdfForm",
     "uploadSection",
     "reviewSection",
-    "errorMessage"
+    "errorMessage",
+    "progressContainer",
+    "extractedContainer",
+    "extractedMetadata"
   ]
 
   static values = {
@@ -140,16 +143,31 @@ export default class extends Controller {
 
   async processFile(file) {
     this.isProcessing = true
-    this.showProgress('Uploading PDF...')
+    this.startTime = Date.now()
+    
+    // Show the new progress container and hide old one
+    this.showProgressContainer()
+    
+    // Start with simulated progress
+    await this.simulateProgressSteps(file)
+  }
 
+  async simulateProgressSteps(file) {
     try {
+      // Step 1: Upload phase
+      this.updateProgressStep('upload', 'Uploading PDF...', 10)
+      await this.delay(500) // Brief delay for user to see
+      
+      // Step 2: Processing phase (start actual upload)
+      this.updateProgressStep('extracting_metadata', 'Extracting cohort information...', 30)
+      
       // Create FormData for upload
       const formData = new FormData()
       formData.append('roster_pdf', file)
       formData.append('authenticity_token', this.csrfTokenValue)
 
-      // Upload and process
-      const response = await fetch(this.uploadUrlValue, {
+      // Start the actual upload in the background while showing progress
+      const uploadPromise = fetch(this.uploadUrlValue, {
         method: 'POST',
         body: formData,
         headers: {
@@ -157,25 +175,272 @@ export default class extends Controller {
         }
       })
 
+      // Continue progress simulation while upload happens
+      await this.delay(2000) // Simulate metadata extraction time
+      this.updateProgressStep('parsing_roster', 'Parsing student roster...', 70)
+      
+      // Wait for actual upload to complete
+      const response = await uploadPromise
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const result = await response.json()
+      
+      // Step 3: Final processing
+      this.updateProgressStep('complete', 'Generating preview...', 95)
+      await this.delay(500)
 
       if (result.success) {
+        // Step 4: Complete
+        this.updateProgressStep('complete', 'Processing complete!', 100, result)
+        await this.delay(1000)
         this.handleSuccessfulExtraction(result)
       } else {
-        this.showError(result.error || 'Failed to process PDF')
+        this.updateProgressStep('error', result.error || 'Failed to process PDF', 0)
       }
 
     } catch (error) {
       console.error('Error processing file:', error)
-      this.showError('Failed to process PDF. Please try again or use manual entry.')
+      this.updateProgressStep('error', 'Failed to process PDF. Please try again or use manual entry.', 0)
     } finally {
       this.isProcessing = false
-      this.hideProgress()
     }
+  }
+
+  showProgressContainer() {
+    if (this.hasProgressContainerTarget) {
+      this.progressContainerTarget.classList.remove('hidden')
+    }
+    
+    // Hide the old progress display
+    if (this.hasUploadProgressTarget) {
+      this.uploadProgressTarget.classList.add('hidden')
+    }
+  }
+
+  updateProgressStep(step, message, progress, data = null) {
+    const elapsed = ((Date.now() - this.startTime) / 1000).toFixed(1)
+    
+    // Create progress HTML directly (simulating turbo frame update)
+    const progressHtml = this.createProgressHtml(step, message, progress, elapsed, data)
+    
+    // Update the turbo frame directly
+    const uploadProgressFrame = document.getElementById('upload_progress')
+    if (uploadProgressFrame) {
+      uploadProgressFrame.innerHTML = progressHtml
+    }
+    
+    // Also show extracted data if available
+    if (data && step === 'complete') {
+      this.showExtractedData(data)
+    }
+  }
+
+  createProgressHtml(step, message, progress, elapsed, data = null) {
+    const stepIcons = {
+      upload: '📤',
+      extracting_metadata: '🔍',
+      parsing_roster: '📋',
+      complete: '✅',
+      error: '❌'
+    }
+
+    const stepNames = {
+      upload: 'Uploading PDF',
+      extracting_metadata: 'Extracting Information', 
+      parsing_roster: 'Parsing Student Roster',
+      complete: 'Processing Complete',
+      error: 'Processing Error'
+    }
+
+    const estimatedRemaining = {
+      upload: 35,
+      extracting_metadata: 25,
+      parsing_roster: 10,
+      complete: 0,
+      error: 0
+    }
+
+    return `
+      <div class="bg-white border border-blue-200 rounded-lg p-6 shadow-sm">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0">
+              <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl">
+                ${stepIcons[step] || '⏳'}
+              </div>
+            </div>
+            <div>
+              <h3 class="text-lg font-medium text-gray-900">${stepNames[step] || 'Processing'}</h3>
+              <p class="text-sm text-gray-600">${message}</p>
+            </div>
+          </div>
+          
+          <!-- Time Display -->
+          <div class="text-right text-sm text-gray-500">
+            <div>Elapsed: ${elapsed}s</div>
+            ${estimatedRemaining[step] > 0 ? `<div>Est. remaining: ~${estimatedRemaining[step]}s</div>` : ''}
+          </div>
+        </div>
+
+        ${step !== 'error' ? `
+        <!-- Progress Bar -->
+        <div class="mb-4">
+          <div class="flex items-center justify-between text-sm text-gray-600 mb-2">
+            <span>Progress</span>
+            <span>${progress}%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="bg-blue-600 h-2 rounded-full transition-all duration-500 ease-out" style="width: ${progress}%"></div>
+          </div>
+        </div>
+        ` : ''}
+
+        ${step === 'error' ? `
+        <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+          <div class="flex items-center">
+            <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+            </svg>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Processing Failed</h3>
+              <p class="mt-1 text-sm text-red-700">${message}</p>
+              <div class="mt-3">
+                <button type="button" 
+                        data-action="click->cohort-upload#resetUpload"
+                        class="inline-flex items-center px-3 py-1 border border-red-300 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100">
+                  Try Again
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        ` : ''}
+
+        ${step === 'complete' && data ? `
+        <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-green-800">Processing Complete!</h3>
+                <p class="mt-1 text-sm text-green-700">
+                  Found ${data.students_preview?.estimated_total || 0} students.
+                  ${data.metadata?.name ? `Cohort: "${data.metadata.name}"` : ''}
+                </p>
+              </div>
+            </div>
+            <div class="text-xs text-green-600 font-medium">
+              ${elapsed}s total
+            </div>
+          </div>
+        </div>
+        ` : ''}
+
+        ${!['complete', 'error'].includes(step) ? `
+        <!-- Loading Animation -->
+        <div class="mt-4 flex items-center justify-center">
+          <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+          <span class="ml-2 text-sm text-gray-600">Processing...</span>
+        </div>
+        ` : ''}
+      </div>
+    `
+  }
+
+  showExtractedData(result) {
+    if (!this.hasExtractedContainerTarget) return
+    
+    this.extractedContainerTarget.classList.remove('hidden')
+    
+    const extractedDataFrame = document.getElementById('extracted_data')
+    if (extractedDataFrame) {
+      extractedDataFrame.innerHTML = this.createExtractedDataHtml(result.metadata, result.students_preview)
+    }
+  }
+
+  createExtractedDataHtml(metadata, studentsPreview) {
+    let html = '<div class="space-y-6">'
+    
+    // Metadata display
+    if (metadata) {
+      html += `
+        <div class="bg-blue-50 rounded-lg p-4">
+          <h4 class="text-lg font-medium text-blue-900 mb-3">Extracted Cohort Information</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      `
+      
+      if (metadata.name) {
+        html += `
+          <div>
+            <span class="font-medium text-blue-800">Name:</span>
+            <span class="text-blue-700">${metadata.name}</span>
+          </div>
+        `
+      }
+      
+      if (metadata.start_date || metadata.end_date) {
+        html += `
+          <div>
+            <span class="font-medium text-blue-800">Dates:</span>
+            <span class="text-blue-700">${metadata.start_date || '?'} to ${metadata.end_date || '?'}</span>
+          </div>
+        `
+      }
+      
+      html += '</div></div>'
+    }
+    
+    // Students preview
+    if (studentsPreview) {
+      html += `
+        <div class="bg-green-50 rounded-lg p-4">
+          <h4 class="text-lg font-medium text-green-900 mb-3">
+            Student Roster Preview
+            <span class="ml-2 text-sm font-normal text-green-700">
+              (${studentsPreview.estimated_total || 0} students detected)
+            </span>
+          </h4>
+      `
+      
+      if (studentsPreview.sample && studentsPreview.sample.length > 0) {
+        html += '<div class="space-y-2">'
+        studentsPreview.sample.forEach((student, index) => {
+          html += `
+            <div class="flex items-center justify-between p-2 bg-white rounded border border-green-200">
+              <div class="flex items-center space-x-3">
+                <span class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center text-xs font-medium text-green-800">
+                  ${index + 1}
+                </span>
+                <div>
+                  <div class="font-medium text-gray-900">${student.name}</div>
+                  <div class="text-sm text-gray-600">
+                    ${student.title ? student.title : ''}
+                    ${student.title && student.organization ? ' • ' : ''}
+                    ${student.organization ? student.organization : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `
+        })
+        html += '</div>'
+      }
+      
+      html += '</div>'
+    }
+    
+    html += '</div>'
+    return html
+  }
+
+  delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
   }
 
   handleSuccessfulExtraction(result) {
@@ -353,6 +618,25 @@ export default class extends Controller {
     // Hide error and progress
     this.hideError()
     this.hideProgress()
+    
+    // Hide new progress containers
+    if (this.hasProgressContainerTarget) {
+      this.progressContainerTarget.classList.add('hidden')
+    }
+    if (this.hasExtractedContainerTarget) {
+      this.extractedContainerTarget.classList.add('hidden')
+    }
+    
+    // Clear turbo frames
+    const uploadProgressFrame = document.getElementById('upload_progress')
+    if (uploadProgressFrame) {
+      uploadProgressFrame.innerHTML = ''
+    }
+    
+    const extractedDataFrame = document.getElementById('extracted_data')
+    if (extractedDataFrame) {
+      extractedDataFrame.innerHTML = ''
+    }
     
     // Show upload section, hide review
     this.showPdfForm()

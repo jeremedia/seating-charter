@@ -1963,3 +1963,206 @@ Started GET "/assets/controllers/index-ee64e1f1.js" for 73.92.124.11 at 2025-09-
 Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
 Started GET "/assets/controllers/rule_parser_controller-9ad13a36.js" for 73.92.124.11 at 2025-09-04 15:22:07 -0700
 Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+[dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_ENV[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
+[dotenv] Loaded [33m.env[0m
+[dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_ENV[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
+[dotenv] Loaded [33m.env[0m
+Started GET "/users/sign_in" for 73.92.124.11 at 2025-09-04 15:23:26 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 0.8ms | GC: 0.0ms)
+  Rendered layout layouts/devise.html.erb (Duration: 2.9ms | GC: 0.0ms)
+Completed 200 OK in 54ms (Views: 3.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/assets/tailwind-86b04897.css" for 73.92.124.11 at 2025-09-04 15:23:26 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+[dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_ENV[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
+[dotenv] Loaded [33m.env[0m
+Started POST "/users/sign_in" for 73.92.124.11 at 2025-09-04 15:23:54 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by Devise::SessionsController#create as TURBO_STREAM
+  Parameters: {"authenticity_token" => "[FILTERED]", "user" => {"email" => "[FILTERED]", "password" => "[FILTERED]", "remember_me" => "0"}, "commit" => "Sign In"}
+  [1m[36mUser Load (1.5ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'admin@chds.edu' ORDER BY "users"."id" ASC LIMIT 1 /*action='create',application='SeatingCharter',controller='sessions'*/[0m
+Redirected to https://sc.dev.domt.app/
+Completed 303 See Other in 292ms (ActiveRecord: 1.5ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/" for 73.92.124.11 at 2025-09-04 15:23:55 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by DashboardController#index as TURBO_STREAM
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 ORDER BY "users"."id" ASC LIMIT 1 /*action='index',application='SeatingCharter',controller='dashboard'*/[0m
+  [1m[36mStudent Count (0.7ms)[0m  [1m[34mSELECT COUNT(*) FROM "students" INNER JOIN "cohorts" ON "cohorts"."id" = "students"."cohort_id" WHERE "cohorts"."user_id" = 1 /*action='index',application='SeatingCharter',controller='dashboard'*/[0m
+  ↳ app/controllers/dashboard_controller.rb:7:in 'DashboardController#index'
+  [1m[36mCohort Count (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "cohorts" WHERE "cohorts"."user_id" = 1 AND (start_date <= '2025-09-04' AND end_date >= '2025-09-04') /*action='index',application='SeatingCharter',controller='dashboard'*/[0m
+  ↳ app/controllers/dashboard_controller.rb:8:in 'DashboardController#index'
+  Rendering layout layouts/application.html.erb
+  Rendering dashboard/index.html.erb within layouts/application
+  [1m[36mCohort Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "cohorts" WHERE "cohorts"."user_id" = 1 /*action='index',application='SeatingCharter',controller='dashboard'*/[0m
+  ↳ app/views/dashboard/index.html.erb:17
+  [1m[36mImportSession Count (2.7ms)[0m  [1m[34mSELECT COUNT(*) FROM (SELECT 1 AS one FROM "import_sessions" WHERE "import_sessions"."user_id" = 1 LIMIT 5) subquery_for_count /*action='index',application='SeatingCharter',controller='dashboard'*/[0m
+  ↳ app/views/dashboard/index.html.erb:59
+  [1m[36mCohort Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "cohorts" WHERE "cohorts"."user_id" = 1 LIMIT 1 /*action='index',application='SeatingCharter',controller='dashboard'*/[0m
+  ↳ app/views/dashboard/index.html.erb:78
+  [1m[36mCACHE Cohort Exists? (0.0ms)[0m  [1m[34mSELECT 1 AS one FROM "cohorts" WHERE "cohorts"."user_id" = 1 LIMIT 1[0m
+  ↳ app/views/dashboard/index.html.erb:183
+  Rendered dashboard/index.html.erb within layouts/application (Duration: 9.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 12.3ms | GC: 0.0ms)
+Completed 200 OK in 81ms (Views: 9.9ms | ActiveRecord: 8.1ms (7 queries, 1 cached) | GC: 0.0ms)
+
+
+Started GET "/cohorts/new" for 73.92.124.11 at 2025-09-04 15:24:04 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by CohortsController#new as HTML
+  [1m[36mUser Load (0.7ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 ORDER BY "users"."id" ASC LIMIT 1 /*action='new',application='SeatingCharter',controller='cohorts'*/[0m
+  Rendering layout layouts/application.html.erb
+  Rendering cohorts/new.html.erb within layouts/application
+  Rendered cohorts/new.html.erb within layouts/application (Duration: 7.2ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 8.6ms | GC: 0.0ms)
+Completed 200 OK in 57ms (Views: 8.9ms | ActiveRecord: 0.7ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/cohorts/upload_roster" for 73.92.124.11 at 2025-09-04 15:24:13 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by CohortsController#upload_roster as */*
+  Parameters: {"roster_pdf" => #<ActionDispatch::Http::UploadedFile:0x000000013366b370 @tempfile=#<Tempfile:/var/folders/xj/kwrgw0614l9fp4tk5j0rwly00000gn/T/RackMultipart20250904-16476-5neyq0.pdf>, @content_type="application/pdf", @original_filename="Emergence 2501 Class Roster.pdf", @headers="Content-Disposition: form-data; name=\"roster_pdf\"; filename=\"Emergence 2501 Class Roster.pdf\"\r\nContent-Type: application/pdf\r\n">, "authenticity_token" => "[FILTERED]"}
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 ORDER BY "users"."id" ASC LIMIT 1 /*action='upload_roster',application='SeatingCharter',controller='cohorts'*/[0m
+  [1m[36mAiConfiguration Load (0.7ms)[0m  [1m[34mSELECT "ai_configurations".* FROM "ai_configurations" WHERE "ai_configurations"."active" = TRUE LIMIT 1 /*action='upload_roster',application='SeatingCharter',controller='cohorts'*/[0m
+  ↳ app/services/openai_service.rb:147:in 'OpenaiService.get_active_configuration'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*action='upload_roster',application='SeatingCharter',controller='cohorts'*/[0m
+  ↳ app/services/openai_service.rb:171:in 'OpenaiService.track_cost'
+  [1m[36mCostTracking Create (2.0ms)[0m  [1m[32mINSERT INTO "cost_trackings" ("user_id", "request_id", "ai_model_used", "input_tokens", "output_tokens", "cost_estimate", "purpose", "created_at", "updated_at") VALUES (1, 'openai_016665edaf85d9e7', 'gpt-5', 586, 927, 0.03026, 'cohort_metadata_extraction', '2025-09-04 22:24:29.096972', '2025-09-04 22:24:29.096972') RETURNING "id" /*action='upload_roster',application='SeatingCharter',controller='cohorts'*/[0m
+  ↳ app/services/openai_service.rb:171:in 'OpenaiService.track_cost'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT /*action='upload_roster',application='SeatingCharter',controller='cohorts'*/[0m
+  ↳ app/services/openai_service.rb:171:in 'OpenaiService.track_cost'
+OpenAI API call tracked: 1513 tokens, $0.03026 estimated cost
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mBEGIN /*action='upload_roster',application='SeatingCharter',controller='cohorts'*/[0m
+  ↳ app/services/openai_service.rb:171:in 'OpenaiService.track_cost'
+  [1m[36mCostTracking Create (2.0ms)[0m  [1m[32mINSERT INTO "cost_trackings" ("user_id", "request_id", "ai_model_used", "input_tokens", "output_tokens", "cost_estimate", "purpose", "created_at", "updated_at") VALUES (1, 'openai_05514b58aa5323df', 'gpt-5', 555, 2548, 0.06206, 'roster_preview', '2025-09-04 22:24:51.156600', '2025-09-04 22:24:51.156600') RETURNING "id" /*action='upload_roster',application='SeatingCharter',controller='cohorts'*/[0m
+  ↳ app/services/openai_service.rb:171:in 'OpenaiService.track_cost'
+  [1m[36mTRANSACTION (0.7ms)[0m  [1m[35mCOMMIT /*action='upload_roster',application='SeatingCharter',controller='cohorts'*/[0m
+  ↳ app/services/openai_service.rb:171:in 'OpenaiService.track_cost'
+OpenAI API call tracked: 3103 tokens, $0.06206 estimated cost
+Completed 200 OK in 37772ms (Views: 3.1ms | ActiveRecord: 11.9ms (4 queries, 0 cached) | GC: 25.3ms)
+
+
+Started GET "/" for 34.220.104.103 at 2025-09-04 15:30:21 -0700
+Started GET "/" for 34.220.104.103 at 2025-09-04 15:30:21 -0700
+Cannot render console from 34.220.104.103! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Cannot render console from 34.220.104.103! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by DashboardController#index as HTML
+Processing by DashboardController#index as HTML
+Completed 401 Unauthorized in 79ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+  Rendering public/406-unsupported-browser.html
+  Rendered public/406-unsupported-browser.html (Duration: 0.2ms | GC: 0.0ms)
+Filter chain halted as #<Proc:0x00000001261a4740 /opt/homebrew/lib/ruby/gems/3.4.0/gems/actionpack-8.0.2.1/lib/action_controller/metal/allow_browser.rb:58 (lambda)> rendered or redirected
+Completed 406 Not Acceptable in 86ms (Views: 0.8ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for 34.220.104.103 at 2025-09-04 15:30:22 -0700
+Cannot render console from 34.220.104.103! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 0.8ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 5.7ms | GC: 0.2ms)
+  Rendered layout layouts/devise.html.erb (Duration: 13.0ms | GC: 0.3ms)
+Completed 200 OK in 60ms (Views: 15.9ms | ActiveRecord: 4.0ms (0 queries, 0 cached) | GC: 0.6ms)
+
+
+Started GET "/" for 38.158.173.62 at 2025-09-04 15:30:24 -0700
+Cannot render console from 38.158.173.62! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by DashboardController#index as HTML
+  Rendering public/406-unsupported-browser.html
+  Rendered public/406-unsupported-browser.html (Duration: 0.2ms | GC: 0.0ms)
+Filter chain halted as #<Proc:0x00000001261a4740 /opt/homebrew/lib/ruby/gems/3.4.0/gems/actionpack-8.0.2.1/lib/action_controller/metal/allow_browser.rb:58 (lambda)> rendered or redirected
+Completed 406 Not Acceptable in 35ms (Views: 0.3ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.2ms)
+
+
+Started GET "/" for 50.36.35.192 at 2025-09-04 15:30:25 -0700
+Cannot render console from 50.36.35.192! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by DashboardController#index as HTML
+Completed 401 Unauthorized in 34ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for 174.199.34.65 at 2025-09-04 15:30:26 -0700
+Cannot render console from 174.199.34.65! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 1.4ms | GC: 0.0ms)
+  Rendered layout layouts/devise.html.erb (Duration: 2.6ms | GC: 0.0ms)
+Completed 200 OK in 42ms (Views: 3.0ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/cohorts" for 73.92.124.11 at 2025-09-04 15:30:34 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by CohortsController#index as HTML
+  [1m[36mUser Load (1.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 ORDER BY "users"."id" ASC LIMIT 1 /*action='index',application='SeatingCharter',controller='cohorts'*/[0m
+  Rendering layout layouts/application.html.erb
+  Rendering cohorts/index.html.erb within layouts/application
+  [1m[36mCohort Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "cohorts" WHERE "cohorts"."user_id" = 1 LIMIT 1 /*action='index',application='SeatingCharter',controller='cohorts'*/[0m
+  ↳ app/views/cohorts/index.html.erb:16
+  Rendered cohorts/index.html.erb within layouts/application (Duration: 1.4ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 4.6ms | GC: 0.6ms)
+Completed 200 OK in 63ms (Views: 4.6ms | ActiveRecord: 1.7ms (2 queries, 0 cached) | GC: 1.5ms)
+
+
+Started GET "/cohorts" for 73.92.124.11 at 2025-09-04 15:30:35 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by CohortsController#index as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 ORDER BY "users"."id" ASC LIMIT 1 /*action='index',application='SeatingCharter',controller='cohorts'*/[0m
+  Rendering layout layouts/application.html.erb
+  Rendering cohorts/index.html.erb within layouts/application
+  [1m[36mCohort Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "cohorts" WHERE "cohorts"."user_id" = 1 LIMIT 1 /*action='index',application='SeatingCharter',controller='cohorts'*/[0m
+  ↳ app/views/cohorts/index.html.erb:16
+  Rendered cohorts/index.html.erb within layouts/application (Duration: 1.2ms | GC: 0.2ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.9ms | GC: 0.2ms)
+Completed 200 OK in 46ms (Views: 1.9ms | ActiveRecord: 0.7ms (2 queries, 0 cached) | GC: 0.2ms)
+
+
+Started GET "/cohorts" for 73.92.124.11 at 2025-09-04 15:30:39 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by CohortsController#index as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 ORDER BY "users"."id" ASC LIMIT 1 /*action='index',application='SeatingCharter',controller='cohorts'*/[0m
+  Rendering layout layouts/application.html.erb
+  Rendering cohorts/index.html.erb within layouts/application
+  [1m[36mCohort Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "cohorts" WHERE "cohorts"."user_id" = 1 LIMIT 1 /*action='index',application='SeatingCharter',controller='cohorts'*/[0m
+  ↳ app/views/cohorts/index.html.erb:16
+  Rendered cohorts/index.html.erb within layouts/application (Duration: 1.5ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 3.1ms | GC: 0.0ms)
+Completed 200 OK in 44ms (Views: 3.0ms | ActiveRecord: 0.7ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/cohorts/new" for 73.92.124.11 at 2025-09-04 15:30:41 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by CohortsController#new as HTML
+  [1m[36mUser Load (0.5ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 ORDER BY "users"."id" ASC LIMIT 1 /*action='new',application='SeatingCharter',controller='cohorts'*/[0m
+  Rendering layout layouts/application.html.erb
+  Rendering cohorts/new.html.erb within layouts/application
+  Rendered cohorts/new.html.erb within layouts/application (Duration: 6.5ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 7.6ms | GC: 0.0ms)
+Completed 200 OK in 55ms (Views: 10.6ms | ActiveRecord: 0.5ms (1 query, 0 cached) | GC: 0.6ms)
+
+
+Started GET "/cohorts" for 73.92.124.11 at 2025-09-04 15:30:44 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by CohortsController#index as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 ORDER BY "users"."id" ASC LIMIT 1 /*action='index',application='SeatingCharter',controller='cohorts'*/[0m
+  Rendering layout layouts/application.html.erb
+  Rendering cohorts/index.html.erb within layouts/application
+  [1m[36mCohort Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "cohorts" WHERE "cohorts"."user_id" = 1 LIMIT 1 /*action='index',application='SeatingCharter',controller='cohorts'*/[0m
+  ↳ app/views/cohorts/index.html.erb:16
+  Rendered cohorts/index.html.erb within layouts/application (Duration: 0.7ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.3ms | GC: 0.0ms)
+Completed 200 OK in 48ms (Views: 1.2ms | ActiveRecord: 0.6ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+[dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_ENV[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
+[dotenv] Loaded [33m.env[0m
