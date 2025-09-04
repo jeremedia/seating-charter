@@ -1451,3 +1451,279 @@ Completed 200 OK in 83ms (Views: 17.5ms | ActiveRecord: 4.8ms (0 queries, 0 cach
 Started GET "/assets/seating_editor-ffe15b26.css" for ::1 at 2025-09-04 12:43:44 -0700
 Started GET "/assets/controllers/rule_parser_controller-9ad13a36.js" for ::1 at 2025-09-04 12:43:44 -0700
 Started GET "/assets/controllers/seating_editor_controller-bb31d6c5.js" for ::1 at 2025-09-04 12:43:44 -0700
+Started GET "/users/sign_in" for ::1 at 2025-09-04 13:53:16 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering /opt/homebrew/lib/ruby/gems/3.4.0/gems/devise-4.9.4/app/views/devise/sessions/new.html.erb within layouts/application
+  Rendered /opt/homebrew/lib/ruby/gems/3.4.0/gems/devise-4.9.4/app/views/devise/shared/_links.html.erb (Duration: 2.6ms | GC: 0.0ms)
+  Rendered /opt/homebrew/lib/ruby/gems/3.4.0/gems/devise-4.9.4/app/views/devise/sessions/new.html.erb within layouts/application (Duration: 11.7ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 15.9ms | GC: 0.1ms)
+Completed 200 OK in 82ms (Views: 18.5ms | ActiveRecord: 8.1ms (0 queries, 0 cached) | GC: 0.3ms)
+
+
+Started GET "/apple-touch-icon-precomposed.png" for ::1 at 2025-09-04 13:57:32 -0700
+Started GET "/apple-touch-icon.png" for ::1 at 2025-09-04 13:57:32 -0700
+Started GET "/favicon.ico" for ::1 at 2025-09-04 13:57:32 -0700
+  
+ActionController::RoutingError (No route matches [GET] "/apple-touch-icon.png"):
+  
+  
+ActionController::RoutingError (No route matches [GET] "/apple-touch-icon-precomposed.png"):
+  
+  
+ActionController::RoutingError (No route matches [GET] "/favicon.ico"):
+  
+[dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_ENV[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
+[dotenv] Loaded [33m.env[0m
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:00:21 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.6ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 3.9ms | GC: 0.2ms)
+  Rendered layout layouts/application.html.erb (Duration: 7.2ms | GC: 0.2ms)
+Completed 200 OK in 52ms (Views: 12.8ms | ActiveRecord: 2.6ms (0 queries, 0 cached) | GC: 0.5ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:00:26 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 2.1ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 3.9ms | GC: 0.0ms)
+Completed 200 OK in 33ms (Views: 4.2ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:00:41 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 1.4ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 2.6ms | GC: 0.0ms)
+Completed 200 OK in 33ms (Views: 2.8ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:00:45 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.8ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 8.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 13.5ms | GC: 0.1ms)
+Completed 200 OK in 57ms (Views: 15.2ms | ActiveRecord: 7.1ms (0 queries, 0 cached) | GC: 0.4ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:00:47 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 1.7ms | GC: 0.1ms)
+  Rendered layout layouts/application.html.erb (Duration: 2.6ms | GC: 0.1ms)
+Completed 200 OK in 34ms (Views: 2.8ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.1ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:00:56 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 1.4ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 2.1ms | GC: 0.0ms)
+Completed 200 OK in 37ms (Views: 2.3ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:01:08 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 5.1ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 5.7ms | GC: 0.0ms)
+Completed 200 OK in 34ms (Views: 6.0ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:01:10 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 1.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.7ms | GC: 0.0ms)
+Completed 200 OK in 33ms (Views: 1.9ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:01:16 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 3.5ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 5.8ms | GC: 0.0ms)
+Completed 200 OK in 50ms (Views: 7.1ms | ActiveRecord: 2.3ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:01:40 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.7ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 2.4ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 5.9ms | GC: 0.2ms)
+Completed 200 OK in 46ms (Views: 9.4ms | ActiveRecord: 2.4ms (0 queries, 0 cached) | GC: 0.7ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:01:50 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 1.6ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 3.3ms | GC: 0.0ms)
+Completed 200 OK in 33ms (Views: 3.5ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.2ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:02:45 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 2.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 4.2ms | GC: 0.0ms)
+Completed 200 OK in 39ms (Views: 5.6ms | ActiveRecord: 2.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:02:47 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.7ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 2.6ms | GC: 0.3ms)
+  Rendered layout layouts/application.html.erb (Duration: 4.8ms | GC: 0.4ms)
+Completed 200 OK in 39ms (Views: 6.4ms | ActiveRecord: 2.0ms (0 queries, 0 cached) | GC: 0.7ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:02:53 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 1.3ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 3.2ms | GC: 0.3ms)
+Completed 200 OK in 34ms (Views: 3.6ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.3ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:02:54 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 0.9ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.7ms | GC: 0.0ms)
+Completed 200 OK in 33ms (Views: 2.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:02:55 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 0.7ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.1ms | GC: 0.0ms)
+Completed 200 OK in 31ms (Views: 1.3ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:03:50 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 0.9ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 8.3ms | GC: 0.0ms)
+  Rendered layout layouts/devise.html.erb (Duration: 11.2ms | GC: 0.0ms)
+Completed 200 OK in 46ms (Views: 12.4ms | ActiveRecord: 2.1ms (0 queries, 0 cached) | GC: 0.1ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:04:02 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 0.7ms | GC: 0.3ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 2.7ms | GC: 0.3ms)
+  Rendered layout layouts/devise.html.erb (Duration: 4.4ms | GC: 0.5ms)
+Completed 200 OK in 38ms (Views: 5.6ms | ActiveRecord: 2.0ms (0 queries, 0 cached) | GC: 0.9ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:04:16 -0700
+Processing by Devise::SessionsController#new as */*
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 0.9ms | GC: 0.0ms)
+  Rendered layout layouts/devise.html.erb (Duration: 2.7ms | GC: 0.0ms)
+Completed 200 OK in 29ms (Views: 2.9ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_up" for ::1 at 2025-09-04 14:04:21 -0700
+Processing by Devise::RegistrationsController#new as */*
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/registrations/new.html.erb within layouts/devise
+  Rendered devise/shared/_error_messages.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered devise/shared/_links.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered devise/registrations/new.html.erb within layouts/devise (Duration: 2.3ms | GC: 0.2ms)
+  Rendered layout layouts/devise.html.erb (Duration: 2.7ms | GC: 0.2ms)
+Completed 200 OK in 27ms (Views: 3.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.2ms)
+
+
+Started GET "/users/password/new" for ::1 at 2025-09-04 14:04:26 -0700
+Processing by Devise::PasswordsController#new as */*
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/passwords/new.html.erb within layouts/devise
+  Rendered devise/shared/_error_messages.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered devise/shared/_links.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered devise/passwords/new.html.erb within layouts/devise (Duration: 1.7ms | GC: 0.0ms)
+  Rendered layout layouts/devise.html.erb (Duration: 2.2ms | GC: 0.0ms)
+Completed 200 OK in 27ms (Views: 2.7ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.2ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:05:00 -0700
+Processing by Devise::SessionsController#new as */*
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 1.0ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 2.8ms | GC: 0.0ms)
+  Rendered layout layouts/devise.html.erb (Duration: 4.2ms | GC: 0.0ms)
+Completed 200 OK in 37ms (Views: 5.7ms | ActiveRecord: 2.1ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:05:05 -0700
+Processing by Devise::SessionsController#new as */*
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 2.0ms | GC: 0.0ms)
+  Rendered layout layouts/devise.html.erb (Duration: 2.4ms | GC: 0.0ms)
+Completed 200 OK in 26ms (Views: 2.5ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:05:09 -0700
+Processing by Devise::SessionsController#new as */*
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 0.7ms | GC: 0.0ms)
+  Rendered layout layouts/devise.html.erb (Duration: 1.5ms | GC: 0.0ms)
+Completed 200 OK in 28ms (Views: 1.7ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for ::1 at 2025-09-04 14:05:43 -0700
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 12.8ms | GC: 0.0ms)
+  Rendered layout layouts/devise.html.erb (Duration: 13.5ms | GC: 0.0ms)
+Completed 200 OK in 43ms (Views: 13.7ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
