@@ -10,13 +10,22 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Deploy to jer-serve via SSH
+    - name: Deploy to jer-serve via Jump Host
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: ${{ secrets.PRODUCTION_HOST }}
-        username: ${{ secrets.PRODUCTION_USER }}
+        # Target server (jer-serve via Tailscale)
+        host: 100.74.87.20
+        username: jeremy
         key: ${{ secrets.PRODUCTION_SSH_KEY }}
         port: 22
+        
+        # Jump host (Caddy server with public IP)
+        proxy_host: 143.110.147.77
+        proxy_username: root
+        proxy_key: ${{ secrets.JUMP_HOST_SSH_KEY }}
+        proxy_port: 22
+        
+        # Deployment script
         script: |
           cd /home/jeremy/apps/seating-charter
           
