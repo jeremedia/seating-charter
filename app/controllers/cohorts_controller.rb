@@ -20,11 +20,32 @@ class CohortsController < ApplicationController
     @cohort = current_user.cohorts.build(cohort_params)
     
     if @cohort.save
-      # If roster PDF was uploaded, parse students after cohort creation
-      if @cohort.roster_pdf.attached?
+      # Check if we have a stored PDF from the upload_roster step
+      if session[:temp_pdf_blob_id]
         begin
-          parse_roster_async(@cohort)
-          redirect_to @cohort, notice: 'Cohort was successfully created. Processing student roster...'
+          # Attach the stored PDF to the cohort
+          pdf_blob = ActiveStorage::Blob.find(session[:temp_pdf_blob_id])
+          @cohort.roster_pdf.attach(pdf_blob)
+          
+          # Import students immediately using the same PDF
+          result = parse_roster_sync(@cohort)
+          
+          # Clear the session
+          session.delete(:temp_pdf_blob_id)
+          
+          redirect_to @cohort, notice: "Cohort created successfully with #{result[:students_created]} students imported!"
+          
+        rescue StandardError => e
+          Rails.logger.error "Error importing students during cohort creation: #{e.message}"
+          # Clear the session even on error
+          session.delete(:temp_pdf_blob_id)
+          redirect_to @cohort, notice: 'Cohort was created, but there was an issue importing students. You can import them manually later.'
+        end
+      elsif @cohort.roster_pdf.attached?
+        # Fallback: if PDF was uploaded via the form field (manual workflow)
+        begin
+          result = parse_roster_sync(@cohort)
+          redirect_to @cohort, notice: "Cohort created successfully with #{result[:students_created]} students imported!"
         rescue StandardError => e
           Rails.logger.error "Error parsing roster after cohort creation: #{e.message}"
           redirect_to @cohort, notice: 'Cohort was created, but there was an issue processing the roster. You can import students manually.'
@@ -33,6 +54,15 @@ class CohortsController < ApplicationController
         redirect_to @cohort, notice: 'Cohort was successfully created.'
       end
     else
+      # If cohort creation fails, clean up any stored PDF
+      if session[:temp_pdf_blob_id]
+        begin
+          ActiveStorage::Blob.find(session[:temp_pdf_blob_id]).destroy
+        rescue
+          # Ignore errors during cleanup
+        end
+        session.delete(:temp_pdf_blob_id)
+      end
       render :new, status: :unprocessable_entity
     end
   end
@@ -44,7 +74,7 @@ class CohortsController < ApplicationController
     end
 
     begin
-      # Save uploaded file temporarily
+      # Save uploaded file temporarily for processing
       uploaded_file = params[:roster_pdf]
       temp_file = save_temp_file(uploaded_file)
       
@@ -55,10 +85,32 @@ class CohortsController < ApplicationController
       )
       
       if result[:success]
+        # Clean up any existing stored PDF from previous uploads
+        if session[:temp_pdf_blob_id]
+          begin
+            ActiveStorage::Blob.find(session[:temp_pdf_blob_id]).destroy
+          rescue
+            # Ignore errors during cleanup
+          end
+        end
+        
+        # Store the PDF file in session for use during cohort creation
+        # We'll save it as a temporary ActiveStorage blob
+        uploaded_file.rewind  # Reset file pointer
+        pdf_blob = ActiveStorage::Blob.create_and_upload!(
+          io: uploaded_file,
+          filename: uploaded_file.original_filename,
+          content_type: uploaded_file.content_type
+        )
+        
+        # Store the blob ID in session so we can attach it during create
+        session[:temp_pdf_blob_id] = pdf_blob.id
+        
         render json: {
           success: true,
           metadata: result[:metadata],
-          students_preview: result[:students_preview]
+          students_preview: result[:students_preview],
+          pdf_stored: true
         }
       else
         render json: {
@@ -114,10 +166,9 @@ class CohortsController < ApplicationController
     temp_file
   end
 
-  def parse_roster_async(cohort)
-    # In a production app, this would be a background job
-    # For now, we'll process it synchronously but could be moved to Sidekiq later
-    return unless cohort.roster_pdf.attached?
+  def parse_roster_sync(cohort)
+    # Synchronously parse roster and return result
+    return { students_created: 0 } unless cohort.roster_pdf.attached?
 
     begin
       # Download the attached file to a temporary location
@@ -136,6 +187,7 @@ class CohortsController < ApplicationController
       )
 
       Rails.logger.info "Roster parsing completed for cohort #{cohort.id}: #{result[:students_created]} students created"
+      return result
       
     rescue StandardError => e
       Rails.logger.error "Error parsing roster for cohort #{cohort.id}: #{e.message}"
@@ -144,5 +196,11 @@ class CohortsController < ApplicationController
       temp_file&.close
       temp_file&.unlink
     end
+  end
+  
+  def parse_roster_async(cohort)
+    # Legacy method - now just calls sync version
+    # In a production app, this would be a background job
+    parse_roster_sync(cohort)
   end
 end

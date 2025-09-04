@@ -148,8 +148,7 @@
             </div>
           <% end %>
 
-          <!-- Hidden file field for PDF -->
-          <%= form.file_field :roster_pdf, class: "hidden" %>
+          <!-- PDF is now stored in session, no need for file field -->
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Left Column: Cohort Details -->
