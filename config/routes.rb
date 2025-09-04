@@ -11,6 +11,10 @@ Rails.application.routes.draw do
   
   # Cohorts management
   resources :cohorts do
+    collection do
+      post :upload_roster
+    end
+    
     resources :students, except: [:show]
     resources :import_sessions, except: [:show]
     

@@ -4,6 +4,9 @@ class Cohort < ApplicationRecord
   has_many :students, dependent: :destroy
   has_many :import_sessions, dependent: :destroy
   has_many :seating_events, dependent: :destroy
+  
+  # ActiveStorage attachments
+  has_one_attached :roster_pdf
 
   # Validations
   validates :name, presence: true, length: { maximum: 255 }
@@ -12,6 +15,7 @@ class Cohort < ApplicationRecord
   validates :end_date, presence: true
   validates :max_students, presence: true, numericality: { greater_than: 0, less_than_or_equal_to: 40 }
   validate :end_date_after_start_date
+  validate :validate_roster_pdf, if: -> { roster_pdf.attached? }
 
   # Callbacks
   before_validation :set_defaults, on: :create
@@ -56,6 +60,19 @@ class Cohort < ApplicationRecord
     user
   end
 
+  def has_roster_pdf?
+    roster_pdf.attached?
+  end
+
+  def roster_pdf_filename
+    roster_pdf.filename.to_s if roster_pdf.attached?
+  end
+
+  def roster_pdf_size_mb
+    return 0 unless roster_pdf.attached?
+    (roster_pdf.byte_size / 1.megabyte.to_f).round(2)
+  end
+
   private
 
   def end_date_after_start_date
@@ -63,6 +80,25 @@ class Cohort < ApplicationRecord
     
     if end_date < start_date
       errors.add(:end_date, "must be after start date")
+    end
+  end
+
+  def validate_roster_pdf
+    return unless roster_pdf.attached?
+
+    # Check file size (10MB limit)
+    if roster_pdf.byte_size > 10.megabytes
+      errors.add(:roster_pdf, "must be smaller than 10MB")
+    end
+
+    # Check content type
+    unless roster_pdf.content_type == 'application/pdf'
+      errors.add(:roster_pdf, "must be a PDF file")
+    end
+
+    # Check filename extension
+    unless roster_pdf.filename.to_s.downcase.ends_with?('.pdf')
+      errors.add(:roster_pdf, "must have .pdf extension")
     end
   end
 

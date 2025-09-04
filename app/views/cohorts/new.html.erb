@@ -1,16 +1,248 @@
-<% content_for :title, "New Cohort" %>
+<% content_for :title, "Create New Cohort" %>
 
-<div class="max-w-2xl mx-auto">
+<div class="max-w-4xl mx-auto" 
+     data-controller="cohort-upload" 
+     data-cohort-upload-upload-url-value="<%= upload_roster_cohorts_path %>"
+     data-cohort-upload-csrf-token-value="<%= form_authenticity_token %>">
+
   <!-- Header -->
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900">Create New Cohort</h1>
-    <p class="text-gray-600 mt-2">Set up a new cohort for your CHDS program</p>
+  <div class="text-center mb-8">
+    <h1 class="text-4xl font-bold text-gray-900 mb-2">Create New Cohort</h1>
+    <p class="text-lg text-gray-600">Upload your roster PDF - it contains everything we need!</p>
   </div>
 
-  <!-- Form -->
-  <div class="bg-white shadow rounded-lg">
+  <!-- Method Selection Tabs -->
+  <div class="bg-white shadow rounded-lg mb-8">
+    <div class="border-b border-gray-200">
+      <nav class="-mb-px flex" aria-label="Tabs">
+        <button type="button" 
+                data-action="click->cohort-upload#showPdfForm"
+                class="w-1/2 py-4 px-1 text-center border-b-2 border-blue-500 font-medium text-sm text-blue-600 whitespace-nowrap focus:outline-none focus:text-blue-800 focus:border-blue-800" 
+                aria-current="page">
+          <svg class="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+          </svg>
+          Upload Roster PDF
+        </button>
+        <button type="button" 
+                data-action="click->cohort-upload#showManualForm"
+                class="w-1/2 py-4 px-1 text-center border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap focus:outline-none focus:text-gray-700 focus:border-gray-300">
+          <svg class="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          Manual Entry
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Error Message (hidden by default) -->
+  <div data-cohort-upload-target="errorMessage" 
+       class="bg-red-50 border border-red-200 rounded-md p-4 mb-6 hidden">
+    <div class="flex">
+      <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+      </svg>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-red-800">Error</h3>
+        <p class="mt-1 text-sm text-red-700"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF Upload Form (Primary) -->
+  <div data-cohort-upload-target="pdfForm" class="bg-white shadow rounded-lg">
+    
+    <!-- Upload Section -->
+    <div data-cohort-upload-target="uploadSection" class="p-8">
+      <!-- Large Upload Area -->
+      <div data-cohort-upload-target="uploadArea" 
+           data-action="click->cohort-upload#selectFile"
+           class="relative border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer">
+        
+        <input type="file" 
+               data-cohort-upload-target="fileInput"
+               data-action="change->cohort-upload#fileSelected"
+               accept=".pdf"
+               class="hidden">
+        
+        <div class="mb-4">
+          <svg class="mx-auto h-16 w-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        
+        <h3 class="text-2xl font-semibold text-gray-900 mb-2">Drop your roster PDF here</h3>
+        <p class="text-lg text-gray-600 mb-4">or click to browse files</p>
+        
+        <div class="text-sm text-gray-500 space-y-1">
+          <p>Accepted format: PDF only</p>
+          <p>Maximum size: 10MB</p>
+        </div>
+
+        <!-- File Info (shown after selection) -->
+        <div class="mt-6 hidden" data-cohort-upload-target="fileInfo">
+          <div class="bg-blue-50 rounded-lg p-4 max-w-md mx-auto">
+            <div class="flex items-center">
+              <svg class="h-8 w-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+              </svg>
+              <div class="ml-3 flex-1">
+                <p class="text-sm font-medium text-gray-900" data-cohort-upload-target="fileName"></p>
+                <p class="text-sm text-gray-500" data-cohort-upload-target="fileSize"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Progress -->
+      <div data-cohort-upload-target="uploadProgress" class="mt-6 hidden">
+        <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+          <div class="flex items-center">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-blue-900" data-cohort-upload-target="processStatus">Processing PDF...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Review Section (shown after processing) -->
+    <div data-cohort-upload-target="reviewSection" class="hidden">
+      <div class="border-t border-gray-200 px-8 py-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Review Extracted Information</h3>
+        
+        <!-- Form with extracted data -->
+        <%= form_with(model: @cohort, local: true, class: "space-y-6") do |form| %>
+          <% if @cohort.errors.any? %>
+            <div class="bg-red-50 border border-red-200 rounded-md p-4">
+              <div class="flex">
+                <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                </svg>
+                <div class="ml-3">
+                  <h3 class="text-sm font-medium text-red-800">Please correct the following errors:</h3>
+                  <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                    <% @cohort.errors.full_messages.each do |message| %>
+                      <li><%= message %></li>
+                    <% end %>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Hidden file field for PDF -->
+          <%= form.file_field :roster_pdf, class: "hidden" %>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column: Cohort Details -->
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Cohort Name
+                  <span data-cohort-upload-target="nameConfidence" class="ml-2"></span>
+                </label>
+                <%= form.text_field :name,
+                      data: { cohort_upload_target: "nameField" },
+                      placeholder: "e.g., Fall 2024 Cohort A",
+                      class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <%= form.text_area :description,
+                      data: { cohort_upload_target: "descriptionField" },
+                      placeholder: "Brief description of this cohort...",
+                      rows: 3,
+                      class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Start Date
+                    <span data-cohort-upload-target="startDateConfidence" class="ml-2"></span>
+                  </label>
+                  <%= form.date_field :start_date,
+                        data: { cohort_upload_target: "startDateField" },
+                        class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    End Date
+                    <span data-cohort-upload-target="endDateConfidence" class="ml-2"></span>
+                  </label>
+                  <%= form.date_field :end_date,
+                        data: { cohort_upload_target: "endDateField" },
+                        class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Maximum Students</label>
+                <%= form.number_field :max_students,
+                      data: { cohort_upload_target: "maxStudentsField" },
+                      value: @cohort.max_students || 25,
+                      min: 1, max: 40,
+                      class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+                <p class="mt-1 text-sm text-gray-500">Maximum capacity for this cohort (1-40 students)</p>
+              </div>
+            </div>
+
+            <!-- Right Column: Students Preview & Confidence -->
+            <div class="space-y-6">
+              <div>
+                <h4 class="text-sm font-medium text-gray-900 mb-3">
+                  Students Found: <span data-cohort-upload-target="studentsCount" class="text-blue-600">0</span>
+                </h4>
+                <div data-cohort-upload-target="studentsPreview" class="bg-gray-50 rounded-lg p-4 h-48 overflow-y-auto">
+                  <p class="text-gray-500 italic">Upload a PDF to see student preview</p>
+                </div>
+              </div>
+
+              <div data-cohort-upload-target="confidenceIndicators">
+                <!-- Confidence indicators will be populated by JavaScript -->
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-gray-200 pt-6">
+            <div class="flex items-center justify-between">
+              <div class="flex space-x-3">
+                <button type="button"
+                        data-action="click->cohort-upload#resetUpload"
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                  Upload Different PDF
+                </button>
+              </div>
+
+              <div class="flex space-x-3">
+                <%= link_to 'Cancel', cohorts_path,
+                      class: 'inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50' %>
+                <%= form.submit "Create Cohort & Import Students",
+                      data: { cohort_upload_target: "submitButton" },
+                      disabled: true,
+                      class: 'inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed' %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manual Form (Secondary) -->
+  <div data-cohort-upload-target="manualForm" class="bg-white shadow rounded-lg hidden">
     <div class="px-6 py-4 border-b border-gray-200">
-      <h3 class="text-lg font-medium text-gray-900">Cohort Information</h3>
+      <h3 class="text-lg font-medium text-gray-900">Manual Cohort Creation</h3>
+      <p class="text-sm text-gray-500 mt-1">Create cohort manually - you can import roster later</p>
     </div>
     
     <div class="p-6">
@@ -65,7 +297,7 @@
         <div>
           <%= form.label :max_students, "Maximum Students", class: "block text-sm font-medium text-gray-700" %>
           <%= form.number_field :max_students, 
-                value: @cohort.max_students || 40,
+                value: @cohort.max_students || 25,
                 min: 1, max: 40,
                 class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" %>
           <p class="mt-1 text-sm text-gray-500">Maximum capacity for this cohort (1-40 students)</p>
