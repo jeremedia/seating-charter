@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  description: MyText
+  start_date: 2025-09-04
+  end_date: 2025-09-04
+  user: one
+  max_students: 1
+
+two:
+  name: MyString
+  description: MyText
+  start_date: 2025-09-04
+  end_date: 2025-09-04
+  user: two
+  max_students: 1

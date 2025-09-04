@@ -1,0 +1,730 @@
+  [1m[35m (150.4ms)[0m  [1m[35mCREATE DATABASE "seating_charter_development" ENCODING = 'unicode' /*application='SeatingCharter'*/[0m
+  [1m[35m (126.5ms)[0m  [1m[35mCREATE DATABASE "seating_charter_development" ENCODING = 'unicode' /*application='SeatingCharter'*/[0m
+  [1m[35mSQL (0.1ms)[0m  [1m[35mSET search_path TO public /*application='SeatingCharter'*/[0m
+  [1m[35m (109.8ms)[0m  [1m[35mCREATE DATABASE "seating_charter_development" ENCODING = 'unicode' /*application='SeatingCharter'*/[0m
+  [1m[35mSQL (0.6ms)[0m  [1m[35mSET search_path TO public /*application='SeatingCharter'*/[0m
+  [1m[35m (77.5ms)[0m  [1m[35mCREATE DATABASE "seating_charter_test" ENCODING = 'unicode' /*application='SeatingCharter'*/[0m
+  [1m[35m (31.1ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" character varying NOT NULL PRIMARY KEY) /*application='SeatingCharter'*/[0m
+  [1m[35m (13.2ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" character varying NOT NULL PRIMARY KEY, "value" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_try_advisory_lock(5197479384563396175) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (1.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Create (1.4ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ('environment', 'development', '2025-09-04 18:08:47.888854', '2025-09-04 18:08:47.888860') RETURNING "key" /*application='SeatingCharter'*/[0m
+Migrating to DeviseCreateUsers (20250904175625)
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (11.4ms)[0m  [1m[35mCREATE TABLE "users" ("id" bigserial primary key, "email" character varying DEFAULT '' NOT NULL, "encrypted_password" character varying DEFAULT '' NOT NULL, "reset_password_token" character varying, "reset_password_sent_at" timestamp(6), "remember_created_at" timestamp(6), "role" integer DEFAULT 0 NOT NULL, "first_name" character varying, "last_name" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL) /*application='SeatingCharter'*/[0m
+  [1m[35m (9.2ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_users_on_email" ON "users" ("email") /*application='SeatingCharter'*/[0m
+  [1m[35m (2.2ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_users_on_reset_password_token" ON "users" ("reset_password_token") /*application='SeatingCharter'*/[0m
+  [1m[35m (4.1ms)[0m  [1m[35mCREATE INDEX "index_users_on_role" ON "users" ("role") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (1.0ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175625') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.9ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateCohorts (20250904175633)
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (5.5ms)[0m  [1m[35mCREATE TABLE "cohorts" ("id" bigserial primary key, "name" character varying NOT NULL, "description" text, "start_date" date NOT NULL, "end_date" date NOT NULL, "user_id" bigint NOT NULL, "max_students" integer DEFAULT 40 NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_5515141c12"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (1.6ms)[0m  [1m[35mCREATE INDEX "index_cohorts_on_user_id" ON "cohorts" ("user_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.6ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175633') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateStudents (20250904175641)
+  [1m[36mTRANSACTION (1.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (15.1ms)[0m  [1m[35mCREATE TABLE "students" ("id" bigserial primary key, "name" character varying, "title" character varying, "organization" character varying, "location" character varying, "cohort_id" bigint NOT NULL, "student_attributes" jsonb, "inferences" jsonb, "confidence_scores" jsonb, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_b70571e3bf"
+FOREIGN KEY ("cohort_id")
+  REFERENCES "cohorts" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (1.7ms)[0m  [1m[35mCREATE INDEX "index_students_on_cohort_id" ON "students" ("cohort_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175641') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateImportSessions (20250904175645)
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (13.8ms)[0m  [1m[35mCREATE TABLE "import_sessions" ("id" bigserial primary key, "cohort_id" bigint NOT NULL, "user_id" bigint NOT NULL, "status" integer, "file_name" character varying, "file_size" integer, "processed_at" timestamp(6), "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_a5037db12b"
+FOREIGN KEY ("cohort_id")
+  REFERENCES "cohorts" ("id")
+, CONSTRAINT "fk_rails_25c4555ade"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (1.3ms)[0m  [1m[35mCREATE INDEX "index_import_sessions_on_cohort_id" ON "import_sessions" ("cohort_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (8.9ms)[0m  [1m[35mCREATE INDEX "index_import_sessions_on_user_id" ON "import_sessions" ("user_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175645') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.9ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateStudentImportRecords (20250904175650)
+  [1m[36mTRANSACTION (4.6ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (19.9ms)[0m  [1m[35mCREATE TABLE "student_import_records" ("id" bigserial primary key, "import_session_id" bigint NOT NULL, "student_id" bigint NOT NULL, "raw_data" jsonb, "ai_inferences" jsonb, "corrections" jsonb, "feedback_provided" boolean, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_d59a5c2fdc"
+FOREIGN KEY ("import_session_id")
+  REFERENCES "import_sessions" ("id")
+, CONSTRAINT "fk_rails_d9049a0c58"
+FOREIGN KEY ("student_id")
+  REFERENCES "students" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (1.3ms)[0m  [1m[35mCREATE INDEX "index_student_import_records_on_import_session_id" ON "student_import_records" ("import_session_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (1.8ms)[0m  [1m[35mCREATE INDEX "index_student_import_records_on_student_id" ON "student_import_records" ("student_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (3.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175650') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateSeatingEvents (20250904175654)
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (63.4ms)[0m  [1m[35mCREATE TABLE "seating_events" ("id" bigserial primary key, "cohort_id" bigint NOT NULL, "name" character varying, "event_type" integer, "event_date" date, "table_size" integer, "total_tables" integer, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_c4f4e07de7"
+FOREIGN KEY ("cohort_id")
+  REFERENCES "cohorts" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.8ms)[0m  [1m[35mCREATE INDEX "index_seating_events_on_cohort_id" ON "seating_events" ("cohort_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175654') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.9ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateSeatingArrangements (20250904175659)
+  [1m[36mTRANSACTION (4.3ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (22.4ms)[0m  [1m[35mCREATE TABLE "seating_arrangements" ("id" bigserial primary key, "seating_event_id" bigint NOT NULL, "optimization_scores" jsonb, "arrangement_data" jsonb, "created_by_id" bigint NOT NULL, "diversity_metrics" jsonb, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_5984d217ad"
+FOREIGN KEY ("seating_event_id")
+  REFERENCES "seating_events" ("id")
+, CONSTRAINT "fk_rails_4924591716"
+FOREIGN KEY ("created_by_id")
+  REFERENCES "created_bies" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (2.1ms)[0m  [1m[31mROLLBACK /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[34mSELECT pg_advisory_unlock(5197479384563396175) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (2.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_try_advisory_lock(5197479384563396175) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+Migrating to CreateSeatingEvents (20250904175654)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (2.4ms)[0m  [1m[35mDROP TABLE "seating_events" /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Destroy (0.3ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20250904175654' /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (1.5ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateStudentImportRecords (20250904175650)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (1.7ms)[0m  [1m[35mDROP TABLE "student_import_records" /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Destroy (0.1ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20250904175650' /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (1.0ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateImportSessions (20250904175645)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (1.6ms)[0m  [1m[35mDROP TABLE "import_sessions" /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Destroy (0.2ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20250904175645' /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (1.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateStudents (20250904175641)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (1.4ms)[0m  [1m[35mDROP TABLE "students" /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Destroy (0.1ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20250904175641' /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.8ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateCohorts (20250904175633)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (2.0ms)[0m  [1m[35mDROP TABLE "cohorts" /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Destroy (0.2ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20250904175633' /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (1.1ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to DeviseCreateUsers (20250904175625)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP INDEX  "index_users_on_role" /*application='SeatingCharter'*/[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP INDEX  "index_users_on_reset_password_token" /*application='SeatingCharter'*/[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP INDEX  "index_users_on_email" /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mDROP TABLE "users" /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Destroy (0.2ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20250904175625' /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (4.0ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_advisory_unlock(5197479384563396175) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_try_advisory_lock(5197479384563396175) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.8ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.6ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+Migrating to DeviseCreateUsers (20250904175625)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.2ms)[0m  [1m[35mCREATE TABLE "users" ("id" bigserial primary key, "email" character varying DEFAULT '' NOT NULL, "encrypted_password" character varying DEFAULT '' NOT NULL, "reset_password_token" character varying, "reset_password_sent_at" timestamp(6), "remember_created_at" timestamp(6), "role" integer DEFAULT 0 NOT NULL, "first_name" character varying, "last_name" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_users_on_email" ON "users" ("email") /*application='SeatingCharter'*/[0m
+  [1m[35m (1.0ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_users_on_reset_password_token" ON "users" ("reset_password_token") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE INDEX "index_users_on_role" ON "users" ("role") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175625') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateCohorts (20250904175633)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (2.3ms)[0m  [1m[35mCREATE TABLE "cohorts" ("id" bigserial primary key, "name" character varying NOT NULL, "description" text, "start_date" date NOT NULL, "end_date" date NOT NULL, "user_id" bigint NOT NULL, "max_students" integer DEFAULT 40 NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_5515141c12"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_cohorts_on_user_id" ON "cohorts" ("user_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175633') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateStudents (20250904175641)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.0ms)[0m  [1m[35mCREATE TABLE "students" ("id" bigserial primary key, "name" character varying, "title" character varying, "organization" character varying, "location" character varying, "cohort_id" bigint NOT NULL, "student_attributes" jsonb, "inferences" jsonb, "confidence_scores" jsonb, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_b70571e3bf"
+FOREIGN KEY ("cohort_id")
+  REFERENCES "cohorts" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE INDEX "index_students_on_cohort_id" ON "students" ("cohort_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175641') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateImportSessions (20250904175645)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.0ms)[0m  [1m[35mCREATE TABLE "import_sessions" ("id" bigserial primary key, "cohort_id" bigint NOT NULL, "user_id" bigint NOT NULL, "status" integer, "file_name" character varying, "file_size" integer, "processed_at" timestamp(6), "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_a5037db12b"
+FOREIGN KEY ("cohort_id")
+  REFERENCES "cohorts" ("id")
+, CONSTRAINT "fk_rails_25c4555ade"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_import_sessions_on_cohort_id" ON "import_sessions" ("cohort_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_import_sessions_on_user_id" ON "import_sessions" ("user_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175645') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateStudentImportRecords (20250904175650)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (2.7ms)[0m  [1m[35mCREATE TABLE "student_import_records" ("id" bigserial primary key, "import_session_id" bigint NOT NULL, "student_id" bigint NOT NULL, "raw_data" jsonb, "ai_inferences" jsonb, "corrections" jsonb, "feedback_provided" boolean, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_d59a5c2fdc"
+FOREIGN KEY ("import_session_id")
+  REFERENCES "import_sessions" ("id")
+, CONSTRAINT "fk_rails_d9049a0c58"
+FOREIGN KEY ("student_id")
+  REFERENCES "students" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.9ms)[0m  [1m[35mCREATE INDEX "index_student_import_records_on_import_session_id" ON "student_import_records" ("import_session_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_student_import_records_on_student_id" ON "student_import_records" ("student_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175650') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateSeatingEvents (20250904175654)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (2.6ms)[0m  [1m[35mCREATE TABLE "seating_events" ("id" bigserial primary key, "cohort_id" bigint NOT NULL, "name" character varying, "event_type" integer, "event_date" date, "table_size" integer, "total_tables" integer, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_c4f4e07de7"
+FOREIGN KEY ("cohort_id")
+  REFERENCES "cohorts" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_seating_events_on_cohort_id" ON "seating_events" ("cohort_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175654') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateSeatingArrangements (20250904175659)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (21.7ms)[0m  [1m[35mCREATE TABLE "seating_arrangements" ("id" bigserial primary key, "seating_event_id" bigint NOT NULL, "optimization_scores" jsonb, "arrangement_data" jsonb, "created_by_id" bigint NOT NULL, "diversity_metrics" jsonb, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_5984d217ad"
+FOREIGN KEY ("seating_event_id")
+  REFERENCES "seating_events" ("id")
+, CONSTRAINT "fk_rails_4924591716"
+FOREIGN KEY ("created_by_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (3.4ms)[0m  [1m[35mCREATE INDEX "index_seating_arrangements_on_seating_event_id" ON "seating_arrangements" ("seating_event_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_seating_arrangements_on_created_by_id" ON "seating_arrangements" ("created_by_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175659') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateTableAssignments (20250904175703)
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (7.7ms)[0m  [1m[35mCREATE TABLE "table_assignments" ("id" bigserial primary key, "seating_arrangement_id" bigint NOT NULL, "student_id" bigint NOT NULL, "table_number" integer, "seat_position" integer, "locked" boolean, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_79afa87324"
+FOREIGN KEY ("seating_arrangement_id")
+  REFERENCES "seating_arrangements" ("id")
+, CONSTRAINT "fk_rails_586280c549"
+FOREIGN KEY ("student_id")
+  REFERENCES "students" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_table_assignments_on_seating_arrangement_id" ON "table_assignments" ("seating_arrangement_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.4ms)[0m  [1m[35mCREATE INDEX "index_table_assignments_on_student_id" ON "table_assignments" ("student_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175703') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateInteractionTrackings (20250904175712)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (2.1ms)[0m  [1m[35mCREATE TABLE "interaction_trackings" ("id" bigserial primary key, "student_a_id" bigint NOT NULL, "student_b_id" bigint NOT NULL, "seating_event_id" bigint NOT NULL, "interaction_count" integer DEFAULT 0 NOT NULL, "last_interaction" date, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_841cd3c611"
+FOREIGN KEY ("student_a_id")
+  REFERENCES "students" ("id")
+, CONSTRAINT "fk_rails_76c379c83a"
+FOREIGN KEY ("student_b_id")
+  REFERENCES "students" ("id")
+, CONSTRAINT "fk_rails_d9a1278622"
+FOREIGN KEY ("seating_event_id")
+  REFERENCES "seating_events" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_interaction_trackings_on_student_a_id" ON "interaction_trackings" ("student_a_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.4ms)[0m  [1m[35mCREATE INDEX "index_interaction_trackings_on_student_b_id" ON "interaction_trackings" ("student_b_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.4ms)[0m  [1m[35mCREATE INDEX "index_interaction_trackings_on_seating_event_id" ON "interaction_trackings" ("seating_event_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.4ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_interaction_trackings_on_student_a_id_and_student_b_id" ON "interaction_trackings" ("student_a_id", "student_b_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (2.1ms)[0m  [1m[35mCREATE INDEX "index_interaction_trackings_on_seating_event_id" ON "interaction_trackings" ("seating_event_id") /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.9ms)[0m  [1m[31mROLLBACK /*application='SeatingCharter'*/[0m
+  [1m[35m (0.4ms)[0m  [1m[34mSELECT pg_advisory_unlock(5197479384563396175) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (2.4ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[35mSQL (0.1ms)[0m  [1m[35mSET search_path TO public /*application='SeatingCharter'*/[0m
+  [1m[35m (44.9ms)[0m  [1m[35mDROP DATABASE IF EXISTS "seating_charter_development" /*application='SeatingCharter'*/[0m
+  [1m[35mSQL (0.1ms)[0m  [1m[35mSET search_path TO public /*application='SeatingCharter'*/[0m
+  [1m[35m (37.2ms)[0m  [1m[35mDROP DATABASE IF EXISTS "seating_charter_test" /*application='SeatingCharter'*/[0m
+  [1m[35mSQL (0.1ms)[0m  [1m[35mSET search_path TO public /*application='SeatingCharter'*/[0m
+  [1m[35m (89.2ms)[0m  [1m[35mCREATE DATABASE "seating_charter_development" ENCODING = 'unicode' /*application='SeatingCharter'*/[0m
+  [1m[35mSQL (0.7ms)[0m  [1m[35mSET search_path TO public /*application='SeatingCharter'*/[0m
+  [1m[35m (76.2ms)[0m  [1m[35mCREATE DATABASE "seating_charter_test" ENCODING = 'unicode' /*application='SeatingCharter'*/[0m
+  [1m[35mSQL (0.4ms)[0m  [1m[35mCREATE EXTENSION IF NOT EXISTS "plpgsql" SCHEMA pg_catalog /*application='SeatingCharter'*/[0m
+  [1m[35m (3.9ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" character varying NOT NULL PRIMARY KEY) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[35m (0.6ms)[0m  [1m[32mINSERT INTO "schema_migrations" (version) VALUES (0) /*application='SeatingCharter'*/[0m
+  [1m[35m (1.9ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" character varying NOT NULL PRIMARY KEY, "value" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.5ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Create (0.3ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ('environment', 'development', '2025-09-04 18:09:35.085227', '2025-09-04 18:09:35.085229') RETURNING "key" /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'schema_sha1' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Create (0.3ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ('schema_sha1', '9c6777daaa6ce85cc74b26c38000144a7834a947', '2025-09-04 18:09:35.088235', '2025-09-04 18:09:35.088236') RETURNING "key" /*application='SeatingCharter'*/[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT pg_try_advisory_lock(5197479384563396175) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+Migrating to DeviseCreateUsers (20250904175625)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.0ms)[0m  [1m[35mCREATE TABLE "users" ("id" bigserial primary key, "email" character varying DEFAULT '' NOT NULL, "encrypted_password" character varying DEFAULT '' NOT NULL, "reset_password_token" character varying, "reset_password_sent_at" timestamp(6), "remember_created_at" timestamp(6), "role" integer DEFAULT 0 NOT NULL, "first_name" character varying, "last_name" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_users_on_email" ON "users" ("email") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_users_on_reset_password_token" ON "users" ("reset_password_token") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_users_on_role" ON "users" ("role") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175625') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateCohorts (20250904175633)
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (2.9ms)[0m  [1m[35mCREATE TABLE "cohorts" ("id" bigserial primary key, "name" character varying NOT NULL, "description" text, "start_date" date NOT NULL, "end_date" date NOT NULL, "user_id" bigint NOT NULL, "max_students" integer DEFAULT 40 NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_5515141c12"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_cohorts_on_user_id" ON "cohorts" ("user_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175633') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateStudents (20250904175641)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.9ms)[0m  [1m[35mCREATE TABLE "students" ("id" bigserial primary key, "name" character varying, "title" character varying, "organization" character varying, "location" character varying, "cohort_id" bigint NOT NULL, "student_attributes" jsonb, "inferences" jsonb, "confidence_scores" jsonb, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_b70571e3bf"
+FOREIGN KEY ("cohort_id")
+  REFERENCES "cohorts" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (4.1ms)[0m  [1m[35mCREATE INDEX "index_students_on_cohort_id" ON "students" ("cohort_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175641') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateImportSessions (20250904175645)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.1ms)[0m  [1m[35mCREATE TABLE "import_sessions" ("id" bigserial primary key, "cohort_id" bigint NOT NULL, "user_id" bigint NOT NULL, "status" integer, "file_name" character varying, "file_size" integer, "processed_at" timestamp(6), "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_a5037db12b"
+FOREIGN KEY ("cohort_id")
+  REFERENCES "cohorts" ("id")
+, CONSTRAINT "fk_rails_25c4555ade"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_import_sessions_on_cohort_id" ON "import_sessions" ("cohort_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_import_sessions_on_user_id" ON "import_sessions" ("user_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175645') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (3.9ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateStudentImportRecords (20250904175650)
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (9.8ms)[0m  [1m[35mCREATE TABLE "student_import_records" ("id" bigserial primary key, "import_session_id" bigint NOT NULL, "student_id" bigint NOT NULL, "raw_data" jsonb, "ai_inferences" jsonb, "corrections" jsonb, "feedback_provided" boolean, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_d59a5c2fdc"
+FOREIGN KEY ("import_session_id")
+  REFERENCES "import_sessions" ("id")
+, CONSTRAINT "fk_rails_d9049a0c58"
+FOREIGN KEY ("student_id")
+  REFERENCES "students" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE INDEX "index_student_import_records_on_import_session_id" ON "student_import_records" ("import_session_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.9ms)[0m  [1m[35mCREATE INDEX "index_student_import_records_on_student_id" ON "student_import_records" ("student_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175650') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateSeatingEvents (20250904175654)
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.3ms)[0m  [1m[35mCREATE TABLE "seating_events" ("id" bigserial primary key, "cohort_id" bigint NOT NULL, "name" character varying, "event_type" integer, "event_date" date, "table_size" integer, "total_tables" integer, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_c4f4e07de7"
+FOREIGN KEY ("cohort_id")
+  REFERENCES "cohorts" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_seating_events_on_cohort_id" ON "seating_events" ("cohort_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175654') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateSeatingArrangements (20250904175659)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.6ms)[0m  [1m[35mCREATE TABLE "seating_arrangements" ("id" bigserial primary key, "seating_event_id" bigint NOT NULL, "optimization_scores" jsonb, "arrangement_data" jsonb, "created_by_id" bigint NOT NULL, "diversity_metrics" jsonb, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_5984d217ad"
+FOREIGN KEY ("seating_event_id")
+  REFERENCES "seating_events" ("id")
+, CONSTRAINT "fk_rails_4924591716"
+FOREIGN KEY ("created_by_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE INDEX "index_seating_arrangements_on_seating_event_id" ON "seating_arrangements" ("seating_event_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.8ms)[0m  [1m[35mCREATE INDEX "index_seating_arrangements_on_created_by_id" ON "seating_arrangements" ("created_by_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175659') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateTableAssignments (20250904175703)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (2.7ms)[0m  [1m[35mCREATE TABLE "table_assignments" ("id" bigserial primary key, "seating_arrangement_id" bigint NOT NULL, "student_id" bigint NOT NULL, "table_number" integer, "seat_position" integer, "locked" boolean, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_79afa87324"
+FOREIGN KEY ("seating_arrangement_id")
+  REFERENCES "seating_arrangements" ("id")
+, CONSTRAINT "fk_rails_586280c549"
+FOREIGN KEY ("student_id")
+  REFERENCES "students" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE INDEX "index_table_assignments_on_seating_arrangement_id" ON "table_assignments" ("seating_arrangement_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_table_assignments_on_student_id" ON "table_assignments" ("student_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175703') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateInteractionTrackings (20250904175712)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (2.4ms)[0m  [1m[35mCREATE TABLE "interaction_trackings" ("id" bigserial primary key, "student_a_id" bigint NOT NULL, "student_b_id" bigint NOT NULL, "seating_event_id" bigint NOT NULL, "interaction_count" integer DEFAULT 0 NOT NULL, "last_interaction" date, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_841cd3c611"
+FOREIGN KEY ("student_a_id")
+  REFERENCES "students" ("id")
+, CONSTRAINT "fk_rails_76c379c83a"
+FOREIGN KEY ("student_b_id")
+  REFERENCES "students" ("id")
+, CONSTRAINT "fk_rails_d9a1278622"
+FOREIGN KEY ("seating_event_id")
+  REFERENCES "seating_events" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE INDEX "index_interaction_trackings_on_student_a_id" ON "interaction_trackings" ("student_a_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_interaction_trackings_on_student_b_id" ON "interaction_trackings" ("student_b_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_interaction_trackings_on_seating_event_id" ON "interaction_trackings" ("seating_event_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_interaction_trackings_on_student_a_id_and_student_b_id" ON "interaction_trackings" ("student_a_id", "student_b_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175712') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateInferenceFeedbacks (20250904175716)
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (7.0ms)[0m  [1m[35mCREATE TABLE "inference_feedbacks" ("id" bigserial primary key, "student_import_record_id" bigint NOT NULL, "field_name" character varying, "original_inference" character varying, "corrected_value" character varying, "feedback_type" integer, "user_id" bigint NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_fe765e7f51"
+FOREIGN KEY ("student_import_record_id")
+  REFERENCES "student_import_records" ("id")
+, CONSTRAINT "fk_rails_d3c7a6d4f7"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE INDEX "index_inference_feedbacks_on_student_import_record_id" ON "inference_feedbacks" ("student_import_record_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_inference_feedbacks_on_user_id" ON "inference_feedbacks" ("user_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175716') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateAiConfigurations (20250904175725)
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (4.2ms)[0m  [1m[35mCREATE TABLE "ai_configurations" ("id" bigserial primary key, "ai_model_name" character varying, "api_endpoint" character varying, "temperature" decimal, "max_tokens" integer, "batch_size" integer, "retry_attempts" integer, "cost_per_token" decimal, "active" boolean, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175725') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateCustomAttributes (20250904175730)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.0ms)[0m  [1m[35mCREATE TABLE "custom_attributes" ("id" bigserial primary key, "name" character varying, "description" text, "inference_enabled" boolean, "inference_prompt" text, "weight_in_optimization" decimal, "display_color" character varying, "active" boolean, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175730') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateSeatingInstructions (20250904175734)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.1ms)[0m  [1m[35mCREATE TABLE "seating_instructions" ("id" bigserial primary key, "seating_event_id" bigint NOT NULL, "instruction_text" text, "parsed_constraints" jsonb, "ai_interpretation" jsonb, "applied" boolean, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_89a73132e9"
+FOREIGN KEY ("seating_event_id")
+  REFERENCES "seating_events" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_seating_instructions_on_seating_event_id" ON "seating_instructions" ("seating_event_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175734') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateCostTrackings (20250904175739)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.3ms)[0m  [1m[35mCREATE TABLE "cost_trackings" ("id" bigserial primary key, "user_id" bigint NOT NULL, "request_id" character varying, "ai_model_used" character varying, "input_tokens" integer, "output_tokens" integer, "cost_estimate" decimal, "purpose" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_43ae47ab24"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE INDEX "index_cost_trackings_on_user_id" ON "cost_trackings" ("user_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175739') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to AddDeviseToUsers (20250904180822)
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (1.3ms)[0m  [1m[35mALTER TABLE "users" ADD "email" character varying DEFAULT '' NOT NULL /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (3.5ms)[0m  [1m[31mROLLBACK /*application='SeatingCharter'*/[0m
+  [1m[35m (1.0ms)[0m  [1m[34mSELECT pg_advisory_unlock(5197479384563396175) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.4ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (2.5ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[35mSET search_path TO public /*application='SeatingCharter'*/[0m
+  [1m[35m (42.0ms)[0m  [1m[35mDROP DATABASE IF EXISTS "seating_charter_development" /*application='SeatingCharter'*/[0m
+  [1m[35mSQL (0.1ms)[0m  [1m[35mSET search_path TO public /*application='SeatingCharter'*/[0m
+  [1m[35m (38.5ms)[0m  [1m[35mDROP DATABASE IF EXISTS "seating_charter_test" /*application='SeatingCharter'*/[0m
+  [1m[35mSQL (0.2ms)[0m  [1m[35mSET search_path TO public /*application='SeatingCharter'*/[0m
+  [1m[35m (87.8ms)[0m  [1m[35mCREATE DATABASE "seating_charter_development" ENCODING = 'unicode' /*application='SeatingCharter'*/[0m
+  [1m[35mSQL (0.8ms)[0m  [1m[35mSET search_path TO public /*application='SeatingCharter'*/[0m
+  [1m[35m (88.6ms)[0m  [1m[35mCREATE DATABASE "seating_charter_test" ENCODING = 'unicode' /*application='SeatingCharter'*/[0m
+  [1m[35mSQL (0.4ms)[0m  [1m[35mCREATE EXTENSION IF NOT EXISTS "plpgsql" SCHEMA pg_catalog /*application='SeatingCharter'*/[0m
+  [1m[35m (4.6ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" character varying NOT NULL PRIMARY KEY) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[32mINSERT INTO "schema_migrations" (version) VALUES (0) /*application='SeatingCharter'*/[0m
+  [1m[35m (2.4ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" character varying NOT NULL PRIMARY KEY, "value" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.7ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Create (0.5ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ('environment', 'development', '2025-09-04 18:09:52.373304', '2025-09-04 18:09:52.373307') RETURNING "key" /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'schema_sha1' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Create (0.3ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ('schema_sha1', '9c6777daaa6ce85cc74b26c38000144a7834a947', '2025-09-04 18:09:52.377255', '2025-09-04 18:09:52.377257') RETURNING "key" /*application='SeatingCharter'*/[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_try_advisory_lock(5197479384563396175) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='SeatingCharter'*/[0m
+Migrating to DeviseCreateUsers (20250904175625)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.3ms)[0m  [1m[35mCREATE TABLE "users" ("id" bigserial primary key, "email" character varying DEFAULT '' NOT NULL, "encrypted_password" character varying DEFAULT '' NOT NULL, "reset_password_token" character varying, "reset_password_sent_at" timestamp(6), "remember_created_at" timestamp(6), "role" integer DEFAULT 0 NOT NULL, "first_name" character varying, "last_name" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.8ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_users_on_email" ON "users" ("email") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.9ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_users_on_reset_password_token" ON "users" ("reset_password_token") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.8ms)[0m  [1m[35mCREATE INDEX "index_users_on_role" ON "users" ("role") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175625') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateCohorts (20250904175633)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.1ms)[0m  [1m[35mCREATE TABLE "cohorts" ("id" bigserial primary key, "name" character varying NOT NULL, "description" text, "start_date" date NOT NULL, "end_date" date NOT NULL, "user_id" bigint NOT NULL, "max_students" integer DEFAULT 40 NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_5515141c12"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE INDEX "index_cohorts_on_user_id" ON "cohorts" ("user_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175633') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateStudents (20250904175641)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (4.3ms)[0m  [1m[35mCREATE TABLE "students" ("id" bigserial primary key, "name" character varying, "title" character varying, "organization" character varying, "location" character varying, "cohort_id" bigint NOT NULL, "student_attributes" jsonb, "inferences" jsonb, "confidence_scores" jsonb, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_b70571e3bf"
+FOREIGN KEY ("cohort_id")
+  REFERENCES "cohorts" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE INDEX "index_students_on_cohort_id" ON "students" ("cohort_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175641') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateImportSessions (20250904175645)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (4.0ms)[0m  [1m[35mCREATE TABLE "import_sessions" ("id" bigserial primary key, "cohort_id" bigint NOT NULL, "user_id" bigint NOT NULL, "status" integer, "file_name" character varying, "file_size" integer, "processed_at" timestamp(6), "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_a5037db12b"
+FOREIGN KEY ("cohort_id")
+  REFERENCES "cohorts" ("id")
+, CONSTRAINT "fk_rails_25c4555ade"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.8ms)[0m  [1m[35mCREATE INDEX "index_import_sessions_on_cohort_id" ON "import_sessions" ("cohort_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE INDEX "index_import_sessions_on_user_id" ON "import_sessions" ("user_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175645') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (4.6ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateStudentImportRecords (20250904175650)
+  [1m[36mTRANSACTION (0.8ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (12.0ms)[0m  [1m[35mCREATE TABLE "student_import_records" ("id" bigserial primary key, "import_session_id" bigint NOT NULL, "student_id" bigint NOT NULL, "raw_data" jsonb, "ai_inferences" jsonb, "corrections" jsonb, "feedback_provided" boolean, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_d59a5c2fdc"
+FOREIGN KEY ("import_session_id")
+  REFERENCES "import_sessions" ("id")
+, CONSTRAINT "fk_rails_d9049a0c58"
+FOREIGN KEY ("student_id")
+  REFERENCES "students" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE INDEX "index_student_import_records_on_import_session_id" ON "student_import_records" ("import_session_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE INDEX "index_student_import_records_on_student_id" ON "student_import_records" ("student_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175650') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateSeatingEvents (20250904175654)
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (4.5ms)[0m  [1m[35mCREATE TABLE "seating_events" ("id" bigserial primary key, "cohort_id" bigint NOT NULL, "name" character varying, "event_type" integer, "event_date" date, "table_size" integer, "total_tables" integer, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_c4f4e07de7"
+FOREIGN KEY ("cohort_id")
+  REFERENCES "cohorts" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE INDEX "index_seating_events_on_cohort_id" ON "seating_events" ("cohort_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175654') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateSeatingArrangements (20250904175659)
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (4.9ms)[0m  [1m[35mCREATE TABLE "seating_arrangements" ("id" bigserial primary key, "seating_event_id" bigint NOT NULL, "optimization_scores" jsonb, "arrangement_data" jsonb, "created_by_id" bigint NOT NULL, "diversity_metrics" jsonb, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_5984d217ad"
+FOREIGN KEY ("seating_event_id")
+  REFERENCES "seating_events" ("id")
+, CONSTRAINT "fk_rails_4924591716"
+FOREIGN KEY ("created_by_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.8ms)[0m  [1m[35mCREATE INDEX "index_seating_arrangements_on_seating_event_id" ON "seating_arrangements" ("seating_event_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (1.0ms)[0m  [1m[35mCREATE INDEX "index_seating_arrangements_on_created_by_id" ON "seating_arrangements" ("created_by_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175659') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateTableAssignments (20250904175703)
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (4.3ms)[0m  [1m[35mCREATE TABLE "table_assignments" ("id" bigserial primary key, "seating_arrangement_id" bigint NOT NULL, "student_id" bigint NOT NULL, "table_number" integer, "seat_position" integer, "locked" boolean, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_79afa87324"
+FOREIGN KEY ("seating_arrangement_id")
+  REFERENCES "seating_arrangements" ("id")
+, CONSTRAINT "fk_rails_586280c549"
+FOREIGN KEY ("student_id")
+  REFERENCES "students" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (1.0ms)[0m  [1m[35mCREATE INDEX "index_table_assignments_on_seating_arrangement_id" ON "table_assignments" ("seating_arrangement_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE INDEX "index_table_assignments_on_student_id" ON "table_assignments" ("student_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175703') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateInteractionTrackings (20250904175712)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.0ms)[0m  [1m[35mCREATE TABLE "interaction_trackings" ("id" bigserial primary key, "student_a_id" bigint NOT NULL, "student_b_id" bigint NOT NULL, "seating_event_id" bigint NOT NULL, "interaction_count" integer DEFAULT 0 NOT NULL, "last_interaction" date, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_841cd3c611"
+FOREIGN KEY ("student_a_id")
+  REFERENCES "students" ("id")
+, CONSTRAINT "fk_rails_76c379c83a"
+FOREIGN KEY ("student_b_id")
+  REFERENCES "students" ("id")
+, CONSTRAINT "fk_rails_d9a1278622"
+FOREIGN KEY ("seating_event_id")
+  REFERENCES "seating_events" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.8ms)[0m  [1m[35mCREATE INDEX "index_interaction_trackings_on_student_a_id" ON "interaction_trackings" ("student_a_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE INDEX "index_interaction_trackings_on_student_b_id" ON "interaction_trackings" ("student_b_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE INDEX "index_interaction_trackings_on_seating_event_id" ON "interaction_trackings" ("seating_event_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_interaction_trackings_on_student_a_id_and_student_b_id" ON "interaction_trackings" ("student_a_id", "student_b_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175712') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateInferenceFeedbacks (20250904175716)
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (5.7ms)[0m  [1m[35mCREATE TABLE "inference_feedbacks" ("id" bigserial primary key, "student_import_record_id" bigint NOT NULL, "field_name" character varying, "original_inference" character varying, "corrected_value" character varying, "feedback_type" integer, "user_id" bigint NOT NULL, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_fe765e7f51"
+FOREIGN KEY ("student_import_record_id")
+  REFERENCES "student_import_records" ("id")
+, CONSTRAINT "fk_rails_d3c7a6d4f7"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE INDEX "index_inference_feedbacks_on_student_import_record_id" ON "inference_feedbacks" ("student_import_record_id") /*application='SeatingCharter'*/[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE INDEX "index_inference_feedbacks_on_user_id" ON "inference_feedbacks" ("user_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175716') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateAiConfigurations (20250904175725)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (4.3ms)[0m  [1m[35mCREATE TABLE "ai_configurations" ("id" bigserial primary key, "ai_model_name" character varying, "api_endpoint" character varying, "temperature" decimal, "max_tokens" integer, "batch_size" integer, "retry_attempts" integer, "cost_per_token" decimal, "active" boolean, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175725') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateCustomAttributes (20250904175730)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (3.6ms)[0m  [1m[35mCREATE TABLE "custom_attributes" ("id" bigserial primary key, "name" character varying, "description" text, "inference_enabled" boolean, "inference_prompt" text, "weight_in_optimization" decimal, "display_color" character varying, "active" boolean, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175730') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateSeatingInstructions (20250904175734)
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (4.9ms)[0m  [1m[35mCREATE TABLE "seating_instructions" ("id" bigserial primary key, "seating_event_id" bigint NOT NULL, "instruction_text" text, "parsed_constraints" jsonb, "ai_interpretation" jsonb, "applied" boolean, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_89a73132e9"
+FOREIGN KEY ("seating_event_id")
+  REFERENCES "seating_events" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE INDEX "index_seating_instructions_on_seating_event_id" ON "seating_instructions" ("seating_event_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175734') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+Migrating to CreateCostTrackings (20250904175739)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[35m (4.0ms)[0m  [1m[35mCREATE TABLE "cost_trackings" ("id" bigserial primary key, "user_id" bigint NOT NULL, "request_id" character varying, "ai_model_used" character varying, "input_tokens" integer, "output_tokens" integer, "cost_estimate" decimal, "purpose" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_43ae47ab24"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+) /*application='SeatingCharter'*/[0m
+  [1m[35m (0.8ms)[0m  [1m[35mCREATE INDEX "index_cost_trackings_on_user_id" ON "cost_trackings" ("user_id") /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.7ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250904175739') RETURNING "version" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[35m (0.4ms)[0m  [1m[34mSELECT pg_advisory_unlock(5197479384563396175) /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.4ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+  [1m[36mUser Load (1.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'admin@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mUser Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "users" WHERE "users"."email" = 'admin@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mUser Create (0.6ms)[0m  [1m[32mINSERT INTO "users" ("email", "encrypted_password", "reset_password_token", "reset_password_sent_at", "remember_created_at", "role", "first_name", "last_name", "created_at", "updated_at") VALUES ('admin@chds.edu', '$2a$12$z/bVQbcFjtSK6PA6dUGfC.2T5e49tB43EVhS5GdFWKnu/QnKsS3Py', NULL, NULL, NULL, 1, 'System', 'Administrator', '2025-09-04 18:11:41.182950', '2025-09-04 18:11:41.182950') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'instructor@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mUser Exists? (1.7ms)[0m  [1m[34mSELECT 1 AS one FROM "users" WHERE "users"."email" = 'instructor@chds.edu' LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mUser Create (0.3ms)[0m  [1m[32mINSERT INTO "users" ("email", "encrypted_password", "reset_password_token", "reset_password_sent_at", "remember_created_at", "role", "first_name", "last_name", "created_at", "updated_at") VALUES ('instructor@chds.edu', '$2a$12$/DktsdIKvOjXHAlT52oZN.pmadbUQ5yn85w2JqpxWfy2YE4dcUg8y', NULL, NULL, NULL, 0, 'Dr. Jane', 'Smith', '2025-09-04 18:11:41.579609', '2025-09-04 18:11:41.579609') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mAiConfiguration Load (0.6ms)[0m  [1m[34mSELECT "ai_configurations".* FROM "ai_configurations" WHERE "ai_configurations"."ai_model_name" = 'gpt-4o' LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mAiConfiguration Create (0.4ms)[0m  [1m[32mINSERT INTO "ai_configurations" ("ai_model_name", "api_endpoint", "temperature", "max_tokens", "batch_size", "retry_attempts", "cost_per_token", "active", "created_at", "updated_at") VALUES ('gpt-4o', 'https://api.openai.com/v1/chat/completions', 0.1, 4000, 8, 3, 0.00001, TRUE, '2025-09-04 18:11:41.620022', '2025-09-04 18:11:41.620022') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mCustomAttribute Load (0.6ms)[0m  [1m[34mSELECT "custom_attributes".* FROM "custom_attributes" WHERE "custom_attributes"."name" = 'Security_Clearance' LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mCustomAttribute Create (0.5ms)[0m  [1m[32mINSERT INTO "custom_attributes" ("name", "description", "inference_enabled", "inference_prompt", "weight_in_optimization", "display_color", "active", "created_at", "updated_at") VALUES ('Security_Clearance', 'Security clearance level (None, Secret, Top Secret)', TRUE, 'Infer security clearance level based on organization and title', 0.3, '#1f2937', TRUE, '2025-09-04 18:11:41.643518', '2025-09-04 18:11:41.643518') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mCustomAttribute Load (3.5ms)[0m  [1m[34mSELECT "custom_attributes".* FROM "custom_attributes" WHERE "custom_attributes"."name" = 'Years_Experience' LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mCustomAttribute Create (1.5ms)[0m  [1m[32mINSERT INTO "custom_attributes" ("name", "description", "inference_enabled", "inference_prompt", "weight_in_optimization", "display_color", "active", "created_at", "updated_at") VALUES ('Years_Experience', 'Years of experience in emergency management', TRUE, 'Infer years of experience based on title and seniority', 0.2, '#059669', TRUE, '2025-09-04 18:11:41.658368', '2025-09-04 18:11:41.658368') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mCustomAttribute Load (0.2ms)[0m  [1m[34mSELECT "custom_attributes".* FROM "custom_attributes" WHERE "custom_attributes"."name" = 'Geographic_Region' LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mCustomAttribute Create (1.4ms)[0m  [1m[32mINSERT INTO "custom_attributes" ("name", "description", "inference_enabled", "inference_prompt", "weight_in_optimization", "display_color", "active", "created_at", "updated_at") VALUES ('Geographic_Region', 'Geographic region (West, Central, East, International)', TRUE, 'Determine geographic region based on location', 0.4, '#dc2626', TRUE, '2025-09-04 18:11:41.677644', '2025-09-04 18:11:41.677644') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mCohort Load (0.6ms)[0m  [1m[34mSELECT "cohorts".* FROM "cohorts" WHERE "cohorts"."name" = 'Emergence 2501' LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mCohort Create (0.7ms)[0m  [1m[32mINSERT INTO "cohorts" ("name", "description", "start_date", "end_date", "user_id", "max_students", "created_at", "updated_at") VALUES ('Emergence 2501', 'CHDS Emergence Program - January 2025 Cohort focusing on emerging threats and innovative emergency management strategies', '2025-01-13', '2025-01-17', 2, 40, '2025-09-04 18:11:41.711575', '2025-09-04 18:11:41.711575') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.7ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Paul Adcox' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (0.6ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Paul Adcox', 'Mobilization Officer', 'Nevada Army National Guard', 'Reno, NV', 1, NULL, '{"gender":{"value":"male","confidence":0.92},"agency_level":{"value":"state","confidence":0.95},"department_type":{"value":"military","confidence":0.98},"seniority_level":{"value":"mid","confidence":0.75}}', '{"gender":0.92,"agency_level":0.95,"department_type":0.98,"seniority_level":0.75}', '2025-09-04 18:11:41.745042', '2025-09-04 18:11:41.745042') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'David Baker' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.1ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('David Baker', 'Deportation Officer', 'DHS – Immigration and Customs Enforcement', 'Nashville, TN', 1, NULL, '{"gender":{"value":"male","confidence":0.94},"agency_level":{"value":"federal","confidence":0.98},"department_type":{"value":"law_enforcement","confidence":0.95},"seniority_level":{"value":"mid","confidence":0.8}}', '{"gender":0.94,"agency_level":0.98,"department_type":0.95,"seniority_level":0.8}', '2025-09-04 18:11:41.753781', '2025-09-04 18:11:41.753781') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.1ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Evan Bart' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.9ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Evan Bart', 'Security Manager', 'The Walt Disney Company', 'Clermont, FL', 1, NULL, '{"gender":{"value":"male","confidence":0.88},"agency_level":{"value":"private","confidence":0.99},"department_type":{"value":"security","confidence":0.92},"seniority_level":{"value":"senior","confidence":0.85}}', '{"gender":0.88,"agency_level":0.99,"department_type":0.92,"seniority_level":0.85}', '2025-09-04 18:11:41.763241', '2025-09-04 18:11:41.763241') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Sarah Chen' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.5ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Sarah Chen', 'Emergency Management Director', 'Santa Clara County', 'San Jose, CA', 1, NULL, '{"gender":{"value":"female","confidence":0.96},"agency_level":{"value":"local","confidence":0.95},"department_type":{"value":"emergency_management","confidence":0.98},"seniority_level":{"value":"executive","confidence":0.9}}', '{"gender":0.96,"agency_level":0.95,"department_type":0.98,"seniority_level":0.9}', '2025-09-04 18:11:41.782593', '2025-09-04 18:11:41.782593') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.3ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Michael Rodriguez' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (2.1ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Michael Rodriguez', 'Fire Chief', 'Austin Fire Department', 'Austin, TX', 1, NULL, '{"gender":{"value":"male","confidence":0.93},"agency_level":{"value":"local","confidence":0.97},"department_type":{"value":"fire","confidence":0.99},"seniority_level":{"value":"executive","confidence":0.95}}', '{"gender":0.93,"agency_level":0.97,"department_type":0.99,"seniority_level":0.95}', '2025-09-04 18:11:41.790641', '2025-09-04 18:11:41.790641') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Jennifer Williams' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.4ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Jennifer Williams', 'Intelligence Analyst', 'FBI', 'Washington, DC', 1, NULL, '{"gender":{"value":"female","confidence":0.95},"agency_level":{"value":"federal","confidence":0.99},"department_type":{"value":"law_enforcement","confidence":0.96},"seniority_level":{"value":"mid","confidence":0.78}}', '{"gender":0.95,"agency_level":0.99,"department_type":0.96,"seniority_level":0.78}', '2025-09-04 18:11:41.799118', '2025-09-04 18:11:41.799118') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.3ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Robert Johnson' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.2ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Robert Johnson', 'Coast Guard Commander', 'US Coast Guard', 'Miami, FL', 1, NULL, '{"gender":{"value":"male","confidence":0.91},"agency_level":{"value":"federal","confidence":0.98},"department_type":{"value":"military","confidence":0.97},"seniority_level":{"value":"senior","confidence":0.88}}', '{"gender":0.91,"agency_level":0.98,"department_type":0.97,"seniority_level":0.88}', '2025-09-04 18:11:41.806625', '2025-09-04 18:11:41.806625') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.1ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Lisa Thompson' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.3ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Lisa Thompson', 'Public Health Emergency Coordinator', 'CDC', 'Atlanta, GA', 1, NULL, '{"gender":{"value":"female","confidence":0.94},"agency_level":{"value":"federal","confidence":0.99},"department_type":{"value":"public_health","confidence":0.95},"seniority_level":{"value":"senior","confidence":0.82}}', '{"gender":0.94,"agency_level":0.99,"department_type":0.95,"seniority_level":0.82}', '2025-09-04 18:11:41.813153', '2025-09-04 18:11:41.813153') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'James Davis' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (3.5ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('James Davis', 'Police Captain', 'LAPD', 'Los Angeles, CA', 1, NULL, '{"gender":{"value":"male","confidence":0.92},"agency_level":{"value":"local","confidence":0.96},"department_type":{"value":"law_enforcement","confidence":0.98},"seniority_level":{"value":"senior","confidence":0.89}}', '{"gender":0.92,"agency_level":0.96,"department_type":0.98,"seniority_level":0.89}', '2025-09-04 18:11:41.818712', '2025-09-04 18:11:41.818712') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.1ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Maria Garcia' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.3ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Maria Garcia', 'Emergency Management Specialist', 'FEMA Region IX', 'Oakland, CA', 1, NULL, '{"gender":{"value":"female","confidence":0.97},"agency_level":{"value":"federal","confidence":0.98},"department_type":{"value":"emergency_management","confidence":0.96},"seniority_level":{"value":"mid","confidence":0.75}}', '{"gender":0.97,"agency_level":0.98,"department_type":0.96,"seniority_level":0.75}', '2025-09-04 18:11:41.825756', '2025-09-04 18:11:41.825756') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Kevin Lee' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.3ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Kevin Lee', 'Cybersecurity Director', 'State of Oregon', 'Salem, OR', 1, NULL, '{"gender":{"value":"male","confidence":0.89},"agency_level":{"value":"state","confidence":0.95},"department_type":{"value":"cybersecurity","confidence":0.97},"seniority_level":{"value":"executive","confidence":0.91}}', '{"gender":0.89,"agency_level":0.95,"department_type":0.97,"seniority_level":0.91}', '2025-09-04 18:11:41.836427', '2025-09-04 18:11:41.836427') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.1ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Amanda Wilson' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.7ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Amanda Wilson', 'Disaster Recovery Manager', 'American Red Cross', 'Phoenix, AZ', 1, NULL, '{"gender":{"value":"female","confidence":0.96},"agency_level":{"value":"nonprofit","confidence":0.94},"department_type":{"value":"emergency_management","confidence":0.93},"seniority_level":{"value":"senior","confidence":0.86}}', '{"gender":0.96,"agency_level":0.94,"department_type":0.93,"seniority_level":0.86}', '2025-09-04 18:11:41.840944', '2025-09-04 18:11:41.840944') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Daniel Brown' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.2ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Daniel Brown', 'Homeland Security Advisor', 'State of Florida', 'Tallahassee, FL', 1, NULL, '{"gender":{"value":"male","confidence":0.93},"agency_level":{"value":"state","confidence":0.97},"department_type":{"value":"homeland_security","confidence":0.95},"seniority_level":{"value":"executive","confidence":0.88}}', '{"gender":0.93,"agency_level":0.97,"department_type":0.95,"seniority_level":0.88}', '2025-09-04 18:11:41.847527', '2025-09-04 18:11:41.847527') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Rachel Martinez' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.3ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Rachel Martinez', 'Emergency Communications Manager', 'King County', 'Seattle, WA', 1, NULL, '{"gender":{"value":"female","confidence":0.95},"agency_level":{"value":"local","confidence":0.96},"department_type":{"value":"emergency_management","confidence":0.89},"seniority_level":{"value":"senior","confidence":0.83}}', '{"gender":0.95,"agency_level":0.96,"department_type":0.89,"seniority_level":0.83}', '2025-09-04 18:11:41.853167', '2025-09-04 18:11:41.853167') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.1ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Christopher Taylor' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.5ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Christopher Taylor', 'Special Agent', 'ATF', 'Denver, CO', 1, NULL, '{"gender":{"value":"male","confidence":0.91},"agency_level":{"value":"federal","confidence":0.98},"department_type":{"value":"law_enforcement","confidence":0.96},"seniority_level":{"value":"mid","confidence":0.79}}', '{"gender":0.91,"agency_level":0.98,"department_type":0.96,"seniority_level":0.79}', '2025-09-04 18:11:41.857942', '2025-09-04 18:11:41.857942') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Nicole Anderson' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.3ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Nicole Anderson', 'Public Safety Director', 'City of Portland', 'Portland, OR', 1, NULL, '{"gender":{"value":"female","confidence":0.94},"agency_level":{"value":"local","confidence":0.95},"department_type":{"value":"public_safety","confidence":0.92},"seniority_level":{"value":"executive","confidence":0.9}}', '{"gender":0.94,"agency_level":0.95,"department_type":0.92,"seniority_level":0.9}', '2025-09-04 18:11:41.863952', '2025-09-04 18:11:41.863952') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Matthew Clark' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (6.5ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Matthew Clark', 'Border Patrol Agent', 'US Customs and Border Protection', 'El Paso, TX', 1, NULL, '{"gender":{"value":"male","confidence":0.92},"agency_level":{"value":"federal","confidence":0.98},"department_type":{"value":"law_enforcement","confidence":0.96},"seniority_level":{"value":"entry","confidence":0.72}}', '{"gender":0.92,"agency_level":0.98,"department_type":0.96,"seniority_level":0.72}', '2025-09-04 18:11:41.871432', '2025-09-04 18:11:41.871432') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Jessica White' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.5ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Jessica White', 'Emergency Preparedness Coordinator', 'University of California System', 'Oakland, CA', 1, NULL, '{"gender":{"value":"female","confidence":0.96},"agency_level":{"value":"state","confidence":0.87},"department_type":{"value":"emergency_management","confidence":0.94},"seniority_level":{"value":"mid","confidence":0.76}}', '{"gender":0.96,"agency_level":0.87,"department_type":0.94,"seniority_level":0.76}', '2025-09-04 18:11:41.890241', '2025-09-04 18:11:41.890241') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Andrew Young' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.4ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Andrew Young', 'Deputy Sheriff', 'Maricopa County Sheriff''s Office', 'Phoenix, AZ', 1, NULL, '{"gender":{"value":"male","confidence":0.9},"agency_level":{"value":"local","confidence":0.95},"department_type":{"value":"law_enforcement","confidence":0.97},"seniority_level":{"value":"mid","confidence":0.81}}', '{"gender":0.9,"agency_level":0.95,"department_type":0.97,"seniority_level":0.81}', '2025-09-04 18:11:41.896469', '2025-09-04 18:11:41.896469') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Stephanie King' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.3ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Stephanie King', 'Risk Management Director', 'Boeing Company', 'Seattle, WA', 1, NULL, '{"gender":{"value":"female","confidence":0.95},"agency_level":{"value":"private","confidence":0.98},"department_type":{"value":"risk_management","confidence":0.91},"seniority_level":{"value":"executive","confidence":0.89}}', '{"gender":0.95,"agency_level":0.98,"department_type":0.91,"seniority_level":0.89}', '2025-09-04 18:11:41.901576', '2025-09-04 18:11:41.901576') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Thomas Scott' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.3ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Thomas Scott', 'Fire Marshal', 'State Fire Marshal''s Office', 'Sacramento, CA', 1, NULL, '{"gender":{"value":"male","confidence":0.93},"agency_level":{"value":"state","confidence":0.96},"department_type":{"value":"fire","confidence":0.98},"seniority_level":{"value":"executive","confidence":0.87}}', '{"gender":0.93,"agency_level":0.96,"department_type":0.98,"seniority_level":0.87}', '2025-09-04 18:11:41.906896', '2025-09-04 18:11:41.906896') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.1ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Linda Green' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.3ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Linda Green', 'Disaster Services Director', 'Salvation Army', 'Dallas, TX', 1, NULL, '{"gender":{"value":"female","confidence":0.97},"agency_level":{"value":"nonprofit","confidence":0.95},"department_type":{"value":"emergency_management","confidence":0.93},"seniority_level":{"value":"executive","confidence":0.86}}', '{"gender":0.97,"agency_level":0.95,"department_type":0.93,"seniority_level":0.86}', '2025-09-04 18:11:41.913735', '2025-09-04 18:11:41.913735') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Ryan Adams' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (2.2ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Ryan Adams', 'Counterterrorism Analyst', 'Joint Terrorism Task Force', 'New York, NY', 1, NULL, '{"gender":{"value":"male","confidence":0.88},"agency_level":{"value":"federal","confidence":0.97},"department_type":{"value":"intelligence","confidence":0.94},"seniority_level":{"value":"mid","confidence":0.77}}', '{"gender":0.88,"agency_level":0.97,"department_type":0.94,"seniority_level":0.77}', '2025-09-04 18:11:41.921619', '2025-09-04 18:11:41.921619') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Karen Nelson' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.4ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Karen Nelson', 'Public Health Director', 'Multnomah County Health Department', 'Portland, OR', 1, NULL, '{"gender":{"value":"female","confidence":0.96},"agency_level":{"value":"local","confidence":0.94},"department_type":{"value":"public_health","confidence":0.97},"seniority_level":{"value":"executive","confidence":0.91}}', '{"gender":0.96,"agency_level":0.94,"department_type":0.97,"seniority_level":0.91}', '2025-09-04 18:11:41.928415', '2025-09-04 18:11:41.928415') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Brian Carter' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.2ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Brian Carter', 'Emergency Management Officer', 'US Air Force', 'Colorado Springs, CO', 1, NULL, '{"gender":{"value":"male","confidence":0.91},"agency_level":{"value":"federal","confidence":0.98},"department_type":{"value":"military","confidence":0.97},"seniority_level":{"value":"senior","confidence":0.84}}', '{"gender":0.91,"agency_level":0.98,"department_type":0.97,"seniority_level":0.84}', '2025-09-04 18:11:41.933193', '2025-09-04 18:11:41.933193') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.3ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Heather Mitchell' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.6ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Heather Mitchell', 'Security Specialist', 'Port of Los Angeles', 'Los Angeles, CA', 1, NULL, '{"gender":{"value":"female","confidence":0.94},"agency_level":{"value":"local","confidence":0.92},"department_type":{"value":"security","confidence":0.95},"seniority_level":{"value":"mid","confidence":0.78}}', '{"gender":0.94,"agency_level":0.92,"department_type":0.95,"seniority_level":0.78}', '2025-09-04 18:11:41.938287', '2025-09-04 18:11:41.938287') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Load (0.2ms)[0m  [1m[34mSELECT "students".* FROM "students" WHERE "students"."name" = 'Mark Roberts' AND "students"."cohort_id" = 1 LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mStudent Create (1.6ms)[0m  [1m[32mINSERT INTO "students" ("name", "title", "organization", "location", "cohort_id", "student_attributes", "inferences", "confidence_scores", "created_at", "updated_at") VALUES ('Mark Roberts', 'Critical Infrastructure Protection Manager', 'Pacific Gas & Electric', 'San Francisco, CA', 1, NULL, '{"gender":{"value":"male","confidence":0.92},"agency_level":{"value":"private","confidence":0.98},"department_type":{"value":"infrastructure","confidence":0.94},"seniority_level":{"value":"senior","confidence":0.85}}', '{"gender":0.92,"agency_level":0.98,"department_type":0.94,"seniority_level":0.85}', '2025-09-04 18:11:41.943406', '2025-09-04 18:11:41.943406') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m
+  [1m[36mSeatingEvent Load (0.8ms)[0m  [1m[34mSELECT "seating_events".* FROM "seating_events" WHERE "seating_events"."name" = 'Day 1 - Opening Session' LIMIT 1 /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='SeatingCharter'*/[0m
+  [1m[36mSeatingEvent Create (0.6ms)[0m  [1m[32mINSERT INTO "seating_events" ("cohort_id", "name", "event_type", "event_date", "table_size", "total_tables", "created_at", "updated_at") VALUES (1, 'Day 1 - Opening Session', 0, '2025-01-13', 4, 7, '2025-09-04 18:11:42.004841', '2025-09-04 18:11:42.004841') RETURNING "id" /*application='SeatingCharter'*/[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='SeatingCharter'*/[0m

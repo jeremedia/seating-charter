@@ -1,0 +1,2 @@
+class AiConfiguration < ApplicationRecord
+end

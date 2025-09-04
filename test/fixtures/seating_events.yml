@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  cohort: one
+  name: MyString
+  event_type: 1
+  event_date: 2025-09-04
+  table_size: 1
+  total_tables: 1
+
+two:
+  cohort: two
+  name: MyString
+  event_type: 1
+  event_date: 2025-09-04
+  table_size: 1
+  total_tables: 1

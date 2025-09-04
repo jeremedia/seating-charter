@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "CHDS Seating Charter" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-gray-50">
+    <!-- CHDS Header -->
+    <header class="bg-blue-900 text-white shadow-lg">
+      <div class="container mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="text-2xl font-bold">
+              <%= link_to root_path, class: "text-white hover:text-yellow-300 transition-colors" do %>
+                CHDS Seating Charter
+              <% end %>
+            </div>
+            <div class="text-sm text-blue-200">
+              Center for Homeland Defense and Security
+            </div>
+          </div>
+          
+          <nav class="flex items-center space-x-6">
+            <% if user_signed_in? %>
+              <span class="text-blue-200">Welcome, <%= current_user.email %></span>
+              <%= link_to "Dashboard", root_path, class: "text-white hover:text-yellow-300 transition-colors" %>
+              <%= link_to "Cohorts", "#", class: "text-white hover:text-yellow-300 transition-colors" %>
+              <%= link_to "Sign Out", destroy_user_session_path, 
+                    method: :delete, 
+                    class: "text-white hover:text-yellow-300 transition-colors",
+                    data: { turbo_method: :delete } %>
+            <% else %>
+              <%= link_to "Sign In", new_user_session_path, 
+                    class: "text-white hover:text-yellow-300 transition-colors" %>
+            <% end %>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <!-- Breadcrumb/Status Bar -->
+    <div class="bg-yellow-500 text-blue-900 py-2">
+      <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between text-sm font-medium">
+          <div class="flex items-center space-x-2">
+            <span>Naval Postgraduate School</span>
+            <span class="text-blue-600">•</span>
+            <span>Center for Homeland Defense and Security</span>
+          </div>
+          <div class="text-xs">
+            AI-Powered Seating Optimization
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Flash Messages -->
+    <% if notice %>
+      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 relative" role="alert">
+        <div class="container mx-auto">
+          <%= notice %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if alert %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 relative" role="alert">
+        <div class="container mx-auto">
+          <%= alert %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+      <%= yield %>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-900 text-white mt-12">
+      <div class="container mx-auto px-4 py-6">
+        <div class="flex items-center justify-between">
+          <div class="text-sm text-blue-200">
+            © <%= Date.current.year %> Center for Homeland Defense and Security, Naval Postgraduate School
+          </div>
+          <div class="text-xs text-blue-300">
+            Powered by AI • Optimized for Emergency Management Professional Education
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

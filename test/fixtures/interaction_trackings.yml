@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  student_a: one
+  student_b: one
+  seating_event: one
+  interaction_count: 1
+  last_interaction: 2025-09-04
+
+two:
+  student_a: two
+  student_b: two
+  seating_event: two
+  interaction_count: 1
+  last_interaction: 2025-09-04

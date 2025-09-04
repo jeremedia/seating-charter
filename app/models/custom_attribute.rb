@@ -1,0 +1,2 @@
+class CustomAttribute < ApplicationRecord
+end

@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  seating_event: one
+  optimization_scores: 
+  arrangement_data: 
+  created_by: one
+  diversity_metrics: 
+
+two:
+  seating_event: two
+  optimization_scores: 
+  arrangement_data: 
+  created_by: two
+  diversity_metrics: 

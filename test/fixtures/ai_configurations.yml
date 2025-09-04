@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  ai_model_name: MyString
+  api_endpoint: MyString
+  temperature: 9.99
+  max_tokens: 1
+  batch_size: 1
+  retry_attempts: 1
+  cost_per_token: 9.99
+  active: false
+
+two:
+  ai_model_name: MyString
+  api_endpoint: MyString
+  temperature: 9.99
+  max_tokens: 1
+  batch_size: 1
+  retry_attempts: 1
+  cost_per_token: 9.99
+  active: false
