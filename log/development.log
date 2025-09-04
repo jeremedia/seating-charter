@@ -1795,3 +1795,171 @@ Completed 401 Unauthorized in 53ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | 
 [ActionDispatch::HostAuthorization::DefaultResponseApp] Blocked hosts: sc.dev.domt.app, sc.dev.domt.app
 [dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
 [dotenv] Loaded [33m.env[0m
+[dotenv] Set [36mDATABASE_USERNAME[0m, [36mDATABASE_PASSWORD[0m, [36mDATABASE_HOST[0m, [36mDATABASE_PORT[0m, [36mOPENAI_API_KEY[0m, [36mOPENAI_ORGANIZATION_ID[0m, [36mOPENAI_PROJECT_ID[0m, [36mRAILS_MAX_THREADS[0m, [36mRAILS_MIN_THREADS[0m, [36mREDIS_URL[0m, [36mAPP_HOST[0m, [36mMAIL_FROM[0m, [36mSECRET_KEY_BASE[0m, [36mDEVISE_JWT_SECRET_KEY[0m, [36mMAX_INSTRUCTORS[0m, [36mMAX_STUDENTS_PER_COHORT[0m, [36mDEFAULT_TABLE_SIZE[0m, [36mDEFAULT_AI_MODEL[0m, [36mDEFAULT_AI_TEMPERATURE[0m, [36mDEFAULT_AI_MAX_TOKENS[0m, [36mDEFAULT_BATCH_SIZE[0m, [36mMONTHLY_API_BUDGET_LIMIT[0m, and [36mCOST_ALERT_THRESHOLD[0m
+[dotenv] Loaded [33m.env[0m
+Started GET "/" for 73.92.124.11 at 2025-09-04 15:18:07 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+  [1m[36mActiveRecord::SchemaMigration Load (0.8ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='SeatingCharter'*/[0m
+Processing by DashboardController#index as HTML
+Completed 401 Unauthorized in 51ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.3ms)
+
+
+Started GET "/users/sign_in" for 73.92.124.11 at 2025-09-04 15:18:08 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 0.7ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 19.0ms | GC: 14.4ms)
+  Rendered layout layouts/devise.html.erb (Duration: 24.5ms | GC: 15.1ms)
+Completed 200 OK in 72ms (Views: 27.8ms | ActiveRecord: 4.8ms (0 queries, 0 cached) | GC: 15.1ms)
+
+
+Started GET "/assets/application-8b441ae0.css" for 73.92.124.11 at 2025-09-04 15:18:08 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/seating_editor-ffe15b26.css" for 73.92.124.11 at 2025-09-04 15:18:08 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/tailwind-8350bad6.css" for 73.92.124.11 at 2025-09-04 15:18:08 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/application-bfcdf840.js" for 73.92.124.11 at 2025-09-04 15:18:08 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/turbo.min-3a2e143f.js" for 73.92.124.11 at 2025-09-04 15:18:08 -0700
+Started GET "/assets/stimulus.min-4b1e420e.js" for 73.92.124.11 at 2025-09-04 15:18:08 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/stimulus-loading-1fc53fe7.js" for 73.92.124.11 at 2025-09-04 15:18:08 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/controllers/application-3affb389.js" for 73.92.124.11 at 2025-09-04 15:18:08 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/controllers/cohort_upload_controller-ff6bd1b6.js" for 73.92.124.11 at 2025-09-04 15:18:09 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/controllers/hello_controller-708796bd.js" for 73.92.124.11 at 2025-09-04 15:18:09 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/controllers/index-ee64e1f1.js" for 73.92.124.11 at 2025-09-04 15:18:09 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/controllers/rule_parser_controller-9ad13a36.js" for 73.92.124.11 at 2025-09-04 15:18:09 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/controllers/seating_editor_controller-bb31d6c5.js" for 73.92.124.11 at 2025-09-04 15:18:09 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/users/sign_in" for 73.92.124.11 at 2025-09-04 15:18:15 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 3.4ms | GC: 0.0ms)
+  Rendered layout layouts/devise.html.erb (Duration: 5.1ms | GC: 0.0ms)
+Completed 200 OK in 47ms (Views: 5.5ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/assets/stimulus.min-2395e199.js.map" for 73.92.124.11 at 2025-09-04 15:18:27 -0700
+Started GET "/assets/turbo.min-5f3b7fda.js.map" for 73.92.124.11 at 2025-09-04 15:18:27 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/users/sign_in" for 73.92.124.11 at 2025-09-04 15:18:32 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 1.6ms | GC: 0.0ms)
+  Rendered layout layouts/devise.html.erb (Duration: 4.0ms | GC: 0.0ms)
+Completed 200 OK in 48ms (Views: 5.0ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started HEAD "/" for 217.182.175.162 at 2025-09-04 15:21:18 -0700
+Cannot render console from 217.182.175.162! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by DashboardController#index as HTML
+  Rendering public/406-unsupported-browser.html
+  Rendered public/406-unsupported-browser.html (Duration: 0.3ms | GC: 0.0ms)
+Filter chain halted as #<Proc:0x0000000132924798 /opt/homebrew/lib/ruby/gems/3.4.0/gems/actionpack-8.0.2.1/lib/action_controller/metal/allow_browser.rb:58 (lambda)> rendered or redirected
+Completed 406 Not Acceptable in 27ms (Views: 1.7ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/users/sign_in" for 73.92.124.11 at 2025-09-04 15:21:28 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 1.3ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 2.7ms | GC: 0.0ms)
+  Rendered layout layouts/devise.html.erb (Duration: 5.8ms | GC: 0.0ms)
+Completed 200 OK in 59ms (Views: 7.9ms | ActiveRecord: 2.4ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/assets/sortablejs-d5bfebfd.js" for 73.92.124.11 at 2025-09-04 15:21:28 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/users/sign_in" for 73.92.124.11 at 2025-09-04 15:21:30 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 2.9ms | GC: 0.0ms)
+  Rendered layout layouts/devise.html.erb (Duration: 3.6ms | GC: 0.0ms)
+Completed 200 OK in 46ms (Views: 3.8ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/assets/sortablejs.js" for 127.0.0.1 at 2025-09-04 15:21:31 -0700
+Started GET "/vendor/javascript/sortablejs.js" for 127.0.0.1 at 2025-09-04 15:21:37 -0700
+  
+ActionController::RoutingError (No route matches [GET] "/vendor/javascript/sortablejs.js"):
+  
+Started GET "/importmap.json" for 127.0.0.1 at 2025-09-04 15:21:44 -0700
+  
+ActionController::RoutingError (No route matches [GET] "/importmap.json"):
+  
+Started GET "/apple-touch-icon-precomposed.png" for 73.92.124.11 at 2025-09-04 15:21:52 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+  
+ActionController::RoutingError (No route matches [GET] "/apple-touch-icon-precomposed.png"):
+  
+Started GET "/apple-touch-icon.png" for 73.92.124.11 at 2025-09-04 15:21:52 -0700
+Started GET "/favicon.ico" for 73.92.124.11 at 2025-09-04 15:21:52 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+  
+ActionController::RoutingError (No route matches [GET] "/favicon.ico"):
+  
+  
+ActionController::RoutingError (No route matches [GET] "/apple-touch-icon.png"):
+  
+Started GET "/users/sign_in" for 73.92.124.11 at 2025-09-04 15:22:05 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by Devise::SessionsController#new as HTML
+  Rendering layout layouts/devise.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/devise
+  Rendered devise/shared/_links.html.erb (Duration: 0.5ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/devise (Duration: 3.1ms | GC: 0.0ms)
+  Rendered layout layouts/devise.html.erb (Duration: 3.8ms | GC: 0.0ms)
+Completed 200 OK in 53ms (Views: 4.5ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/assets/application-bfcdf840.js" for 73.92.124.11 at 2025-09-04 15:22:06 -0700
+Started GET "/assets/application-8b441ae0.css" for 73.92.124.11 at 2025-09-04 15:22:06 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/seating_editor-ffe15b26.css" for 73.92.124.11 at 2025-09-04 15:22:06 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/tailwind-8350bad6.css" for 73.92.124.11 at 2025-09-04 15:22:06 -0700
+Started GET "/assets/turbo.min-3a2e143f.js" for 73.92.124.11 at 2025-09-04 15:22:06 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/controllers/application-3affb389.js" for 73.92.124.11 at 2025-09-04 15:22:06 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/stimulus.min-4b1e420e.js" for 73.92.124.11 at 2025-09-04 15:22:06 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/stimulus-loading-1fc53fe7.js" for 73.92.124.11 at 2025-09-04 15:22:06 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/sortablejs-d5bfebfd.js" for 73.92.124.11 at 2025-09-04 15:22:06 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/controllers/seating_editor_controller-bb31d6c5.js" for 73.92.124.11 at 2025-09-04 15:22:06 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/controllers/cohort_upload_controller-ff6bd1b6.js" for 73.92.124.11 at 2025-09-04 15:22:07 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/controllers/hello_controller-708796bd.js" for 73.92.124.11 at 2025-09-04 15:22:07 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/controllers/index-ee64e1f1.js" for 73.92.124.11 at 2025-09-04 15:22:07 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Started GET "/assets/controllers/rule_parser_controller-9ad13a36.js" for 73.92.124.11 at 2025-09-04 15:22:07 -0700
+Cannot render console from 73.92.124.11! Allowed networks: 127.0.0.0/127.255.255.255, ::1
