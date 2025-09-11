@@ -27,8 +27,21 @@ class CohortsController < ApplicationController
           pdf_blob = ActiveStorage::Blob.find(session[:temp_pdf_blob_id])
           @cohort.roster_pdf.attach(pdf_blob)
           
-          # Import students immediately using the same PDF
-          result = parse_roster_sync(@cohort)
+          # Import students using ALREADY EXTRACTED data (no API call needed!)
+          if session[:students_cache_key].present?
+            extracted_students = Rails.cache.read(session[:students_cache_key])
+            if extracted_students.present?
+              result = create_students_from_extracted_data(@cohort, extracted_students)
+              Rails.cache.delete(session[:students_cache_key])
+              session.delete(:students_cache_key)
+            else
+              # Cache expired or missing, fallback to parsing
+              result = parse_roster_sync(@cohort)
+            end
+          else
+            # Fallback: parse if we don't have extracted data
+            result = parse_roster_sync(@cohort)
+          end
           
           # Clear the session
           session.delete(:temp_pdf_blob_id)
@@ -54,7 +67,7 @@ class CohortsController < ApplicationController
         redirect_to @cohort, notice: 'Cohort was successfully created.'
       end
     else
-      # If cohort creation fails, clean up any stored PDF
+      # If cohort creation fails, clean up any stored PDF and cache
       if session[:temp_pdf_blob_id]
         begin
           ActiveStorage::Blob.find(session[:temp_pdf_blob_id]).destroy
@@ -62,6 +75,10 @@ class CohortsController < ApplicationController
           # Ignore errors during cleanup
         end
         session.delete(:temp_pdf_blob_id)
+      end
+      if session[:students_cache_key]
+        Rails.cache.delete(session[:students_cache_key])
+        session.delete(:students_cache_key)
       end
       render :new, status: :unprocessable_entity
     end
@@ -78,9 +95,10 @@ class CohortsController < ApplicationController
       uploaded_file = params[:roster_pdf]
       temp_file = save_temp_file(uploaded_file)
       
-      # Extract metadata using our service
-      result = PdfCohortExtractorService.extract_cohort_metadata(
+      # Extract metadata using our new structured service
+      result = OpenaiServiceV2.extract_roster_from_file(
         temp_file.path, 
+        purpose: 'cohort_metadata_extraction',
         user: current_user
       )
       
@@ -106,10 +124,25 @@ class CohortsController < ApplicationController
         # Store the blob ID in session so we can attach it during create
         session[:temp_pdf_blob_id] = pdf_blob.id
         
+        # IMPORTANT: Store the already-extracted students data in Rails cache (not session - too big!)
+        # Use a unique cache key tied to the blob ID
+        cache_key = "extracted_students_#{pdf_blob.id}"
+        Rails.cache.write(cache_key, result[:students], expires_in: 1.hour)
+        session[:students_cache_key] = cache_key
+        
+        # Convert structured result to expected format
+        metadata = {
+          name: result[:cohort_name] || "Extracted Cohort"
+        }
+        students_preview = {
+          estimated_total: result[:students]&.size || 0,
+          sample_students: result[:students]&.first(3) || []
+        }
+        
         render json: {
           success: true,
-          metadata: result[:metadata],
-          students_preview: result[:students_preview],
+          metadata: metadata,
+          students_preview: students_preview,
           pdf_stored: true
         }
       else
@@ -166,8 +199,77 @@ class CohortsController < ApplicationController
     temp_file
   end
 
+  def create_students_from_extracted_data(cohort, students_data)
+    # Create students directly from the already-extracted data (no API call!)
+    created_count = 0
+    
+    students_data.each do |student_data|
+      # Handle both string keys and symbol keys
+      name = student_data['name'] || student_data[:name]
+      next unless name.present? && name.length > 2
+      
+      # Build inferences from the already-extracted AI data
+      inferences = {}
+      
+      # Extract gender with confidence
+      gender = student_data['gender'] || student_data[:gender]
+      gender_confidence = student_data['gender_confidence'] || student_data[:gender_confidence]
+      if gender.present?
+        inferences['gender'] = {
+          'value' => gender.to_s,
+          'confidence' => gender_confidence || 0.5
+        }
+      end
+      
+      # Extract agency level with confidence
+      agency_level = student_data['agency_level'] || student_data[:agency_level]
+      agency_confidence = student_data['agency_level_confidence'] || student_data[:agency_level_confidence]
+      if agency_level.present?
+        inferences['agency_level'] = {
+          'value' => agency_level.to_s,
+          'confidence' => agency_confidence || 0.5
+        }
+      end
+      
+      # Extract department type with confidence
+      dept_type = student_data['department_type'] || student_data[:department_type]
+      dept_confidence = student_data['department_type_confidence'] || student_data[:department_type_confidence]
+      if dept_type.present?
+        inferences['department_type'] = {
+          'value' => dept_type.to_s,
+          'confidence' => dept_confidence || 0.5
+        }
+      end
+      
+      # Extract seniority level with confidence
+      seniority = student_data['seniority_level'] || student_data[:seniority_level]
+      seniority_confidence = student_data['seniority_level_confidence'] || student_data[:seniority_level_confidence]
+      if seniority.present?
+        inferences['seniority_level'] = {
+          'value' => seniority.to_s,
+          'confidence' => seniority_confidence || 0.5
+        }
+      end
+      
+      additional_info = (student_data['additional_info'] || student_data[:additional_info])&.strip
+      
+      student = cohort.students.create(
+        name: (student_data['name'] || student_data[:name])&.strip&.titleize,
+        title: (student_data['title'] || student_data[:title])&.strip,
+        organization: (student_data['organization'] || student_data[:organization])&.strip,
+        location: (student_data['location'] || student_data[:location])&.strip,
+        student_attributes: additional_info.present? ? { additional_info: additional_info } : {},
+        inferences: inferences.present? ? inferences : nil
+      )
+      
+      created_count += 1 if student.persisted?
+    end
+    
+    { students_created: created_count }
+  end
+
   def parse_roster_sync(cohort)
-    # Synchronously parse roster and return result
+    # Synchronously parse roster and return result using new structured service
     return { students_created: 0 } unless cohort.roster_pdf.attached?
 
     begin
@@ -179,8 +281,8 @@ class CohortsController < ApplicationController
       end
       temp_file.rewind
 
-      # Parse using existing AiRosterParser
-      result = AiRosterParser.parse_roster(
+      # Parse using new AiRosterParserV2 with structured outputs
+      result = AiRosterParserV2.parse_roster(
         temp_file.path,
         cohort.id,
         user: current_user

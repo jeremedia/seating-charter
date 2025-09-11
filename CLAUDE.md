@@ -167,6 +167,8 @@ gh pr create --title "Title" --body "Description"
 
 5. **File Uploads**: Models ready but controllers/views not implemented
 
+6. **Prawn PDF Cursor Management**: When using `pdf.bounding_box()`, Prawn automatically moves the cursor below the box. Don't add the full box height to cursor movement - only add small gaps (10-20px) between elements. Common mistake: `pdf.move_down(table_height + spacing)` should be just `pdf.move_down(spacing)`.
+
 ## 🔐 Security Notes
 
 - OpenAI API key is in .env (not committed to git normally, but provided by user)

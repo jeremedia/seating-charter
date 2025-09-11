@@ -1,0 +1,140 @@
+<% content_for :title, "Edit Student - #{@cohort.name}" %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Edit Student</h1>
+    <p class="text-gray-600 mt-1"><%= @cohort.name %></p>
+  </div>
+
+  <div class="bg-white shadow rounded-lg p-6">
+    <%= form_with model: [@cohort, @student], local: true do |form| %>
+      <% if @student.errors.any? %>
+        <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 class="text-sm font-medium text-red-800 mb-2">Please fix the following errors:</h3>
+          <ul class="list-disc list-inside text-sm text-red-700">
+            <% @student.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="space-y-6">
+        <!-- Basic Information -->
+        <div>
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
+          
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <%= form.label :name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm", required: true %>
+            </div>
+
+            <div>
+              <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.text_field :title, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+            </div>
+
+            <div>
+              <%= form.label :organization, class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.text_field :organization, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+            </div>
+
+            <div>
+              <%= form.label :location, class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.text_field :location, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI-Inferred Attributes -->
+        <div>
+          <h3 class="text-lg font-medium text-gray-900 mb-4">AI-Inferred Attributes</h3>
+          <p class="text-sm text-gray-500 mb-3">These attributes were automatically inferred from the roster data. You can modify them if needed.</p>
+          
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <%= form.label :gender, class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.select :gender, 
+                    options_for_select([
+                      ['Not specified', nil],
+                      ['Male', 'male'],
+                      ['Female', 'female'],
+                      ['Unsure', 'unsure']
+                    ], @student.inferences&.dig('gender', 'value')),
+                    {}, 
+                    class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+              <% if @student.inferences&.dig('gender', 'confidence') %>
+                <p class="mt-1 text-xs text-gray-500">AI confidence: <%= (@student.inferences['gender']['confidence'] * 100).round %>%</p>
+              <% end %>
+            </div>
+
+            <div>
+              <%= form.label :agency_level, class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.select :agency_level,
+                    options_for_select([
+                      ['Not specified', nil],
+                      ['Federal', 'federal'],
+                      ['State', 'state'],
+                      ['Local', 'local'],
+                      ['Private', 'private'],
+                      ['Unsure', 'unsure']
+                    ], @student.inferences&.dig('agency_level', 'value')),
+                    {},
+                    class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+              <% if @student.inferences&.dig('agency_level', 'confidence') %>
+                <p class="mt-1 text-xs text-gray-500">AI confidence: <%= (@student.inferences['agency_level']['confidence'] * 100).round %>%</p>
+              <% end %>
+            </div>
+
+            <div>
+              <%= form.label :department_type, class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.select :department_type,
+                    options_for_select([
+                      ['Not specified', nil],
+                      ['Police', 'police'],
+                      ['Fire', 'fire'],
+                      ['Emergency Management', 'emergency_management'],
+                      ['Public Health', 'public_health'],
+                      ['Military', 'military'],
+                      ['Intelligence', 'intelligence'],
+                      ['Other', 'other'],
+                      ['Unsure', 'unsure']
+                    ], @student.inferences&.dig('department_type', 'value')),
+                    {},
+                    class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+              <% if @student.inferences&.dig('department_type', 'confidence') %>
+                <p class="mt-1 text-xs text-gray-500">AI confidence: <%= (@student.inferences['department_type']['confidence'] * 100).round %>%</p>
+              <% end %>
+            </div>
+
+            <div>
+              <%= form.label :seniority_level, class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.select :seniority_level,
+                    options_for_select([
+                      ['Not specified', nil],
+                      ['Entry', 'entry'],
+                      ['Mid', 'mid'],
+                      ['Senior', 'senior'],
+                      ['Executive', 'executive'],
+                      ['Unsure', 'unsure']
+                    ], @student.inferences&.dig('seniority_level', 'value')),
+                    {},
+                    class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+              <% if @student.inferences&.dig('seniority_level', 'confidence') %>
+                <p class="mt-1 text-xs text-gray-500">AI confidence: <%= (@student.inferences['seniority_level']['confidence'] * 100).round %>%</p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center justify-end space-x-3">
+        <%= link_to 'Cancel', cohort_students_path(@cohort), 
+              class: 'px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50' %>
+        <%= form.submit 'Update Student', 
+              class: 'px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium hover:bg-blue-700' %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -127,10 +127,9 @@ class Student < ApplicationRecord
   end
 
   def all_interactions
-    InteractionTracking.where(
-      '(student_a_id = :id OR student_b_id = :id) AND cohort_id = :cohort_id',
-      id: id, cohort_id: cohort_id
-    )
+    InteractionTracking.joins(:seating_event)
+      .where(seating_events: { cohort_id: cohort_id })
+      .where('student_a_id = ? OR student_b_id = ?', id, id)
   end
 
   private

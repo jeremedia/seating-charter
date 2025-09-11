@@ -408,9 +408,9 @@ export default class extends Controller {
           </h4>
       `
       
-      if (studentsPreview.sample && studentsPreview.sample.length > 0) {
+      if (studentsPreview.sample_students && studentsPreview.sample_students.length > 0) {
         html += '<div class="space-y-2">'
-        studentsPreview.sample.forEach((student, index) => {
+        studentsPreview.sample_students.forEach((student, index) => {
           html += `
             <div class="flex items-center justify-between p-2 bg-white rounded border border-green-200">
               <div class="flex items-center space-x-3">
@@ -485,7 +485,7 @@ export default class extends Controller {
   }
 
   showStudentsPreview(studentsPreview) {
-    if (!studentsPreview || studentsPreview.count === 0) {
+    if (!studentsPreview || studentsPreview.estimated_total === 0) {
       this.studentsCountTarget.textContent = "No students detected"
       this.studentsPreviewTarget.innerHTML = "<p class='text-gray-500 italic'>No student data found in PDF</p>"
       return
@@ -497,7 +497,8 @@ export default class extends Controller {
     html += "<h4 class='font-medium text-gray-900'>Sample Students:</h4>"
     html += "<div class='space-y-1'>"
     
-    studentsPreview.sample.forEach(student => {
+    const students = studentsPreview.sample_students || []
+    students.forEach(student => {
       html += "<div class='text-sm text-gray-700'>"
       html += `<strong>${student.name}</strong>`
       if (student.title) html += ` - ${student.title}`
@@ -507,8 +508,8 @@ export default class extends Controller {
     
     html += "</div>"
     
-    if (studentsPreview.estimated_total > studentsPreview.sample.length) {
-      const remaining = studentsPreview.estimated_total - studentsPreview.sample.length
+    if (studentsPreview.estimated_total > students.length) {
+      const remaining = studentsPreview.estimated_total - students.length
       html += `<p class='text-xs text-gray-500 mt-2'>...and ${remaining} more students</p>`
     }
     

@@ -8,7 +8,7 @@ class ImportsController < ApplicationController
   end
   
   def create
-    @import_session = @cohort.import_sessions.build(import_session_params)
+    @import_session = @cohort.import_sessions.build
     @import_session.user = current_user
     @import_session.status = :pending
     
@@ -71,7 +71,7 @@ class ImportsController < ApplicationController
   end
   
   def import_session_params
-    params.require(:import_session).permit(:description)
+    params.require(:import_session).permit(:file)
   end
   
   def authorize_cohort_access

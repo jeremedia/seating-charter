@@ -23,8 +23,8 @@ gem "devise"
 # Environment variables
 gem "dotenv-rails"
 
-# OpenAI integration
-gem "ruby-openai"
+# OpenAI integration - official gem
+gem "openai", "~> 0.22.0"
 
 # PDF processing and export
 gem "prawn"

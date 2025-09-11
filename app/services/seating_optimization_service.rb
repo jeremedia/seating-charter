@@ -16,7 +16,11 @@ class SeatingOptimizationService
     Rails.logger.info "Starting seating optimization for event #{seating_event.id} with #{strategy} strategy"
     
     start_time = Time.current
-    students = seating_event.cohort.students.includes(:table_assignments)
+    # Load students without includes to avoid any weird Rails behavior
+    students = seating_event.cohort.students.to_a
+    
+    # Verify students are persisted
+    Rails.logger.info "Loaded #{students.count} students, all persisted: #{students.all?(&:persisted?)}"
     
     return failure_result("No students found") if students.empty?
     return failure_result("Insufficient students for optimization") if students.count < 2
@@ -30,8 +34,9 @@ class SeatingOptimizationService
     
     # Generate initial arrangement
     initial_arrangement = generate_initial_arrangement(students)
-    current_arrangement = initial_arrangement.dup
-    best_arrangement = initial_arrangement.dup
+    # Deep copy the arrangement structure but keep the same Student object references
+    current_arrangement = deep_copy_arrangement(initial_arrangement)
+    best_arrangement = deep_copy_arrangement(initial_arrangement)
     
     # Calculate initial scores
     current_score = calculator.calculate_total_score(current_arrangement, seating_event)
@@ -165,8 +170,29 @@ class SeatingOptimizationService
   end
 
   def save_arrangement(arrangement_data, created_by)
+    # Keep the original arrangement with Student objects for table assignments
+    original_arrangement = arrangement_data[:arrangement]
+    
+    # Convert arrangement to store student IDs instead of objects for JSONB storage
+    arrangement_for_storage = {}
+    original_arrangement.each do |table_number, students|
+      arrangement_for_storage[table_number] = students.map do |student|
+        if student.is_a?(Student)
+          # Store just essential data for display, not full object
+          {
+            'id' => student.id,
+            'name' => student.name,
+            'organization' => student.organization,
+            'inferences' => student.inferences
+          }
+        else
+          student # Already a hash
+        end
+      end
+    end
+    
     seating_arrangement = seating_event.seating_arrangements.build(
-      arrangement_data: arrangement_data[:arrangement],
+      arrangement_data: arrangement_for_storage,
       optimization_scores: arrangement_data[:optimization_stats],
       diversity_metrics: arrangement_data[:diversity_metrics],
       decision_log_data: arrangement_data[:decision_log] || {},
@@ -174,7 +200,8 @@ class SeatingOptimizationService
     )
     
     if seating_arrangement.save
-      create_table_assignments(seating_arrangement, arrangement_data[:arrangement])
+      # Pass the ORIGINAL arrangement with Student objects, not the converted one
+      create_table_assignments(seating_arrangement, original_arrangement)
       seating_arrangement
     else
       nil
@@ -196,24 +223,52 @@ class SeatingOptimizationService
   end
 
   private
+  
+  def deep_copy_arrangement(arrangement)
+    # Create a new hash with new arrays, but keep the same Student object references
+    new_arrangement = {}
+    arrangement.each do |table_number, students_at_table|
+      # Create a new array with the same Student objects (not duplicates)
+      new_arrangement[table_number] = students_at_table.dup
+    end
+    new_arrangement
+  end
 
   def generate_initial_arrangement(students)
     # Simple round-robin assignment to ensure even distribution
     tables = {}
     students_per_table = seating_event.table_size
     total_tables = seating_event.total_tables
+    max_capacity = students_per_table * total_tables
     
-    students.each_with_index do |student, index|
+    # Only seat as many students as we have seats for
+    students_to_seat = students.first(max_capacity)
+    
+    # Log warning if there are more students than seats
+    if students.count > max_capacity
+      Rails.logger.warn "Warning: #{students.count} students but only #{max_capacity} seats available. #{students.count - max_capacity} students will not be seated."
+    end
+    
+    students_to_seat.each_with_index do |student, index|
       table_number = (index % total_tables) + 1
       tables[table_number] ||= []
       
       if tables[table_number].size < students_per_table
         tables[table_number] << student
       else
-        # Handle overflow by finding the table with the least students
-        least_filled_table = tables.min_by { |_, students_list| students_list.size }
-        least_filled_table[1] << student
+        # Find a table with space (should not happen with proper sizing)
+        available_table = tables.find { |_, students_list| students_list.size < students_per_table }
+        if available_table
+          available_table[1] << student
+        else
+          Rails.logger.error "No available seats for student #{student.id}"
+        end
       end
+    end
+    
+    # Ensure all tables exist even if empty
+    (1..total_tables).each do |table_num|
+      tables[table_num] ||= []
     end
     
     tables
@@ -246,16 +301,39 @@ class SeatingOptimizationService
   end
 
   def create_table_assignments(seating_arrangement, arrangement_data)
+    cohort_id = seating_arrangement.seating_event.cohort_id
+    
     arrangement_data.each do |table_number, students|
-      students.each_with_index do |student, seat_position|
-        seating_arrangement.table_assignments.create!(
-          student: student,
+      students.each_with_index do |student_data, seat_position|
+        # Always look up the student fresh from the database to avoid unpersisted duplicates
+        student = if student_data.is_a?(Student)
+          # Look up by name since the object might be a duplicate
+          Student.find_by!(name: student_data.name, cohort_id: cohort_id)
+        elsif student_data.is_a?(Hash) && student_data['id']
+          Student.find(student_data['id'])
+        elsif student_data.is_a?(Hash)
+          Student.find_by!(
+            name: student_data['name'] || student_data[:name],
+            cohort_id: cohort_id
+          )
+        else
+          raise "Invalid student data: #{student_data.inspect}"
+        end
+        
+        # Create TableAssignment with the fresh student ID
+        TableAssignment.create!(
+          seating_arrangement_id: seating_arrangement.id,
+          student_id: student.id,
           table_number: table_number,
           seat_position: seat_position + 1,
           locked: false
         )
       end
     end
+  rescue => e
+    Rails.logger.error "Error creating table assignments: #{e.message}"
+    Rails.logger.error "Arrangement data sample: #{arrangement_data.first.inspect}"
+    raise
   end
 
   def failure_result(message)

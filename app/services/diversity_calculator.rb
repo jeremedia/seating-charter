@@ -22,7 +22,8 @@ class DiversityCalculator
     
     # Weighted sum of all diversity dimensions
     total_score = @weights.sum do |dimension, weight|
-      weight * detailed_metrics.dig(dimension, :score).to_f
+      score = detailed_metrics.dig(:overall, dimension, :score) || 0.0
+      weight * score.to_f
     end
 
     # Normalize to 0-1 range
@@ -182,11 +183,13 @@ class DiversityCalculator
     
     students.combination(2) do |student_a, student_b|
       # Check previous interactions in this cohort
-      interactions = InteractionTracking.where(
-        cohort_id: seating_event.cohort_id,
-        student_a_id: [student_a.id, student_b.id],
-        student_b_id: [student_a.id, student_b.id]
-      ).where.not(seating_event_id: seating_event.id)
+      interactions = InteractionTracking.joins(:seating_event)
+        .where(seating_events: { cohort_id: seating_event.cohort_id })
+        .where(
+          '(student_a_id = ? AND student_b_id = ?) OR (student_a_id = ? AND student_b_id = ?)',
+          student_a.id, student_b.id, student_b.id, student_a.id
+        )
+        .where.not(seating_event_id: seating_event.id)
       
       interaction_count_pair = interactions.sum(:interaction_count)
       

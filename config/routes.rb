@@ -30,6 +30,11 @@ Rails.application.routes.draw do
     end
     
     resources :seating_events do
+      member do
+        post :generate
+        get :export_all_days
+      end
+      
       # Export routes at seating_event level
       resources :exports, only: [:index] do
         collection do

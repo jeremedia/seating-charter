@@ -1,0 +1,146 @@
+<% content_for :title, "Edit Seating Chart - #{@cohort.name}" %>
+
+<div class="max-w-4xl mx-auto">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Edit Seating Chart</h1>
+    <p class="text-gray-600 mt-1"><%= @cohort.name %> - <%= @seating_event.name %></p>
+  </div>
+
+  <div class="bg-white shadow rounded-lg p-6">
+    <%= form_with model: [@cohort, @seating_event], local: true do |form| %>
+      <% if @seating_event.errors.any? %>
+        <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 class="text-sm font-medium text-red-800 mb-2">Please fix the following errors:</h3>
+          <ul class="list-disc list-inside text-sm text-red-700">
+            <% @seating_event.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="space-y-6">
+        <!-- Basic Information -->
+        <div>
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Event Details</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <%= form.label :name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.text_field :name, 
+                    class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
+                    required: true %>
+            </div>
+
+            <div>
+              <%= form.label :event_date, class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.date_field :event_date, 
+                    class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
+                    required: true %>
+            </div>
+
+            <div class="md:col-span-2">
+              <%= form.label :event_type, "Event Type", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.select :event_type,
+                    options_for_select([
+                      ['Single Day', 'single_day'],
+                      ['In-Residence', 'multi_day'],
+                      ['Extended Workshop', 'workshop']
+                    ], @seating_event.event_type),
+                    {},
+                    class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Configuration -->
+        <div>
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Table Configuration</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <%= form.label :total_tables, "Number of Tables", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.number_field :total_tables, 
+                    class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
+                    min: 1,
+                    max: 20,
+                    required: true %>
+              <p class="mt-1 text-xs text-gray-500">How many tables will be in the room?</p>
+            </div>
+
+            <div>
+              <%= form.label :table_size, "Seats per Table", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.number_field :table_size, 
+                    class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm",
+                    min: 3,
+                    max: 8,
+                    required: true %>
+              <p class="mt-1 text-xs text-gray-500">How many people can sit at each table?</p>
+            </div>
+          </div>
+
+          <!-- Capacity Calculator -->
+          <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-blue-900">Total Capacity</p>
+                <p class="text-xs text-blue-700 mt-1">
+                  <span id="capacity-display"><%= @seating_event.max_students_capacity %></span> seats 
+                  (<span id="tables-display"><%= @seating_event.total_tables %></span> tables × <span id="seats-display"><%= @seating_event.table_size %></span> seats)
+                </p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-blue-900">Students to Seat</p>
+                <p class="text-xs text-blue-700 mt-1"><%= @cohort.students.count %> students enrolled</p>
+              </div>
+            </div>
+            <div id="capacity-warning" class="<%= 'hidden' unless @seating_event.max_students_capacity < @cohort.students.count %> mt-3 p-3 bg-yellow-100 rounded-md">
+              <p class="text-sm text-yellow-800">
+                <strong>Warning:</strong> Not enough seats for all students. Some students won't be seated.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center justify-end space-x-3">
+        <%= link_to 'Cancel', cohort_seating_event_path(@cohort, @seating_event), 
+              class: 'px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50' %>
+        <%= form.submit 'Update Seating Chart', 
+              class: 'px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium hover:bg-blue-700' %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Update capacity display
+  const tablesInput = document.getElementById('seating_event_total_tables');
+  const seatsInput = document.getElementById('seating_event_table_size');
+  const capacityDisplay = document.getElementById('capacity-display');
+  const tablesDisplay = document.getElementById('tables-display');
+  const seatsDisplay = document.getElementById('seats-display');
+  const capacityWarning = document.getElementById('capacity-warning');
+  const studentCount = <%= @cohort.students.count %>;
+
+  function updateCapacity() {
+    const tables = parseInt(tablesInput.value) || 0;
+    const seats = parseInt(seatsInput.value) || 0;
+    const capacity = tables * seats;
+    
+    capacityDisplay.textContent = capacity;
+    tablesDisplay.textContent = tables;
+    seatsDisplay.textContent = seats;
+    
+    if (capacity < studentCount && capacity > 0) {
+      capacityWarning.classList.remove('hidden');
+    } else {
+      capacityWarning.classList.add('hidden');
+    }
+  }
+
+  tablesInput.addEventListener('input', updateCapacity);
+  seatsInput.addEventListener('input', updateCapacity);
+});
+</script>

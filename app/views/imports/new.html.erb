@@ -68,10 +68,10 @@
                 <p class="text-xs text-gray-500">PDF, Excel (.xlsx, .xls), or CSV files</p>
                 <p class="text-xs text-gray-400 mt-2">Maximum file size: 10MB</p>
               </div>
-              <input id="file-upload" name="import_session[file]" type="file" 
-                     accept=".pdf,.xlsx,.xls,.csv"
-                     class="hidden"
-                     required />
+              <%= form.file_field :file, id: "file-upload", 
+                           accept: ".pdf,.xlsx,.xls,.csv",
+                           class: "hidden",
+                           required: true %>
             </label>
           </div>
           
@@ -80,16 +80,6 @@
           <% end %>
         </div>
 
-        <!-- Description -->
-        <div class="space-y-2">
-          <%= form.label :description, "Import description (optional)", 
-                class: "block text-sm font-medium text-gray-700" %>
-          <%= form.text_area :description, 
-                placeholder: "e.g., Fall 2024 Cohort A - Initial roster",
-                rows: 3,
-                class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" %>
-          <p class="text-xs text-gray-500">This will help you identify the import session later</p>
-        </div>
 
         <!-- Current Cohort Info -->
         <div class="bg-gray-50 p-4 rounded-md">

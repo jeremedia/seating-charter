@@ -346,10 +346,14 @@ class DecisionLogService
     current_metrics.each do |metric, current_value|
       previous_value = previous_metrics[metric]
       if previous_value
-        change = current_value.to_f - previous_value.to_f
+        # Extract numeric score from hash if needed
+        current_score = current_value.is_a?(Hash) ? (current_value[:score] || 0.0) : current_value
+        previous_score = previous_value.is_a?(Hash) ? (previous_value[:score] || 0.0) : previous_value
+        
+        change = current_score.to_f - previous_score.to_f
         trends[metric] = {
-          current: current_value,
-          previous: previous_value,
+          current: current_score,
+          previous: previous_score,
           change: change.round(4),
           trend: change > 0.01 ? 'improving' : (change < -0.01 ? 'declining' : 'stable')
         }
@@ -366,12 +370,16 @@ class DecisionLogService
     current_metrics.each do |metric, current_value|
       previous_value = previous_metrics[metric]
       if previous_value
-        change = (current_value.to_f - previous_value.to_f).abs
+        # Extract numeric score from hash if needed
+        current_score = current_value.is_a?(Hash) ? (current_value[:score] || 0.0) : current_value
+        previous_score = previous_value.is_a?(Hash) ? (previous_value[:score] || 0.0) : previous_value
+        
+        change = (current_score.to_f - previous_score.to_f).abs
         if change >= threshold
           significant_changes << {
             metric: metric,
             change_magnitude: change.round(4),
-            direction: current_value.to_f > previous_value.to_f ? 'improvement' : 'decline',
+            direction: current_score.to_f > previous_score.to_f ? 'improvement' : 'decline',
             significance: 'high'
           }
         end
@@ -472,7 +480,9 @@ class DecisionLogService
   def identify_key_achievements(final_metrics)
     achievements = []
     
-    final_metrics.each do |metric, score|
+    final_metrics.each do |metric, metric_data|
+      # Extract numeric score from hash if needed
+      score = metric_data.is_a?(Hash) ? (metric_data[:score] || 0.0) : metric_data
       if score.to_f >= 0.8
         achievements << "Strong #{metric.humanize.downcase} (#{(score.to_f * 100).round(1)}%)"
       end
