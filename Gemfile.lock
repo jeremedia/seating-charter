@@ -266,7 +266,7 @@ GEM
     oj (3.16.11)
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
-    openai (0.22.0)
+    openai (0.23.1)
       connection_pool
     orm_adapter (0.5.0)
     ostruct (0.6.3)
@@ -565,7 +565,7 @@ DEPENDENCIES
   lograge
   newrelic_rpm
   oj
-  openai (~> 0.22.0)
+  openai (~> 0.23.1)
   pdf-reader
   pg (~> 1.1)
   prawn
