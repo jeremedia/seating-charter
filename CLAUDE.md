@@ -256,13 +256,21 @@ bin/release major
 - **Port**: 3200
 - **Database**: PostgreSQL (seating_charter_production)
 - **Service**: systemd (seating-charter.service)
-- **CI/CD**: GitHub Actions (auto-deploy on push to main)
+- **CI/CD**: GitHub Actions (auto-deploy on release publish)
 - **DNS**: Google Cloud DNS → Caddy proxy → Tailscale
 
-### Deployment
-- Pushing to `main` branch automatically deploys via GitHub Actions
+### Deployment Process
+- **Automatic**: Creating a GitHub release automatically deploys to production
+- **Manual**: Can manually trigger deployment of any release tag via GitHub Actions
+- **Version-Locked**: Production always runs a specific release version, not latest main
 - Service managed by systemd on production server
 - Environment variables in `/home/jeremy/apps/seating-charter/.env`
+
+### Release → Deploy Flow
+1. Run `bin/release [patch|minor|major]` to create a GitHub release
+2. GitHub Actions automatically deploys the release to production
+3. Production server checks out the specific release tag
+4. Version badge in app updates to show deployed version
 
 ## 📞 Contact & Context
 

@@ -1,16 +1,21 @@
 name: Deploy to Production
 
 on:
-  push:
-    branches: [ main, master ]
+  release:
+    types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to deploy (e.g., v1.0.0)'
+        required: false
+        default: ''
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Deploy to jer-serve via Jump Host
+    - name: Deploy Release to Production
       uses: appleboy/ssh-action@v1.0.0
       with:
         # Target server (jer-serve via Tailscale)
@@ -29,8 +34,24 @@ jobs:
         script: |
           cd /home/jeremy/apps/seating-charter
           
-          # Pull latest changes
-          git pull origin main
+          # Determine which tag to deploy
+          DEPLOY_TAG="${{ github.event.release.tag_name }}"
+          if [ -z "$DEPLOY_TAG" ]; then
+            DEPLOY_TAG="${{ github.event.inputs.tag }}"
+          fi
+          
+          if [ -z "$DEPLOY_TAG" ]; then
+            echo "❌ No release tag specified for deployment"
+            exit 1
+          fi
+          
+          echo "🚀 Deploying release: $DEPLOY_TAG"
+          
+          # Fetch latest tags and changes
+          git fetch --all --tags
+          
+          # Checkout the specific release tag
+          git checkout tags/$DEPLOY_TAG -f
           
           # Setup Ruby environment
           export PATH="$HOME/.rbenv/bin:$PATH"
@@ -54,4 +75,4 @@ jobs:
           # Check service status
           sudo systemctl status seating-charter --no-pager
           
-          echo "✅ Deployment completed successfully!"
+          echo "✅ Release $DEPLOY_TAG deployed successfully!"
