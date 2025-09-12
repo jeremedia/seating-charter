@@ -86,8 +86,18 @@ class ReleaseManager
 
   def get_recent_commits(since_tag)
     if since_tag
+      # Fetch the tag if it doesn't exist locally
+      `git fetch --tags --quiet 2>/dev/null`
+      
       # Get commits since last release
-      `git log #{since_tag}..HEAD --pretty=format:"- %s (%an)" --no-merges`.split("\n")
+      output = `git log #{since_tag}..HEAD --pretty=format:"- %s (%an)" --no-merges 2>/dev/null`
+      
+      # If the tag doesn't exist locally, fall back to recent commits
+      if output.empty? || $?.exitstatus != 0
+        `git log -20 --pretty=format:"- %s (%an)" --no-merges`.split("\n")
+      else
+        output.split("\n")
+      end
     else
       # Get last 20 commits for first release
       `git log -20 --pretty=format:"- %s (%an)" --no-merges`.split("\n")
