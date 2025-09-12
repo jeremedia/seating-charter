@@ -212,6 +212,38 @@ The following can be started immediately:
 2. Natural language parsing (Issue #7) - Service exists, needs UI
 3. Optimization algorithm (Issue #8) - Core business logic
 
+## 🚀 Release Management
+
+### Creating a New Release
+
+When you request a release, I will:
+1. Ensure we're on the main branch with clean working directory
+2. Determine the version number (patch/minor/major bump)
+3. Generate release notes from recent commits
+4. Create and push the GitHub release
+5. The version badge in the app will automatically update
+
+### Release Commands
+
+```bash
+# Create a patch release (v1.0.0 -> v1.0.1)
+bin/release patch
+
+# Create a minor release (v1.0.0 -> v1.1.0)  
+bin/release minor
+
+# Create a major release (v1.0.0 -> v2.0.0)
+bin/release major
+```
+
+### When to Cut Releases
+
+- **Patch Release**: Bug fixes, small improvements
+- **Minor Release**: New features, non-breaking changes
+- **Major Release**: Breaking changes, major features
+
+**Note**: Just ask me to "cut a release" or "create a new release" and I'll handle the entire process!
+
 ## 🌐 Production Deployment
 
 ### Live URLs

@@ -1,0 +1,163 @@
+#!/usr/bin/env ruby
+require 'json'
+require 'open3'
+
+class ReleaseManager
+  def initialize
+    @repo = "jeremedia/seating-charter"
+  end
+
+  def create_release(version_type = 'patch')
+    ensure_clean_working_directory!
+    ensure_on_main_branch!
+    
+    current_version = get_current_version
+    new_version = bump_version(current_version, version_type)
+    
+    puts "🚀 Creating release #{new_version} (was #{current_version || 'unreleased'})"
+    
+    # Get recent commits for release notes
+    commits = get_recent_commits(current_version)
+    release_notes = generate_release_notes(new_version, commits)
+    
+    # Create the release using gh CLI
+    create_github_release(new_version, release_notes)
+    
+    puts "✅ Release #{new_version} created successfully!"
+    puts "🔗 View at: https://github.com/#{@repo}/releases/tag/#{new_version}"
+    
+    new_version
+  end
+
+  private
+
+  def ensure_clean_working_directory!
+    status = `git status --porcelain`.strip
+    unless status.empty?
+      puts "❌ Working directory is not clean. Please commit or stash changes first."
+      exit 1
+    end
+  end
+
+  def ensure_on_main_branch!
+    branch = `git branch --show-current`.strip
+    unless branch == 'main'
+      puts "❌ Not on main branch. Current branch: #{branch}"
+      puts "Run: git checkout main"
+      exit 1
+    end
+  end
+
+  def get_current_version
+    # Get the latest release tag
+    output, status = Open3.capture2("gh release list --repo #{@repo} --limit 1 --json tagName")
+    return nil unless status.success?
+    
+    releases = JSON.parse(output)
+    return nil if releases.empty?
+    
+    releases.first['tagName']
+  rescue
+    nil
+  end
+
+  def bump_version(current, type)
+    if current.nil?
+      return 'v0.1.0' # First release
+    end
+    
+    # Parse version (v1.2.3)
+    version = current.gsub(/^v/, '')
+    parts = version.split('.').map(&:to_i)
+    
+    # Ensure we have major.minor.patch
+    parts << 0 while parts.length < 3
+    major, minor, patch = parts[0..2]
+    
+    case type.to_s.downcase
+    when 'major'
+      "v#{major + 1}.0.0"
+    when 'minor'  
+      "v#{major}.#{minor + 1}.0"
+    else # patch
+      "v#{major}.#{minor}.#{patch + 1}"
+    end
+  end
+
+  def get_recent_commits(since_tag)
+    if since_tag
+      # Get commits since last release
+      `git log #{since_tag}..HEAD --pretty=format:"- %s (%an)" --no-merges`.split("\n")
+    else
+      # Get last 20 commits for first release
+      `git log -20 --pretty=format:"- %s (%an)" --no-merges`.split("\n")
+    end
+  end
+
+  def generate_release_notes(version, commits)
+    notes = []
+    notes << "## 🎉 Release #{version}"
+    notes << ""
+    notes << "### 📅 Released on #{Time.now.strftime('%B %d, %Y')}"
+    notes << ""
+    
+    # Categorize commits
+    features = commits.select { |c| c =~ /✨|feat/i }
+    fixes = commits.select { |c| c =~ /🐛|🔧|fix/i }
+    other = commits - features - fixes
+    
+    if features.any?
+      notes << "### ✨ Features"
+      notes.concat(features)
+      notes << ""
+    end
+    
+    if fixes.any?
+      notes << "### 🐛 Bug Fixes"
+      notes.concat(fixes)
+      notes << ""
+    end
+    
+    if other.any?
+      notes << "### 📝 Other Changes"
+      notes.concat(other)
+      notes << ""
+    end
+    
+    notes << "---"
+    notes << "🤖 *Release created with Claude Code*"
+    
+    notes.join("\n")
+  end
+
+  def create_github_release(version, notes)
+    # Write release notes to temp file to handle special characters
+    require 'tempfile'
+    temp_file = Tempfile.new(['release_notes', '.md'])
+    temp_file.write(notes)
+    temp_file.close
+    
+    cmd = [
+      'gh', 'release', 'create', version,
+      '--repo', @repo,
+      '--title', "Release #{version}",
+      '--notes-file', temp_file.path
+    ]
+    
+    system(*cmd) || raise("Failed to create release")
+  ensure
+    temp_file&.unlink
+  end
+end
+
+# Main execution
+if ARGV.empty?
+  puts "Usage: bin/release [patch|minor|major]"
+  puts "  patch: v1.0.0 -> v1.0.1 (default)"
+  puts "  minor: v1.0.0 -> v1.1.0"
+  puts "  major: v1.0.0 -> v2.0.0"
+  exit 0
+end
+
+version_type = ARGV[0] || 'patch'
+ReleaseManager.new.create_release(version_type)
