@@ -27,7 +27,7 @@ class OpenaiServiceV2
             { role: "system", content: "You are an expert at extracting student information from educational rosters. Extract all student names and infer demographic attributes. For gender, always choose 'male', 'female', or 'unsure' based on the first name. Always provide confidence scores between 0.0 and 1.0." },
             { role: "user", content: prompt }
           ],
-          text: OpenAIStudentRoster # Use structured output
+          text: OpenaiStudentRoster # Use structured output
         )
 
         # Track costs
@@ -97,7 +97,7 @@ class OpenaiServiceV2
               content: "Please extract all student information from this document. Include names, titles, organizations, locations, and any additional information about each student.\n\nDocument content:\n#{text_content}"
             }
           ],
-          text: OpenAIStudentRoster # Use structured output
+          text: OpenaiStudentRoster # Use structured output
         )
 
         # Track costs
@@ -158,7 +158,7 @@ class OpenaiServiceV2
             { role: "system", content: "You are an expert at inferring demographic and professional attributes from names and job information. Provide confidence scores for your inferences." },
             { role: "user", content: prompt }
           ],
-          text: OpenAIStudentAnalysis # Use structured output
+          text: OpenaiStudentAnalysis # Use structured output
         )
 
         # Track costs

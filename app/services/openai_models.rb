@@ -1,5 +1,5 @@
 # OpenAI BaseModel classes for structured data extraction
-class OpenAIStudent < OpenAI::BaseModel
+class OpenaiStudent < OpenAI::BaseModel
   required :name, String
   required :title, String, nil?: true
   required :organization, String, nil?: true
@@ -16,22 +16,22 @@ class OpenAIStudent < OpenAI::BaseModel
   required :seniority_level_confidence, Float
 end
 
-class OpenAIStudentRoster < OpenAI::BaseModel
-  required :students, OpenAI::ArrayOf[OpenAIStudent]
+class OpenaiStudentRoster < OpenAI::BaseModel
+  required :students, OpenAI::ArrayOf[OpenaiStudent]
   required :total_count, Integer, nil?: true
   required :cohort_name, String, nil?: true
 end
 
-class OpenAIStudentAttribute < OpenAI::BaseModel
+class OpenaiStudentAttribute < OpenAI::BaseModel
   required :confidence, Float # 0.0 to 1.0
   required :value, String
   required :reasoning, String, nil?: true
 end
 
-class OpenAIStudentAnalysis < OpenAI::BaseModel
+class OpenaiStudentAnalysis < OpenAI::BaseModel
   required :name, String
-  required :gender, OpenAIStudentAttribute, nil?: true
-  required :agency_level, OpenAIStudentAttribute, nil?: true
-  required :department_type, OpenAIStudentAttribute, nil?: true
-  required :seniority_level, OpenAIStudentAttribute, nil?: true
+  required :gender, OpenaiStudentAttribute, nil?: true
+  required :agency_level, OpenaiStudentAttribute, nil?: true
+  required :department_type, OpenaiStudentAttribute, nil?: true
+  required :seniority_level, OpenaiStudentAttribute, nil?: true
 end
