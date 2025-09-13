@@ -1,6 +1,3 @@
-# Load the OpenAI BaseModel classes
-require_relative 'openai_models'
-
 # Modernized OpenAI Service using the official OpenAI gem with structured outputs
 # Always uses GPT-5 as requested
 class OpenaiServiceV2
