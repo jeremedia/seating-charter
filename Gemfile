@@ -24,7 +24,7 @@ gem "devise"
 gem "dotenv-rails"
 
 # OpenAI integration - official gem
-gem "openai", "~> 0.22.0"
+gem "openai", "~> 0.24.0"
 
 # PDF processing and export
 gem "prawn"
