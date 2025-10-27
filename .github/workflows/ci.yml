@@ -30,7 +30,7 @@ jobs:
           bundle exec brakeman --no-pager
 
       - name: Upload security scan results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: security-scan
@@ -70,7 +70,7 @@ jobs:
           bundle exec rubocop -f github
           
       - name: Upload code quality results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: code-quality
@@ -118,21 +118,21 @@ jobs:
           bundle exec rspec --format RspecJunitFormatter --out tmp/rspec_results.xml --format progress
         
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: test-results
           path: tmp/rspec_results.xml
 
       - name: Upload coverage results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: coverage
           path: coverage/
 
       - name: Keep screenshots from failed system tests
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: screenshots
@@ -203,7 +203,7 @@ jobs:
           bundle exec ruby tmp/benchmark_runner.rb
           
       - name: Upload benchmark results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: benchmarks
           path: tmp/benchmarks/
